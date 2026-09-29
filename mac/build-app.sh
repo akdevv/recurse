@@ -8,12 +8,12 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$(swift build -c release --show-bin-path)/Recurse" "$APP/Contents/MacOS/"
 
-# icon: reuse the web app's Liquid Glass render
+# icon: the Liquid Glass render of the Recurse icon
 ICON=build/AppIcon.iconset
 mkdir -p "$ICON"
 for s in 16 32 128 256 512; do
-  sips -z $s $s ../web/public/icon-512.png --out "$ICON/icon_${s}x${s}.png" >/dev/null
-  sips -z $((s * 2)) $((s * 2)) ../web/public/icon-512.png --out "$ICON/icon_${s}x${s}@2x.png" >/dev/null
+  sips -z $s $s AppIcon.png --out "$ICON/icon_${s}x${s}.png" >/dev/null
+  sips -z $((s * 2)) $((s * 2)) AppIcon.png --out "$ICON/icon_${s}x${s}@2x.png" >/dev/null
 done
 iconutil -c icns "$ICON" -o "$APP/Contents/Resources/AppIcon.icns"
 

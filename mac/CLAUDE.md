@@ -5,15 +5,16 @@ Native SwiftUI port of the web app (SwiftPM, macOS 15+, no dependencies). Run co
 ## Run
 
 - `swift build && swift run`: debug build (opens in Xcode too: `open Package.swift`)
-- `./build-app.sh [--open]`: release `build/Recurse.app` (icon from `web/public/icon-512.png`, ad-hoc signed)
+- `./build-app.sh [--open]`: release `build/Recurse.app` (icon from `AppIcon.png`, ad-hoc signed)
 - `swift test`: engine checks (mirror `web/server/engine/selfcheck.ts`), problem.md parser over every problem, judge + solve/boss/chest/reward/settings/stats flows, reminder timing (same PRNG as the web) on a temp DB (boss AI grading isn't covered), every viz step renders
 - Throwaway DB: `DB_PATH=/tmp/x.db swift run`. Screenshots without Screen Recording permission: `open -n -W --env DB_PATH=… --env RECURSE_SNAPSHOT=<dir> --env RECURSE_ROUTES="today,review,course,rewards:<path|trophies|chests>,problems,stats,patterns,boss:<module>,topic:<id>,problem:<id>" build/Recurse.app` writes one PNG per route, then quits
 - `VIZ_OUT=<dir> swift test --filter everyVizRenders`: PNG of every viz trace's middle step
 
 ## Data
 
-- Own DB at `~/Library/Application Support/Recurse/recurse.db`. First launch seeds it from `data/learn.db` (read-only `VACUUM INTO`); after that the two apps don't sync
-- Schema is read from `web/server/schema.sql` at launch, so both DBs stay interchangeable. Never edit the schema in only one place
+- The one real DB: `~/Library/Application Support/Recurse/recurse.db` (it was seeded once from the web app's `data/learn.db`; the Mac app is the only app in use now). Covered by Time Machine; never test on it
+- Schema is embedded in `DB.swift` (`DB.schema`), same tables and JSON shapes as the web's `schema.sql`, so an old `learn.db` still opens with `DB_PATH`
+- Independent of `web/`: it needs only `courses/`, `scripts/pyjudge.py`, `python3` and (for AI) the `claude` CLI
 - Repo root comes from `#filePath` (this checkout), `RECURSE_ROOT` overrides it. Content is read live from `courses/dsa`
 
 ## Layout (`Sources/Recurse`)
