@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { problemDir } from "../content.ts";
 import type { JudgeResult } from "../../shared/types.ts";
 
-const PYJUDGE = join(import.meta.dirname, "pyjudge.py");
+const PYJUDGE = join(import.meta.dirname, "..", "..", "..", "scripts", "pyjudge.py");
 
 /** Runs user code in a local python3 process. Per-test limits are enforced in Python; this is the hard backstop. */
 export function judge(

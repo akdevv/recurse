@@ -2,7 +2,8 @@ import { DatabaseSync } from "node:sqlite";
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const ROOT = join(import.meta.dirname, "..");
+/** Repo root (courses/, data/, scripts/ live here; the app itself is in web/). */
+export const ROOT = join(import.meta.dirname, "..", "..");
 mkdirSync(join(ROOT, "data"), { recursive: true });
 
 export const db = new DatabaseSync(

@@ -10,7 +10,7 @@
     <string>/opt/homebrew/opt/node@24/bin/node</string>
     <string>server/index.ts</string>
   </array>
-  <key>WorkingDirectory</key><string>/Users/ashish/Developer/me/projects/recurse</string>
+  <key>WorkingDirectory</key><string>/Users/ashish/Developer/me/projects/recurse/web</string>
   <key>EnvironmentVariables</key>
   <dict>
     <key>NODE_ENV</key><string>production</string>

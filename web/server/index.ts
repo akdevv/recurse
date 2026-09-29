@@ -692,7 +692,7 @@ app.use(
   }),
 );
 if (process.env.NODE_ENV === "production") {
-  const dist = relative(process.cwd(), join(ROOT, "dist"));
+  const dist = relative(process.cwd(), join(import.meta.dirname, "..", "dist"));
   app.use("/*", serveStatic({ root: dist }));
   app.get("*", serveStatic({ path: join(dist, "index.html") }));
 }

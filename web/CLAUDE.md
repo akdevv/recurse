@@ -1,4 +1,6 @@
-# Recurse (rcx): personal DSA learning tool (single user: akdevv)
+# Recurse web app (rcx): personal DSA learning tool (single user: akdevv)
+
+Lives in `web/`; run all npm commands from `web/`. Repo-root `courses/`, `scripts/` and `data/` are shared with the Mac app (`mac/`).
 
 The curriculum (16 modules, 51 topics, 235 problems) lives in `courses/dsa/`; it is the source of truth.
 
@@ -10,7 +12,7 @@ The curriculum (16 modules, 51 topics, 235 problems) lives in `courses/dsa/`; it
 - Only production servers send reminders (`REMINDERS=1` forces them on in dev), so dev + the agent never double-notify
 - `npm run check`: tsc + eslint + engine selfcheck + content validation
 - `npm run content`: rebuild viz traces + tests.json, then validate
-- Test against a throwaway DB: `DB_PATH=/tmp/x.db PORT=3998 node server/index.ts` (never test on `data/learn.db`, that's real progress)
+- Test against a throwaway DB: `DB_PATH=/tmp/x.db PORT=3998 node server/index.ts` (from `web/`) (never test on `data/learn.db`, that's real progress)
 
 ## Layout
 
@@ -24,13 +26,13 @@ The curriculum (16 modules, 51 topics, 235 problems) lives in `courses/dsa/`; it
   - `chests.ts`: mystery chests (earned by boss wins / clean first solves, never bought), rewards incl. streak freezes passed to `computeStreak` as bonus freezes
   - `boss.ts` (module boss fights), `rewards.ts` (real-world reward path unlocked by finishing modules, tiered trophies), `stats.ts` (stats + patterns), `settings.ts` (settings table, defaults)
   - `notify.ts`: web-push reminder loop (one setTimeout, timing in `engine/reminders.ts`); VAPID keys in `data/vapid.json`
-  - `judge/pyjudge.py`: Python judge core (used live and by scripts); `judge.ts` spawns it
+  - `judge/judge.ts` spawns `scripts/pyjudge.py` (Python judge core, shared with scripts and the Mac app)
   - `schema.sql`: SQLite via `node:sqlite`, DB at `data/learn.db` (gitignored)
 - `shared/types.ts`: content + API types
 - `public/`: `sw.js` (push + notification clicks; caches hashed `/assets` and shows `offline.html` when the server is down; never caches `/api` or `/content`), `manifest.webmanifest` (icons, maskable icons, shortcuts, screenshots), icon PNGs (Liquid Glass render of the Recurse icon), `avatar.svg`
-- `launchd/`: agent that runs the built app at login on :3000 so reminders fire with the browser closed (logs: `data/server.log`). Install: `npm run build`, copy the plist to `~/Library/LaunchAgents/`, `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.akdevv.rcx.plist`
-- `courses/dsa/`: all course content (format below)
-- `scripts/`: python content tooling (`import_lc.py`, `gen_tests.py`, `build_viz.py`, `validate.py`; shared CLI/paths in `common.py`). `gen_tests` runs problems in parallel with `PYTHONHASHSEED=0`, so tests.json is reproducible
+- `launchd/`: agent (WorkingDirectory `web/`) that runs the built app at login on :3000 so reminders fire with the browser closed (logs: `data/server.log`). Install: `npm run build`, copy the plist to `~/Library/LaunchAgents/`, `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.akdevv.rcx.plist`
+- `../courses/dsa/` (repo root): all course content (format below)
+- `../scripts/` (repo root): python content tooling (`import_lc.py`, `gen_tests.py`, `build_viz.py`, `validate.py`; shared CLI/paths in `common.py`). `gen_tests` runs problems in parallel with `PYTHONHASHSEED=0`, so tests.json is reproducible
 
 ## Content format (courses/dsa)
 
