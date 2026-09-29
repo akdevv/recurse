@@ -110,6 +110,7 @@ struct StatsView: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
+            .backdrop(Color(hex: 0x7aa2f7), height: 260)
         }
         .navigationTitle("Stats")
     }
@@ -151,7 +152,7 @@ struct StatsView: View {
                 ForEach(data) { b in
                     BarMark(x: .value(unit, Dates.parse(b.start), unit: range == "day" ? .day : .weekOfYear),
                             y: .value(metric == "xp" ? "XP" : "Minutes", value(b)))
-                        .foregroundStyle(goal.map { value(b) >= $0 ? Color.green : Color.accentColor } ?? Color.accentColor)
+                        .foregroundStyle(goal.map { value(b) >= $0 ? Color.success : Color.brand } ?? Color.brand)
                         .cornerRadius(3)
                 }
                 if let goal { RuleMark(y: .value("Goal", goal)).foregroundStyle(.secondary).lineStyle(StrokeStyle(lineWidth: 1, dash: [4])) }
@@ -175,7 +176,7 @@ struct StatsView: View {
                 ForEach(Array(s.grades.enumerated()), id: \.offset) { i, g in
                     LineMark(x: .value("Attempt", i + 1), y: .value("Score", g.score)).interpolationMethod(.monotone)
                     PointMark(x: .value("Attempt", i + 1), y: .value("Score", g.score))
-                        .foregroundStyle(g.score >= 4 ? Color.green : g.score >= 3 ? .orange : .red)
+                        .foregroundStyle(g.score >= 4 ? Color.success : g.score >= 3 ? .warning : .danger)
                 }
             }
             .chartYScale(domain: 0...5)
@@ -233,7 +234,7 @@ struct PatternsView: View {
                             ForEach(p.topics, id: \.topic.id) { t in
                                 Button { nav.go(.topic(t.topic.id)) } label: {
                                     HStack {
-                                        Image(systemName: t.topic.status.complete ? "checkmark.circle.fill" : "book").foregroundStyle(t.topic.status.complete ? .green : .secondary)
+                                        Image(systemName: t.topic.status.complete ? "checkmark.circle.fill" : "book").foregroundStyle(t.topic.status.complete ? .success : .secondary)
                                         Text(t.topic.topic.title)
                                         Text("Module \(t.module.number)").font(.caption).foregroundStyle(.secondary)
                                     }
@@ -258,7 +259,7 @@ struct PatternsView: View {
                         if !p.problems.isEmpty {
                             Text("\(p.solved)/\(p.problems.count)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                             ProgressView(value: Double(p.solved), total: Double(p.problems.count)).frame(width: 70)
-                                .tint(p.solved == p.problems.count ? .green : .accentColor)
+                                .tint(p.solved == p.problems.count ? .success : .brand)
                         }
                     }
                     .padding(.vertical, 4)

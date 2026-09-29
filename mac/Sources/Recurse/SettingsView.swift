@@ -52,7 +52,7 @@ struct SettingsView: View {
                     Text(reminders.nextAt.map { "Next: \($0.formatted(date: .omitted, time: .shortened))" } ?? (s.reminders ? "Nothing more today" : "Off"))
                         .font(.caption).foregroundStyle(.secondary)
                 }
-                if !permission.isEmpty { Text(permission).font(.caption).foregroundStyle(.red) }
+                if !permission.isEmpty { Text(permission).font(.caption).foregroundStyle(.danger) }
             }
         }
         .formStyle(.grouped)

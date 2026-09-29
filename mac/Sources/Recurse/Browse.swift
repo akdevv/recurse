@@ -105,7 +105,6 @@ struct ProblemsView: View {
 struct CommandPalette: View {
     @Environment(Store.self) private var store
     @Environment(Nav.self) private var nav
-    @Environment(\.dismiss) private var dismiss
     @State private var query = ""
     @State private var sel = 0
     @FocusState private var focused: Bool
@@ -149,8 +148,8 @@ struct CommandPalette: View {
                     .textFieldStyle(.plain).font(.title3).focused($focused)
                     .onSubmit { go(shown[safe: sel]) }
             }
-            .padding(14)
-            Divider()
+            .padding(.horizontal, 18).padding(.vertical, 15)
+            if !shown.isEmpty { Divider().opacity(0.5) }
             ScrollViewReader { proxy in
                 List(Array(shown.enumerated()), id: \.element.id) { i, item in
                     HStack(spacing: 10) {
@@ -161,26 +160,31 @@ struct CommandPalette: View {
                     }
                     .padding(.vertical, 3)
                     .contentShape(.rect)
-                    .listRowBackground(i == sel ? Color.accentColor.opacity(0.2) : .clear)
+                    .listRowBackground(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(i == sel ? Color.brand.opacity(0.22) : .clear).padding(.horizontal, 6))
                     .onTapGesture { go(item) }
                     .id(i)
                 }
                 .listStyle(.plain)
                 .onChange(of: sel) { proxy.scrollTo(sel) }
             }
-            .frame(height: 320)
+            .scrollContentBackground(.hidden)
+            .frame(height: shown.isEmpty ? 0 : min(340, CGFloat(shown.count) * 34 + 10))
         }
-        .frame(width: 560)
+        .frame(width: 580)
+        .glassEffect(.regular, in: .rect(cornerRadius: 24, style: .continuous))
+        .shadow(color: .black.opacity(0.25), radius: 30, y: 12)
         .onAppear { focused = true }
         .onChange(of: query) { sel = 0 }
         .onKeyPress(.downArrow) { sel = min(sel + 1, max(0, shown.count - 1)); return .handled }
         .onKeyPress(.upArrow) { sel = max(sel - 1, 0); return .handled }
-        .onExitCommand { dismiss() }
+        .onExitCommand { close() }
     }
+
+    private func close() { withAnimation(.bouncy(duration: 0.3)) { nav.searching = false } }
 
     private func go(_ item: Item?) {
         guard let item else { return }
-        dismiss()
+        close()
         nav.go(item.route)
     }
 }

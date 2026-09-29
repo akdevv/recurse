@@ -57,12 +57,12 @@ struct ProblemView: View {
             if let boss {
                 if a?.finished == true {
                     Button { nav.go(.boss(boss.moduleId)) } label: { Label("Finish the boss fight", systemImage: "figure.fencing") }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                 } else {
                     BossCountdown(deadline: boss.deadline)
                 }
             } else if let a, a.finished {
-                Label(a.outcome?.label ?? "Solved", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
+                Label(a.outcome?.label ?? "Solved", systemImage: "checkmark.circle.fill").foregroundStyle(.success).labelStyle(.titleAndIcon)
                 Button {
                     store.startProblem(pid, fresh: true)
                     code = p.starter
@@ -71,6 +71,9 @@ struct ProblemView: View {
             } else if let a {
                 AttemptClock(pid: pid, base: a.activeSeconds)
             }
+        }
+        ToolbarSpacer(.fixed, placement: .primaryAction)
+        ToolbarItemGroup(placement: .primaryAction) {
             Button { judge("run") } label: {
                 if busy == "run" { ProgressView().controlSize(.small) } else { Label("Run", systemImage: "play.fill") }
             }
@@ -78,11 +81,11 @@ struct ProblemView: View {
             .help("Run against the examples (⌘↵)")
             .disabled(busy != nil)
             Button { judge("submit") } label: {
-                if busy == "submit" { ProgressView().controlSize(.small) } else { Label("Submit", systemImage: "paperplane.fill") }
+                if busy == "submit" { ProgressView().controlSize(.small) } else { Label("Submit", systemImage: "paperplane.fill").labelStyle(.titleAndIcon) }
             }
             .keyboardShortcut(.return, modifiers: [.command, .shift])
             .help("Submit against all tests (⌘⇧↵)")
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.glassProminent)
             .disabled(busy != nil)
         }
     }
@@ -141,16 +144,15 @@ private struct DescriptionPane: View {
         let boss = a.map { store.inBoss($0.id) } ?? false
         let solutions = store.showSolutions(p.id, a)
         VStack(spacing: 0) {
-            // compact tab row: five segments don't fit a narrow pane
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 2) {
-                    tabButton("statement", "Description", "doc.text")
-                    tabButton("hints", "Hints \(revealed)/\(p.hints.count)", "lightbulb")
-                    tabButton("tutor", "Tutor", (a?.hintsUsed ?? 0) >= 1 && !boss ? "bubble.left" : "lock")
-                    tabButton("solutions", "Solutions", solutions ? "flask" : "lock")
-                    tabButton("submissions", "Submissions", "clock.arrow.circlepath")
-                }
-                .padding(.horizontal, 8).padding(.vertical, 6)
+                GlassTabs(selection: $tab, tabs: [
+                    .init(id: "statement", title: "Description", icon: "doc.text"),
+                    .init(id: "hints", title: "Hints \(revealed)/\(p.hints.count)", icon: "lightbulb"),
+                    .init(id: "tutor", title: "Tutor", icon: (a?.hintsUsed ?? 0) >= 1 && !boss ? "bubble.left" : "lock"),
+                    .init(id: "solutions", title: "Solutions", icon: solutions ? "flask" : "lock"),
+                    .init(id: "submissions", title: "Submissions", icon: "clock.arrow.circlepath"),
+                ])
+                .padding(.horizontal, 10).padding(.vertical, 8)
             }
             Divider()
 
@@ -169,19 +171,6 @@ private struct DescriptionPane: View {
             }
         }
         .background(.background)
-    }
-
-    private func tabButton(_ id: String, _ title: String, _ icon: String) -> some View {
-        Button { tab = id } label: {
-            Label(title, systemImage: icon)
-                .font(.callout.weight(tab == id ? .semibold : .regular))
-                .foregroundStyle(tab == id ? .primary : .secondary)
-                .padding(.horizontal, 9).padding(.vertical, 5)
-                .background(tab == id ? Color.primary.opacity(0.09) : .clear, in: .rect(cornerRadius: 6))
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .fixedSize()
     }
 
     private var statement: some View {
@@ -219,7 +208,7 @@ private struct HintsTab: View {
             }
             ForEach(0..<shown, id: \.self) { i in
                 VStack(alignment: .leading, spacing: 6) {
-                    Label("Hint \(i + 1)", systemImage: "lightbulb.fill").font(.caption.weight(.medium)).foregroundStyle(.orange)
+                    Label("Hint \(i + 1)", systemImage: "lightbulb.fill").font(.caption.weight(.medium)).foregroundStyle(.warning)
                     Text(MD.inline(p.hints[i]))
                 }
                 .card(padding: 12)
@@ -235,7 +224,7 @@ private struct HintsTab: View {
                         Button("Reveal hint \(shown + 1)") {
                             activity.flush() // unlocks are decided from recorded time
                             store.revealHint(p.id)
-                        }
+                        }.buttonStyle(.glass)
                     }
                 }
                 .padding(12)
@@ -264,8 +253,8 @@ private struct SolutionsTab: View {
                             Text("\(i + 1).").foregroundStyle(.secondary)
                             Text(s.title).font(.headline)
                             if s.reference {
-                                Text("Optimal").font(.caption.weight(.medium)).foregroundStyle(.green)
-                                    .padding(.horizontal, 7).padding(.vertical, 2).background(Color.green.opacity(0.12), in: .capsule)
+                                Text("Optimal").font(.caption.weight(.medium)).foregroundStyle(.success)
+                                    .padding(.horizontal, 7).padding(.vertical, 2).background(Color.success.opacity(0.12), in: .capsule)
                             }
                             Spacer()
                             Text("\(s.time) time · \(s.space) space").font(.caption.monospaced()).foregroundStyle(.secondary)
@@ -289,7 +278,7 @@ private struct SolutionsTab: View {
                         Button("Show solutions (XP drops to 20%)") {
                             activity.flush()
                             store.revealSolution(p.id)
-                        }
+                        }.buttonStyle(.glass)
                         .padding(.top, 6)
                     } else {
                         Text("Available in \(fmtClock(u.solutionAt - active))").font(.caption.monospacedDigit())
@@ -315,8 +304,8 @@ private struct SubmissionsTab: View {
                 ForEach(subs) { s in
                     let ok = s.verdict == "Accepted" || s.verdict == "Ran"
                     HStack(spacing: 10) {
-                        Image(systemName: ok ? "checkmark.circle.fill" : "xmark.circle.fill").foregroundStyle(ok ? .green : .red)
-                        Text(s.verdict).fontWeight(.medium).foregroundStyle(ok ? .green : .red)
+                        Image(systemName: ok ? "checkmark.circle.fill" : "xmark.circle.fill").foregroundStyle(ok ? .success : .danger)
+                        Text(s.verdict).fontWeight(.medium).foregroundStyle(ok ? .success : .danger)
                         Text(s.kind.capitalized).font(.caption).foregroundStyle(.secondary)
                             .padding(.horizontal, 6).padding(.vertical, 1).background(.quaternary, in: .rect(cornerRadius: 4))
                         Text("\(s.passed)/\(s.total) tests").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
@@ -366,7 +355,7 @@ private struct TutorTab: View {
                     TextArea(text: $draft, placeholder: "Where are you stuck? Describe your idea, not just “help”.", minHeight: 70)
                         .focused(focused)
                     HStack {
-                        Text(err.isEmpty ? "⌘↵ to send · sees your current code" : err).font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : .red)
+                        Text(err.isEmpty ? "⌘↵ to send · sees your current code" : err).font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : .danger)
                         Spacer()
                         Button { send() } label: { Label("Ask", systemImage: "paperplane") }
                             .keyboardShortcut(focused.wrappedValue ? KeyboardShortcut(.return, modifiers: .command) : nil)
@@ -382,11 +371,11 @@ private struct TutorTab: View {
     private func bubble(_ role: String, _ text: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
             if role == "user" { Spacer(minLength: 40) } else {
-                Image(systemName: "graduationcap.fill").foregroundStyle(Color.accentColor).frame(width: 26, height: 26)
+                Image(systemName: "graduationcap.fill").foregroundStyle(Color.brand).frame(width: 26, height: 26)
                     .background(.quaternary, in: .circle)
             }
             Text(text).textSelection(.enabled).padding(10)
-                .background(role == "user" ? Color.accentColor.opacity(0.12) : Color.primary.opacity(0.06), in: .rect(cornerRadius: 12))
+                .background(role == "user" ? Color.brand.opacity(0.12) : Color.primary.opacity(0.06), in: .rect(cornerRadius: 12))
             if role != "user" { Spacer(minLength: 24) }
         }
     }
@@ -420,11 +409,10 @@ private struct ConsolePane: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Picker("", selection: $tab) {
-                    Text("Result").tag("result")
-                    Text(custom.isEmpty ? "Custom input" : "Custom input •").tag("input")
-                }
-                .pickerStyle(.segmented).labelsHidden().fixedSize()
+                GlassTabs(selection: $tab, tabs: [
+                    .init(id: "result", title: "Result", icon: "terminal"),
+                    .init(id: "input", title: custom.isEmpty ? "Custom input" : "Custom input •", icon: "character.cursor.ibeam"),
+                ])
                 Spacer()
                 if busy != nil { ProgressView().controlSize(.small) }
             }
@@ -478,14 +466,14 @@ private struct Results: View {
         let r = res.results[safe: min(sel, res.results.count - 1)]
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(res.verdict).font(.title3.weight(.semibold)).foregroundStyle(ok || res.verdict == "Ran" ? .green : .red)
+                Text(res.verdict).font(.title3.weight(.semibold)).foregroundStyle(ok || res.verdict == "Ran" ? .success : .danger)
                 Text("\(res.passed) / \(res.total) tests passed" + (kind == "submit" && res.slowestMs != nil ? " · slowest \(Int(res.slowestMs!)) ms" : ""))
                     .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
             if let outcome {
                 Label("\(outcome.label). Now explain your solution below.", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green).padding(10).frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.green.opacity(0.1), in: .rect(cornerRadius: 8))
+                    .foregroundStyle(.success).padding(10).frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.success.opacity(0.1), in: .rect(cornerRadius: 8))
             }
             if let e = res.error { ErrorBox(text: e) }
             if let r {
@@ -495,7 +483,7 @@ private struct Results: View {
                             let c = res.results[i]
                             Button { sel = i } label: {
                                 HStack(spacing: 5) {
-                                    Circle().fill(Self.pass.contains(c.verdict) ? Color.green : .red).frame(width: 6, height: 6)
+                                    Circle().fill(Self.pass.contains(c.verdict) ? Color.success : .danger).frame(width: 6, height: 6)
                                     Text(c.kind == "custom" ? "Custom" : "Case \(i + 1)")
                                 }
                                 .font(.caption.weight(.medium))
@@ -508,17 +496,17 @@ private struct Results: View {
                     }
                 }
                 if !Self.pass.contains(r.verdict) {
-                    Text("\(r.verdict) · \(r.kind) test · \(Int(r.ms)) ms").font(.caption.weight(.medium)).foregroundStyle(.red)
+                    Text("\(r.verdict) · \(r.kind) test · \(Int(r.ms)) ms").font(.caption.weight(.medium)).foregroundStyle(.danger)
                 }
                 Field(label: "Input") {
                     VStack(alignment: .leading, spacing: 2) {
                         ForEach(r.input.indices, id: \.self) { i in
-                            (Text(r.input.count == params.count ? "\(params[i]) = " : "").foregroundStyle(.secondary) + Text(r.input[i]))
+                            Text("\(Text(r.input.count == params.count ? "\(params[i]) = " : "").foregroundStyle(.secondary))\(Text(r.input[i]))")
                         }
                     }
                 }
-                if let got = r.got { Field(label: "Output") { Text(got).foregroundStyle(Self.pass.contains(r.verdict) ? .primary : Color.red) } }
-                if let exp = r.expected { Field(label: "Expected") { Text(exp).foregroundStyle(.green) } }
+                if let got = r.got { Field(label: "Output") { Text(got).foregroundStyle(Self.pass.contains(r.verdict) ? .primary : Color.danger) } }
+                if let exp = r.expected { Field(label: "Expected") { Text(exp).foregroundStyle(.success) } }
                 if !r.stdout.isEmpty { Field(label: "Stdout") { Text(r.stdout) } }
                 if let e = r.error { ErrorBox(text: e) }
             }
@@ -543,10 +531,10 @@ private struct Field<C: View>: View {
 private struct ErrorBox: View {
     let text: String
     var body: some View {
-        Text(text).font(.system(size: 11.5, design: .monospaced)).foregroundStyle(.red).textSelection(.enabled)
+        Text(text).font(.system(size: 11.5, design: .monospaced)).foregroundStyle(.danger).textSelection(.enabled)
             .padding(10).frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.red.opacity(0.08), in: .rect(cornerRadius: 6))
-            .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.red.opacity(0.2)))
+            .background(Color.danger.opacity(0.08), in: .rect(cornerRadius: 6))
+            .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(Color.danger.opacity(0.2)))
     }
 }
 
@@ -572,7 +560,7 @@ private struct ProblemExplain: View {
                 Button(saved.isEmpty ? "Save" : "Update") {
                     store.saveProblemExplain(p.id, text: text)
                     saved = text
-                }
+                }.buttonStyle(.glass)
                 .disabled(remaining > 0 || !changed)
             }
             if !saved.isEmpty {

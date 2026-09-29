@@ -21,7 +21,7 @@ struct VizView: View {
                 if let vars = step["vars"]?.object, !vars.isEmpty {
                     HStack(spacing: 6) {
                         ForEach(vars.keys.sorted(), id: \.self) { k in
-                            (Text("\(k) = ").foregroundStyle(.secondary) + Text(vars[k]!.json))
+                            Text("\(Text("\(k) = ").foregroundStyle(.secondary))\(Text(vars[k]!.json))")
                                 .font(.system(size: 11, design: .monospaced))
                                 .padding(.horizontal, 8).padding(.vertical, 4)
                                 .background(.background, in: .rect(cornerRadius: 6))
@@ -30,30 +30,26 @@ struct VizView: View {
                     }
                 }
             }
-            .padding(16)
-            .frame(maxWidth: .infinity, minHeight: 180)
-            .background(.background.secondary)
+            .padding(.horizontal, 16).padding(.top, 16).padding(.bottom, 64) // room for the floating controls
+            .frame(maxWidth: .infinity, minHeight: 200)
+            .background(DotGrid())
+            .overlay(alignment: .bottom) { controls.padding(12) }
 
-            Divider()
-            HStack(spacing: 12) {
-                Text(step["caption"]?.string ?? "").font(.callout).frame(maxWidth: .infinity, alignment: .leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                ControlGroup {
-                    Button { go(i - 1) } label: { Image(systemName: "chevron.left") }.disabled(i == 0)
-                    Text("\(i + 1)/\(n)").font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(minWidth: 36)
-                    Button { go(i + 1) } label: { Image(systemName: "chevron.right") }.disabled(atEnd)
-                }
-                .fixedSize()
-                Button { toggle() } label: {
-                    Image(systemName: playing ? "pause.fill" : atEnd ? "arrow.counterclockwise" : "play.fill").frame(width: 14)
-                }
-                .buttonStyle(.borderedProminent)
-                .help(playing ? "Pause" : atEnd ? "Replay" : "Play")
+            // step progress: a thin track under the stage
+            GeometryReader { g in
+                Capsule().fill(Color.brand).frame(width: g.size.width * Double(i + 1) / Double(max(1, n)))
             }
-            .padding(.horizontal, 14).padding(.vertical, 10)
+            .frame(height: 2)
+            .background(.quaternary)
+
+            Text(step["caption"]?.string ?? "").font(.callout).lineSpacing(3)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 16).padding(.vertical, 12)
         }
-        .clipShape(.rect(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.separator))
+        .background(.surface)
+        .clipShape(.rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
         .animation(.easeOut(duration: 0.25), value: i)
         .task(id: playing) {
             guard playing else { return }
@@ -63,6 +59,29 @@ struct VizView: View {
                 try? await Task.sleep(for: .milliseconds(1100))
                 if !NSApp.isActive { playing = false; break }
                 if atEnd { playing = false } else { i += 1 }
+            }
+        }
+    }
+
+    /// Floating glass cluster: step back / counter / step forward, and play.
+    private var controls: some View {
+        GlassEffectContainer(spacing: 8) {
+            HStack(spacing: 8) {
+                HStack(spacing: 2) {
+                    Button { go(i - 1) } label: { Image(systemName: "chevron.left").frame(width: 22, height: 22) }.disabled(i == 0)
+                    Text("\(i + 1) / \(n)").font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(minWidth: 44)
+                    Button { go(i + 1) } label: { Image(systemName: "chevron.right").frame(width: 22, height: 22) }.disabled(atEnd)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 8).padding(.vertical, 5)
+                .glassEffect(.regular.interactive(), in: .capsule)
+                Button { toggle() } label: {
+                    Image(systemName: playing ? "pause.fill" : atEnd ? "arrow.counterclockwise" : "play.fill")
+                        .contentTransition(.symbolEffect(.replace)).frame(width: 18, height: 22)
+                }
+                .buttonStyle(.glassProminent)
+                .buttonBorderShape(.circle)
+                .help(playing ? "Pause" : atEnd ? "Replay" : "Play")
             }
         }
     }
@@ -107,6 +126,19 @@ struct VizStage: View {
 }
 
 
+/// Faint dot grid behind the stage, like graph paper.
+private struct DotGrid: View {
+    var body: some View {
+        Canvas { ctx, size in
+            for x in stride(from: 8.0, to: size.width, by: 16) {
+                for y in stride(from: 8.0, to: size.height, by: 16) {
+                    ctx.fill(Path(ellipseIn: CGRect(x: x, y: y, width: 1.2, height: 1.2)), with: .color(.primary.opacity(0.12)))
+                }
+            }
+        }
+    }
+}
+
 // MARK: pieces
 
 private let mono = Font.system(size: 13, design: .monospaced)
@@ -119,9 +151,9 @@ private struct Cell: View {
     var body: some View {
         Text(text).font(mono)
             .frame(minWidth: 40, minHeight: 40).padding(.horizontal, text.count > 3 ? 6 : 0)
-            .background(on ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.06), in: .rect(cornerRadius: round ? 20 : 8))
-            .overlay(RoundedRectangle(cornerRadius: round ? 20 : 8).strokeBorder(on ? Color.accentColor : Color.primary.opacity(0.15)))
-            .foregroundStyle(on ? Color.accentColor : .primary)
+            .background(on ? Color.brand.opacity(0.18) : Color.primary.opacity(0.06), in: .rect(cornerRadius: round ? 20 : 8))
+            .overlay(RoundedRectangle(cornerRadius: round ? 20 : 8).strokeBorder(on ? Color.brand : Color.primary.opacity(0.15)))
+            .foregroundStyle(on ? Color.brand : .primary)
             .opacity(dim ? 0.25 : 1)
             .strikethrough(dim && !round)
     }
@@ -132,7 +164,7 @@ private func pointerTags(_ s: JSON, at k: Int) -> some View {
     return VStack(spacing: 0) {
         ForEach(names, id: \.self) { Text("↑ \($0)") }
     }
-    .font(.system(size: 11, weight: .medium, design: .monospaced)).foregroundStyle(.orange).frame(minHeight: 14)
+    .font(.system(size: 11, weight: .medium, design: .monospaced)).foregroundStyle(.warning).frame(minHeight: 14)
 }
 
 private func intSet(_ j: JSON?) -> Set<Int> { Set(j?.array.compactMap(\.int) ?? []) }
@@ -167,9 +199,9 @@ private struct StackViz: View {
                 let top = k == frames.count - 1
                 Text(frames[k]).font(.system(size: 12, design: .monospaced))
                     .frame(maxWidth: .infinity).padding(.vertical, 5)
-                    .background(top ? Color.orange.opacity(0.12) : Color.primary.opacity(0.06), in: .rect(cornerRadius: 6))
-                    .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(top ? Color.orange.opacity(0.5) : Color.primary.opacity(0.15)))
-                    .foregroundStyle(top ? Color.orange : .primary)
+                    .background(top ? Color.warning.opacity(0.12) : Color.primary.opacity(0.06), in: .rect(cornerRadius: 6))
+                    .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(top ? Color.warning.opacity(0.5) : Color.primary.opacity(0.15)))
+                    .foregroundStyle(top ? Color.warning : .primary)
             }
             Divider()
             Text(label.uppercased()).font(.system(size: 10)).tracking(1).foregroundStyle(.secondary)
@@ -197,12 +229,12 @@ private struct GridViz: View {
                         let filled = v == "█"
                         Text(filled ? "" : v).font(.system(size: compact ? 10 : 13, design: .monospaced))
                             .frame(width: size, height: size)
-                            .background(filled ? (on ? Color.accentColor.opacity(0.7) : Color.primary.opacity(0.3))
-                                               : on ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.06),
+                            .background(filled ? (on ? Color.brand.opacity(0.7) : Color.primary.opacity(0.3))
+                                               : on ? Color.brand.opacity(0.18) : Color.primary.opacity(0.06),
                                         in: .rect(cornerRadius: compact ? 4 : 8))
                             .overlay(RoundedRectangle(cornerRadius: compact ? 4 : 8)
-                                .strokeBorder(here ? Color.orange : on ? Color.accentColor : Color.primary.opacity(0.15), lineWidth: here ? 2 : 1))
-                            .foregroundStyle(on ? Color.accentColor : .primary)
+                                .strokeBorder(here ? Color.warning : on ? Color.brand : Color.primary.opacity(0.15), lineWidth: here ? 2 : 1))
+                            .foregroundStyle(on ? Color.brand : .primary)
                             .opacity(dim.contains(k) ? 0.25 : 1)
                     }
                 }
@@ -213,7 +245,7 @@ private struct GridViz: View {
                         Text("\(n) = (\(ptrs[n]![0]?.text ?? ""), \(ptrs[n]![1]?.text ?? ""))")
                     }
                 }
-                .font(.system(size: 11, weight: .medium, design: .monospaced)).foregroundStyle(.orange).padding(.top, 4)
+                .font(.system(size: 11, weight: .medium, design: .monospaced)).foregroundStyle(.warning).padding(.top, 4)
             }
         }
     }
@@ -249,7 +281,7 @@ private struct ListViz: View {
                     }
                 }
                 ForEach(far, id: \.0) { i, t in
-                    Text("\(vals[i].text) ↩ \(vals[t].text) (index \(t))").font(.system(size: 11, design: .monospaced)).foregroundStyle(.orange)
+                    Text("\(vals[i].text) ↩ \(vals[t].text) (index \(t))").font(.system(size: 11, design: .monospaced)).foregroundStyle(.warning)
                 }
             }
         }
@@ -303,7 +335,7 @@ private struct TreeViz: View {
             ForEach(visible.indices, id: \.self) { k in
                 let n = visible[k], nid = id(n)
                 let isActive = active == nid, done = s["highlight"] != nil ? marked.contains(nid) : values[nid] != nil
-                let tint: Color = isActive ? .orange : done ? .accentColor : .primary
+                let tint: Color = isActive ? .warning : done ? .brand : .primary
                 VStack(spacing: 3) {
                     Text(label(n)).font(.system(size: 11, design: .monospaced))
                         .frame(width: boxW(n), height: 26)
@@ -312,7 +344,7 @@ private struct TreeViz: View {
                         .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(isActive || done ? tint.opacity(0.7) : Color.primary.opacity(0.2)))
                         .foregroundStyle(tint)
                     if let v = values[nid], !inline(n["label"]?.text ?? "") {
-                        Text(v.text).font(.system(size: 10, design: .monospaced)).foregroundStyle(.orange)
+                        Text(v.text).font(.system(size: 10, design: .monospaced)).foregroundStyle(.warning)
                     }
                 }
                 .position(x: pt(nid).x, y: pt(nid).y + (values[nid] != nil && !inline(n["label"]?.text ?? "") ? 8 : 0))
@@ -353,7 +385,7 @@ private struct GraphViz: View {
                     let p1 = CGPoint(x: a.x + dx / len * R, y: a.y + dy / len * R)
                     let p2 = CGPoint(x: b.x - dx / len * tip, y: b.y - dy / len * tip)
                     let on = ehi.contains(ek(from, to))
-                    let color: Color = on ? .accentColor : .primary.opacity(0.25)
+                    let color: Color = on ? .brand : .primary.opacity(0.25)
                     var line = Path()
                     line.move(to: p1)
                     line.addLine(to: p2)
@@ -368,7 +400,7 @@ private struct GraphViz: View {
                         ctx.fill(head, with: .color(color))
                     }
                     if let w = e["w"] {
-                        ctx.draw(Text(w.text).font(.system(size: 10, design: .monospaced)).foregroundStyle(on ? Color.accentColor : .secondary),
+                        ctx.draw(Text(w.text).font(.system(size: 10, design: .monospaced)).foregroundStyle(on ? Color.brand : .secondary),
                                  at: CGPoint(x: (a.x + b.x) / 2 + dy / len * 10, y: (a.y + b.y) / 2 - dx / len * 10))
                     }
                 }
@@ -376,7 +408,7 @@ private struct GraphViz: View {
             ForEach(nodes.indices, id: \.self) { k in
                 let n = nodes[k], nid = n["id"]?.text ?? "", p = at[nid] ?? .zero
                 let isActive = active == nid, on = hi.contains(nid)
-                let tint: Color = isActive ? .orange : on ? .accentColor : .primary
+                let tint: Color = isActive ? .warning : on ? .brand : .primary
                 Text(n["label"]?.text ?? nid).font(.system(size: 12, design: .monospaced))
                     .frame(width: R * 2, height: R * 2)
                     .background(Circle().fill(isActive || on ? tint.opacity(0.16) : .clear))
@@ -385,7 +417,7 @@ private struct GraphViz: View {
                     .foregroundStyle(tint)
                     .overlay(alignment: .topTrailing) {
                         if let v = values[nid] {
-                            Text(v.text).font(.system(size: 10, design: .monospaced)).foregroundStyle(.orange).fixedSize().offset(x: 14, y: -8)
+                            Text(v.text).font(.system(size: 10, design: .monospaced)).foregroundStyle(.warning).fixedSize().offset(x: 14, y: -8)
                         }
                     }
                     .opacity(dim.contains(nid) ? 0.3 : 1)

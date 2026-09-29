@@ -74,7 +74,7 @@ private struct TopicPage: View {
                                         ForEach(steps) { s in
                                             Button { withAnimation { proxy.scrollTo(s.id, anchor: .top) } } label: {
                                                 VStack(alignment: .leading, spacing: 6) {
-                                                    Capsule().fill(s.done ? Color.green : s.started ? Color.accentColor : Color.primary.opacity(0.1)).frame(height: 4)
+                                                    Capsule().fill(s.done ? Color.success : s.started ? Color.brand : Color.primary.opacity(0.1)).frame(height: 4)
                                                     Label(s.label, systemImage: s.icon).font(.callout.weight(.medium))
                                                         .foregroundStyle(s.done || s.started ? .primary : .secondary)
                                                     Text(s.detail).font(.caption).foregroundStyle(.secondary).lineLimit(1)
@@ -87,11 +87,11 @@ private struct TopicPage: View {
                                 }
                                 }
                                 if let hook = t.hook {
-                                    (Text("Why this matters. ").fontWeight(.semibold).foregroundStyle(.orange) + Text(MD.inline(hook)))
+                                    Text("\(Text("Why this matters. ").fontWeight(.semibold).foregroundStyle(.warning))\(Text(MD.inline(hook)))")
                                         .font(.callout).lineSpacing(3)
                                         .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-                                        .background(Color.orange.opacity(0.07), in: .rect(cornerRadius: 10))
-                                        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.orange.opacity(0.2)))
+                                        .background(Color.warning.opacity(0.07), in: .rect(cornerRadius: 16, style: .continuous))
+                                        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.warning.opacity(0.2)))
                                 }
                             }
 
@@ -135,6 +135,7 @@ private struct TopicPage: View {
                         .padding(.horizontal, 36).padding(.vertical, 32)
                         .frame(maxWidth: 780)
                         .frame(maxWidth: .infinity)
+                        .backdrop(status.complete ? .success : .brand, height: 300)
                     }
                     if geo.size.width > 1100 { OnThisPage(headings: headings, hasQuiz: !quiz.isEmpty, hasProblems: !problems.isEmpty, proxy: proxy) }
                 }
@@ -157,7 +158,7 @@ private struct LessonDone: View {
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: done ? "checkmark.circle.fill" : "book.fill")
-                .font(.title2).foregroundStyle(done ? Color.green : Color.accentColor)
+                .font(.title2).foregroundStyle(done ? Color.success : Color.brand)
             VStack(alignment: .leading, spacing: 2) {
                 Text(done ? "Lesson complete" : "Finished the lesson?").fontWeight(.medium)
                 Text(done ? "Step 1 is done. Test what stuck with the quiz." : "Mark it as read to complete step 1.")
@@ -165,14 +166,14 @@ private struct LessonDone: View {
             }
             Spacer()
             if !done {
-                Button("Mark as read") { store.markLessonDone(t.id) }.buttonStyle(.borderedProminent)
+                Button("Mark as read") { store.markLessonDone(t.id) }.buttonStyle(.glassProminent)
             } else if hasQuiz {
-                Button("Go to quiz", action: toQuiz)
+                Button("Go to quiz", action: toQuiz).buttonStyle(.glass)
             }
         }
         .padding(16)
-        .background((done ? Color.green : Color.accentColor).opacity(0.07), in: .rect(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder((done ? Color.green : Color.accentColor).opacity(0.25)))
+        .background((done ? Color.success : Color.brand).opacity(0.07), in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder((done ? Color.success : Color.brand).opacity(0.25)))
     }
 }
 
@@ -218,14 +219,14 @@ private struct QuizView: View {
                         HStack(spacing: 10) {
                             Text(String(UnicodeScalar(65 + oi)!)).font(.caption.monospaced().weight(.medium))
                                 .frame(width: 20, height: 20)
-                                .background(on ? Color.accentColor : Color.primary.opacity(0.08), in: .rect(cornerRadius: 4))
+                                .background(on ? Color.brand : Color.primary.opacity(0.08), in: .rect(cornerRadius: 4))
                                 .foregroundStyle(on ? .white : .secondary)
                             Text(MD.inline(q.options[oi])).multilineTextAlignment(.leading)
                             Spacer()
                         }
                         .padding(10)
-                        .background(on ? Color.accentColor.opacity(0.1) : .clear, in: .rect(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(on ? Color.accentColor.opacity(0.6) : Color.primary.opacity(0.12)))
+                        .background(on ? Color.brand.opacity(0.1) : .clear, in: .rect(cornerRadius: 12, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(on ? Color.brand.opacity(0.6) : Color.primary.opacity(0.12)))
                         .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
@@ -240,13 +241,13 @@ private struct QuizView: View {
                 Spacer()
                 Text("Click the quiz, then 1–4 to answer, ← → to move").font(.caption2).foregroundStyle(.tertiary)
                 Button("Check answers") { result = store.submitQuiz(topicId, answers: answers) }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                     .disabled(answered < quiz.count)
             }
             .padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .background(.background.secondary, in: .rect(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.6)))
+        .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
         .focusable()
         .focusEffectDisabled()
         .onKeyPress { key in
@@ -266,9 +267,9 @@ private struct QuizView: View {
                     HStack {
                         Text("\(score) of \(quiz.count) correct").font(.title3.weight(.semibold))
                         Text(passed ? "Passed" : "Not passed").font(.caption.weight(.medium))
-                            .foregroundStyle(passed ? .green : .orange)
+                            .foregroundStyle(passed ? .success : .warning)
                             .padding(.horizontal, 8).padding(.vertical, 2)
-                            .background((passed ? Color.green : .orange).opacity(0.14), in: .capsule)
+                            .background((passed ? Color.success : .warning).opacity(0.14), in: .capsule)
                     }
                     Text(passed ? "Nice work. Move on to the problems."
                                 : "You need \(Int((Double(quiz.count) * Store.quizPass).rounded(.up))) to pass. Check what you missed, then retake.")
@@ -279,19 +280,19 @@ private struct QuizView: View {
                     answers = Array(repeating: nil, count: quiz.count)
                     idx = 0
                     result = nil
-                } label: { Label("Retake", systemImage: "arrow.counterclockwise") }
+                } label: { Label("Retake", systemImage: "arrow.counterclockwise") }.buttonStyle(.glass)
             }
             .padding(20)
             ForEach(quiz.indices, id: \.self) { i in
                 Divider()
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Image(systemName: correct[i] ? "checkmark" : "xmark").foregroundStyle(correct[i] ? .green : .red)
+                    Image(systemName: correct[i] ? "checkmark" : "xmark").foregroundStyle(correct[i] ? .success : .danger)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(MD.inline(quiz[i].q))
                         if !correct[i] {
                             HStack(spacing: 6) {
                                 if let a = answers[i] { Text(MD.inline(quiz[i].options[a])).strikethrough().foregroundStyle(.secondary); Text("→") }
-                                Text(MD.inline(quiz[i].options[quiz[i].answer])).foregroundStyle(.green).fontWeight(.medium)
+                                Text(MD.inline(quiz[i].options[quiz[i].answer])).foregroundStyle(.success).fontWeight(.medium)
                             }
                             .font(.callout)
                             Text(MD.inline(quiz[i].why)).font(.callout).foregroundStyle(.secondary)
@@ -301,8 +302,8 @@ private struct QuizView: View {
                 .padding(.horizontal, 20).padding(.vertical, 12)
             }
         }
-        .background(.background.secondary, in: .rect(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.6)))
+        .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
     }
 }
 
@@ -332,7 +333,7 @@ private struct TopicExplain: View {
                     .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                 Spacer()
                 Button(saved.isEmpty ? "Submit" : "Update") { store.submitTopicExplain(t.id, text: text) }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                     .disabled(remaining > 0 || (!saved.isEmpty && !changed))
             }
             if !saved.isEmpty {
@@ -384,11 +385,11 @@ private struct WrappedCard: View {
             : w.hintFree >= 0.6 ? "\(pct(w.hintFree)) of it without hints." : "You pushed through the hard parts."
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 14) {
-                Image(systemName: "rosette").font(.title2).foregroundStyle(.green)
-                    .frame(width: 44, height: 44).background(Color.green.opacity(0.14), in: .rect(cornerRadius: 11))
+                Image(systemName: "rosette").font(.title2).foregroundStyle(.success)
+                    .frame(width: 44, height: 44).background(Color.success.opacity(0.14), in: .rect(cornerRadius: 11))
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Topic mastered" + (w.masteredAt.flatMap(Dates.fromIso).map { " · \($0.formatted(date: .abbreviated, time: .omitted))" } ?? ""))
-                        .font(.caption.weight(.medium)).foregroundStyle(.green)
+                        .font(.caption.weight(.medium)).foregroundStyle(.success)
                     Text("\(title), wrapped").font(.title3.weight(.semibold))
                     Text(line).font(.callout).foregroundStyle(.secondary)
                 }
@@ -403,8 +404,8 @@ private struct WrappedCard: View {
                 stat("Best explanation", w.bestExplain < 0 ? "–" : "\(w.bestExplain)/5")
             }
         }
-        .background(LinearGradient(colors: [Color.green.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), in: .rect(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.green.opacity(0.25)))
+        .background(LinearGradient(colors: [Color.success.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), in: .rect(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.success.opacity(0.25)))
     }
 
     private func stat(_ label: String, _ value: String) -> some View {

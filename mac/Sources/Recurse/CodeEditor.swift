@@ -33,7 +33,7 @@ struct CodeEditor: NSViewRepresentable {
         let para = NSMutableParagraphStyle()
         para.lineSpacing = 3
         tv.defaultParagraphStyle = para
-        tv.typingAttributes = [.font: Self.font, .foregroundColor: NSColor.labelColor, .paragraphStyle: para]
+        tv.typingAttributes = [.font: Self.font, .foregroundColor: CodeColors.text, .paragraphStyle: para]
         tv.string = text
         context.coordinator.highlight(tv)
         let ruler = LineNumbers(textView: tv)
@@ -69,7 +69,7 @@ struct CodeEditor: NSViewRepresentable {
             let s = tv.string
             storage.beginEditing()
             let all = NSRange(location: 0, length: storage.length)
-            storage.addAttribute(.foregroundColor, value: NSColor.labelColor, range: all)
+            storage.addAttribute(.foregroundColor, value: CodeColors.text, range: all)
             storage.addAttribute(.font, value: CodeEditor.font, range: all)
             for (r, k) in Python.spans(s) {
                 storage.addAttribute(.foregroundColor, value: Python.color(k), range: NSRange(r, in: s))

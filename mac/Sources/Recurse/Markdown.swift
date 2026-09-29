@@ -161,11 +161,11 @@ struct MarkdownView: View {
             }
             .font(.callout)
             .padding(12)
-            .background(.background.secondary, in: .rect(cornerRadius: 8))
+            .background(.canvas.opacity(0.6), in: .rect(cornerRadius: 12, style: .continuous))
         case .code(let lang, let s):
             CodeBlock(code: s, python: lang == "python")
         case .viz(let name):
-            if let t = viz[name] { VizView(trace: t) } else { Text("Missing visualization: \(name)").foregroundStyle(.red) }
+            if let t = viz[name] { VizView(trace: t) } else { Text("Missing visualization: \(name)").foregroundStyle(.danger) }
         case .image(let url):
             AsyncImage(url: url) { img in img.resizable().scaledToFit().frame(maxWidth: 420, maxHeight: 260) } placeholder: {
                 ProgressView().frame(height: 60)
@@ -188,8 +188,8 @@ struct CodeBlock: View {
                 .padding(12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.background.secondary, in: .rect(cornerRadius: 8))
-        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.separator))
+        .background(.canvas.opacity(0.6), in: .rect(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(.hairline))
     }
 }
 
@@ -233,17 +233,18 @@ enum Python {
 
     static func color(_ k: Kind) -> NSColor {
         switch k {
-        case .keyword: .systemPink
-        case .builtin: .systemTeal
-        case .string: .systemOrange
-        case .comment: .secondaryLabelColor
-        case .number: .systemPurple
-        case .definition: .systemBlue
+        case .keyword: CodeColors.keyword
+        case .builtin: CodeColors.builtin
+        case .string: CodeColors.string
+        case .comment: CodeColors.comment
+        case .number: CodeColors.number
+        case .definition: CodeColors.definition
         }
     }
 
     static func highlighted(_ code: String) -> AttributedString {
         var a = AttributedString(code)
+        a.foregroundColor = Color(nsColor: CodeColors.text)
         for (r, k) in spans(code) {
             guard let lo = AttributedString.Index(r.lowerBound, within: a), let hi = AttributedString.Index(r.upperBound, within: a) else { continue }
             a[lo..<hi].foregroundColor = Color(nsColor: color(k))

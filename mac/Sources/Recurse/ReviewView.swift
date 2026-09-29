@@ -18,11 +18,11 @@ struct ReviewView: View {
                             Text("Recall each one before you look. Forgetting costs no XP.").foregroundStyle(.secondary)
                         }
                         Spacer()
-                        (Text("\(done + 1)").font(.title2.weight(.semibold)) + Text(" / \(total)").foregroundStyle(.secondary)).monospacedDigit()
+                        Text("\(Text("\(done + 1)").font(.title2.weight(.semibold)))\(Text(" / \(total)").foregroundStyle(.secondary))").monospacedDigit()
                     }
                     HStack(spacing: 5) {
                         ForEach(0..<total, id: \.self) { i in
-                            Capsule().fill(i < done ? Color.green : i == done ? Color.accentColor : Color.primary.opacity(0.1)).frame(height: 5)
+                            Capsule().fill(i < done ? Color.success : i == done ? Color.brand : Color.primary.opacity(0.1)).frame(height: 5)
                         }
                     }
                     Card(it: it) { passed in
@@ -32,7 +32,7 @@ struct ReviewView: View {
                     .id(it.id)
                 } else {
                     VStack(spacing: 10) {
-                        Image(systemName: done > 0 ? "party.popper.fill" : "checkmark.circle.fill").font(.largeTitle).foregroundStyle(.green)
+                        Image(systemName: done > 0 ? "party.popper.fill" : "checkmark.circle.fill").font(.largeTitle).foregroundStyle(.success)
                         Text(done > 0 ? "Session done: \(done) review\(done == 1 ? "" : "s")" : "All caught up").font(.title2.weight(.semibold))
                         Text("Solved problems and finished topics come back here after 1, 3, 7, 21 and 60 days. Recalling them right before you'd forget is what makes them stick.")
                             .multilineTextAlignment(.center).foregroundStyle(.secondary).frame(maxWidth: 440)
@@ -61,6 +61,7 @@ struct ReviewView: View {
             .padding(28)
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
+            .backdrop(.success)
         }
         .navigationTitle("Review")
     }
@@ -84,8 +85,8 @@ private struct Card: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 10) {
                 Image(systemName: it.type == "problem" ? "chevron.left.forwardslash.chevron.right" : "book")
-                    .foregroundStyle(Color.accentColor).frame(width: 32, height: 32)
-                    .background(Color.accentColor.opacity(0.1), in: .rect(cornerRadius: 8))
+                    .foregroundStyle(Color.brand).frame(width: 32, height: 32)
+                    .background(Color.brand.opacity(0.1), in: .rect(cornerRadius: 8))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(it.title).font(.headline)
                     Text("\(it.type == "problem" ? "Problem" : "Topic") · last seen \(days(it.interval)) ago").font(.caption).foregroundStyle(.secondary)
@@ -102,7 +103,7 @@ private struct Card: View {
                 HStack {
                     Spacer()
                     Button { revealed = true } label: { Label("Show answer", systemImage: "eye") }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                         .keyboardShortcut(.return, modifiers: .command)
                         .help("⌘↵")
                 }
@@ -128,11 +129,11 @@ private struct Card: View {
                             .buttonStyle(.borderless)
                     }
                     Spacer()
-                    Button { grade(false) } label: { gradeLabel("Forgot", "again in \(days(it.failNext))") }
+                    Button { grade(false) } label: { gradeLabel("Forgot", "again in \(days(it.failNext))") }.buttonStyle(.glass)
                         .keyboardShortcut("1", modifiers: .command)
                         .help("⌘1")
                     Button { grade(true) } label: { gradeLabel("Got it", "next in \(days(it.passNext))") }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                         .keyboardShortcut("2", modifiers: .command)
                         .help("⌘2")
                 }

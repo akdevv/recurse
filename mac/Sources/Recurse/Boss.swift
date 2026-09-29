@@ -120,7 +120,7 @@ struct BossCountdown: View {
             Label(left == 0 ? "Time's up" : fmtClock(left), systemImage: "figure.fencing")
                 .labelStyle(.titleAndIcon)
                 .font(.callout.weight(.medium).monospacedDigit())
-                .foregroundStyle(left < 300 ? .red : .orange)
+                .foregroundStyle(left < 300 ? .danger : .warning)
                 .help("Boss fight: time left")
         }
     }
@@ -155,9 +155,9 @@ struct BossView: View {
                         }
                         Spacer()
                         BossCountdown(deadline: active.deadline)
-                        Button("Give up") { store.abandonBoss(active.id) }
+                        Button("Give up") { store.abandonBoss(active.id) }.buttonStyle(.glass)
                         Button { nav.go(.problem(active.problemId)) } label: { Label("Back to the problem", systemImage: "arrow.right") }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(.glassProminent)
                     }
                     .card(padding: 18)
                 } else {
@@ -171,7 +171,7 @@ struct BossView: View {
                         ForEach(Array(past.enumerated()), id: \.element.id) { i, r in
                             HStack(spacing: 10) {
                                 Image(systemName: r.passed == true ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                    .foregroundStyle(r.passed == true ? .green : .red)
+                                    .foregroundStyle(r.passed == true ? .success : .danger)
                                 Text(r.problemTitle)
                                 Spacer()
                                 Text((r.solvedIn.map(fmtClock) ?? "unsolved") + (r.score.map { " · \($0)/5" } ?? ""))
@@ -188,6 +188,7 @@ struct BossView: View {
             .padding(28)
             .frame(maxWidth: 680)
             .frame(maxWidth: .infinity)
+            .backdrop(beaten ? .success : .warning, height: 420)
         }
         .navigationTitle("Boss fight")
         .navigationSubtitle(m.title)
@@ -196,11 +197,11 @@ struct BossView: View {
     private func intro(_ m: Module, beaten: Bool, topicsLeft: Int, available: Bool) -> some View {
         VStack(spacing: 0) {
             VStack(spacing: 10) {
-                Image(systemName: "figure.fencing").font(.system(size: 44)).foregroundStyle(beaten ? .green : .orange)
+                Image(systemName: "figure.fencing").font(.system(size: 44)).foregroundStyle(beaten ? .success : .warning)
                     .frame(width: 96, height: 96)
-                    .background(RadialGradient(colors: [(beaten ? Color.green : .orange).opacity(0.22), .clear], center: .center, startRadius: 0, endRadius: 60))
+                    .background(RadialGradient(colors: [(beaten ? Color.success : .warning).opacity(0.22), .clear], center: .center, startRadius: 0, endRadius: 60))
                 Text("Module \(m.number) · Boss fight" + (beaten ? " · beaten" : "")).font(.caption.weight(.semibold))
-                    .textCase(.uppercase).tracking(1).foregroundStyle(.orange)
+                    .textCase(.uppercase).tracking(1).foregroundStyle(.warning)
                 Text(m.title).font(.largeTitle.weight(.semibold))
                 Text("A mock interview to close the module. One problem, a clock, and an interviewer waiting at the end.")
                     .foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 420)
@@ -220,24 +221,24 @@ struct BossView: View {
             if topicsLeft > 0 || !err.isEmpty {
                 Divider()
                 Text(err.isEmpty ? "\(topicsLeft) \(topicsLeft == 1 ? "topic" : "topics") left in this module. You can still try, but it's meant for the end." : err)
-                    .font(.caption).foregroundStyle(err.isEmpty ? Color.orange : .red)
+                    .font(.caption).foregroundStyle(err.isEmpty ? Color.warning : .danger)
                     .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 20).padding(.vertical, 10)
             }
             Divider()
             HStack {
                 if beaten { Text("Beaten before. Replays are for practice.").font(.caption).foregroundStyle(.secondary) }
-                else { (Text("+\(Store.bossXP) XP").foregroundStyle(.orange).fontWeight(.medium) + Text(" on your first win").foregroundStyle(.secondary)).font(.caption) }
+                else { Text("\(Text("+\(Store.bossXP) XP").foregroundStyle(.warning).fontWeight(.medium))\(Text(" on your first win").foregroundStyle(.secondary))").font(.caption) }
                 Spacer()
                 Button {
                     if let pid = store.startBoss(moduleId) { nav.go(.problem(pid)) } else { err = "This module has no problems yet." }
                 } label: { Label(available ? "Start the fight" : "No problems yet", systemImage: "figure.fencing") }
-                    .buttonStyle(.borderedProminent).controlSize(.large)
+                    .buttonStyle(.glassProminent).controlSize(.large)
                     .disabled(!available)
             }
             .padding(16)
         }
-        .background(.background.secondary, in: .rect(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.6)))
+        .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
     }
 
     private func fact(_ value: String, _ label: String, _ hint: String) -> some View {
@@ -270,7 +271,7 @@ private struct ExplainStep: View {
             TextArea(text: $text, placeholder: "Talk it through like you would in the room.", minHeight: 170)
             HStack {
                 Text(err.isEmpty ? (busy ? "The interviewer is thinking…" : "Graded honestly, 0–5.") : err)
-                    .font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : .red)
+                    .font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : .danger)
                 Spacer()
                 Button {
                     busy = true
@@ -282,7 +283,7 @@ private struct ExplainStep: View {
                 } label: {
                     if busy { ProgressView().controlSize(.small) } else { Text("Submit to interviewer") }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .disabled(busy || text.trimmingCharacters(in: .whitespacesAndNewlines).count < 40)
             }
         }
@@ -300,7 +301,7 @@ private struct ResultCard: View {
         VStack(spacing: 0) {
             VStack(spacing: 8) {
                 Image(systemName: passed ? "checkmark.circle.fill" : "xmark.circle.fill").font(.system(size: 44))
-                    .foregroundStyle(passed ? .green : .red)
+                    .foregroundStyle(passed ? .success : .danger)
                 Text(passed ? "Boss defeated" : "Not this time").font(.title2.weight(.semibold))
                 Text("Solved in \(fmtClock(r.run.solvedIn ?? 0))" + (r.inTime ? "" : " (over time)") + " · explanation \(r.grade.score)/5"
                      + (r.xp > 0 ? " · +\(r.xp) XP" : ""))
@@ -310,18 +311,18 @@ private struct ResultCard: View {
             Divider()
             VStack(alignment: .leading, spacing: 10) {
                 Text(r.grade.feedback)
-                if !r.grade.followUp.isEmpty { (Text("Follow-up: ").foregroundStyle(.secondary) + Text(r.grade.followUp)) }
+                if !r.grade.followUp.isEmpty { Text("\(Text("Follow-up: ").foregroundStyle(.secondary))\(Text(r.grade.followUp))") }
             }
             .frame(maxWidth: .infinity, alignment: .leading).padding(20)
             Divider()
             HStack {
                 Spacer()
-                Button(passed ? "Done" : "Try again", action: again)
-                Button("Review the solution") { nav.go(.problem(r.run.problemId)) }
+                Button(passed ? "Done" : "Try again", action: again).buttonStyle(.glass)
+                Button("Review the solution") { nav.go(.problem(r.run.problemId)) }.buttonStyle(.glass)
             }
             .padding(14)
         }
-        .background(.background.secondary, in: .rect(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.6)))
+        .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
     }
 }

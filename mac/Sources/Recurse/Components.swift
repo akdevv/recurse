@@ -3,9 +3,9 @@ import SwiftUI
 extension Difficulty {
     var color: Color {
         switch self {
-        case .easy: .green
-        case .medium: .orange
-        case .hard: .red
+        case .easy: .success
+        case .medium: .warning
+        case .hard: .danger
         }
     }
     var short: String { self == .medium ? "Med" : rawValue }
@@ -28,22 +28,25 @@ struct StatusIcon: View {
     var body: some View {
         let done = Store.isSolved(status), started = status == "in-progress"
         Image(systemName: done ? "checkmark.circle.fill" : started ? "circle.dashed" : "circle")
-            .foregroundStyle(done ? Color.green : started ? Color.accentColor : Color.secondary.opacity(0.5))
+            .foregroundStyle(done ? Color.success : started ? Color.brand : Color.secondary.opacity(0.5))
     }
 }
 
 struct Ring: View {
     let pct: Double
     var size: CGFloat = 64
+    var lineWidth: CGFloat = 5
     var label = true
     var body: some View {
+        let done = pct >= 1
         ZStack {
-            Circle().stroke(.quaternary, lineWidth: 5)
+            Circle().stroke(.quaternary, lineWidth: lineWidth)
             Circle().trim(from: 0, to: min(1, pct))
-                .stroke(pct >= 1 ? Color.green : Color.accentColor, style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                .stroke(AngularGradient(colors: done ? [.success.opacity(0.75), .success, .success.opacity(0.75)] : [.brand.opacity(0.55), .brand, Color(hex: 0x7ad6c9), .brand.opacity(0.55)], center: .center),
+                        style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
-            if !label {} else if pct >= 1 { Image(systemName: "checkmark").font(.title3.bold()).foregroundStyle(.green) }
-            else { Text("\(Int(pct * 100))%").font(.callout.weight(.semibold).monospacedDigit()) }
+            if !label {} else if done { Image(systemName: "checkmark").font(.system(size: size * 0.28, weight: .bold)).foregroundStyle(.success) }
+            else { Text("\(Int(pct * 100))%").font(.system(size: size * 0.22, weight: .semibold, design: .rounded).monospacedDigit()) }
         }
         .frame(width: size, height: size)
         .animation(.easeOut, value: pct)
@@ -51,12 +54,67 @@ struct Ring: View {
 }
 
 extension View {
-    /// Grouped content surface.
+    /// Content surface. Content stays solid and calm; glass is kept for the controls floating above it.
     func card(padding: CGFloat = 16) -> some View {
         self.padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.background.secondary, in: .rect(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator.opacity(0.6)))
+            .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
+    }
+
+    /// Soft tinted glow behind a page header; extends under the glass sidebar.
+    func backdrop(_ tint: Color, height: CGFloat = 320) -> some View {
+        background(alignment: .top) {
+            Backdrop(tint: tint).frame(height: height).ignoresSafeArea().backgroundExtensionEffect()
+        }
+    }
+}
+
+private struct Backdrop: View {
+    let tint: Color
+    var body: some View {
+        MeshGradient(width: 3, height: 2, points: [[0, 0], [0.5, 0], [1, 0], [0, 1], [0.6, 1], [1, 1]], colors: [
+            tint.opacity(0.22), tint.opacity(0.1), Color(hex: 0x7aa2f7).opacity(0.1),
+            .clear, .clear, .clear,
+        ])
+        .mask(LinearGradient(colors: [.black, .black.opacity(0)], startPoint: .top, endPoint: .bottom))
+        .allowsHitTesting(false)
+    }
+}
+
+/// A row of tabs on glass; the selected pill morphs from tab to tab.
+struct GlassTabs: View {
+    struct Tab: Identifiable {
+        let id, title: String
+        var icon: String?
+    }
+    @Binding var selection: String
+    let tabs: [Tab]
+    @Namespace private var ns
+
+    var body: some View {
+        GlassEffectContainer(spacing: 4) {
+            HStack(spacing: 2) {
+                ForEach(tabs) { t in
+                    let on = selection == t.id
+                    Button { withAnimation(.bouncy(duration: 0.35)) { selection = t.id } } label: {
+                        Group {
+                            if let icon = t.icon { Label(t.title, systemImage: icon) } else { Text(t.title) }
+                        }
+                        .font(.callout.weight(on ? .semibold : .regular))
+                        .foregroundStyle(on ? .primary : .secondary)
+                        .padding(.horizontal, 11).padding(.vertical, 6)
+                        .contentShape(.capsule)
+                    }
+                    .buttonStyle(.plain)
+                    .fixedSize()
+                    .background {
+                        if on { Capsule().fill(.clear).glassEffect(.regular.interactive(), in: .capsule).glassEffectID("pill", in: ns) }
+                    }
+                }
+            }
+            .padding(3)
+        }
     }
 }
 
@@ -69,8 +127,8 @@ struct SectionHeader: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 10) {
                 ZStack {
-                    Circle().fill(done ? Color.green.opacity(0.15) : Color.primary.opacity(0.06))
-                    if done { Image(systemName: "checkmark").font(.caption.bold()).foregroundStyle(.green) }
+                    Circle().fill(done ? Color.success.opacity(0.15) : Color.primary.opacity(0.06))
+                    if done { Image(systemName: "checkmark").font(.caption.bold()).foregroundStyle(.success) }
                     else { Text("\(n)").font(.caption.weight(.semibold).monospacedDigit()).foregroundStyle(.secondary) }
                 }
                 .frame(width: 24, height: 24)
@@ -117,7 +175,7 @@ struct ExplainFeedback: View {
                             manual = next
                         } label: {
                             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                Image(systemName: on ? "checkmark.circle.fill" : "circle").foregroundStyle(on ? Color.green : .secondary)
+                                Image(systemName: on ? "checkmark.circle.fill" : "circle").foregroundStyle(on ? Color.success : .secondary)
                                 Text(keyPoints[i]).foregroundStyle(on ? .primary : .secondary).multilineTextAlignment(.leading)
                             }
                             .contentShape(.rect)
@@ -129,7 +187,7 @@ struct ExplainFeedback: View {
 
             HStack {
                 Text(err.isEmpty ? (busy ? "The interviewer is reading your answer…" : "Get an honest score, what you missed and a follow-up question.") : err)
-                    .font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : Color.red)
+                    .font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : Color.danger)
                 Spacer()
                 Button {
                     Task {
@@ -144,6 +202,7 @@ struct ExplainFeedback: View {
                 } label: {
                     if busy { ProgressView().controlSize(.small) } else { Label(grade == nil ? "Grade with AI" : "Grade again", systemImage: "sparkles") }
                 }
+                .buttonStyle(.glass)
                 .disabled(busy || answer.trimmingCharacters(in: .whitespacesAndNewlines).count < 20)
             }
         }
@@ -153,8 +212,8 @@ struct ExplainFeedback: View {
 private struct GradeCard: View {
     let g: Grade
     var body: some View {
-        let (label, tone): (String, Color) = g.score >= 5 ? ("Interview-ready", .green) : g.score >= 4 ? ("Strong", .green)
-            : g.score >= 3 ? ("Getting there", .orange) : ("Needs work", .red)
+        let (label, tone): (String, Color) = g.score >= 5 ? ("Interview-ready", .success) : g.score >= 4 ? ("Strong", .success)
+            : g.score >= 3 ? ("Getting there", .warning) : ("Needs work", .danger)
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Text("\(g.score)/5").font(.caption.weight(.bold).monospacedDigit()).foregroundStyle(tone)
@@ -166,7 +225,7 @@ private struct GradeCard: View {
             Text(g.feedback).font(.callout)
             if !g.followUp.isEmpty {
                 Divider()
-                (Text("Follow-up: ").foregroundStyle(.secondary) + Text(g.followUp)).font(.callout)
+                Text("\(Text("Follow-up: ").foregroundStyle(.secondary))\(Text(g.followUp))").font(.callout)
             }
         }
         .card(padding: 12)

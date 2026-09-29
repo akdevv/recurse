@@ -53,9 +53,9 @@ enum ChestReward: Codable, Equatable {
     }
     var tint: Color {
         switch self {
-        case .xp: .accentColor
-        case .freeze: .green
-        case .collectible: .orange
+        case .xp: .brand
+        case .freeze: .success
+        case .collectible: .warning
         }
     }
 }
@@ -154,7 +154,7 @@ struct ChestSheet: View {
         VStack(spacing: 18) {
             if let r = reward {
                 Image(systemName: r.icon).font(.system(size: 36)).foregroundStyle(r.tint)
-                    .frame(width: 80, height: 80).background(r.tint.opacity(0.14), in: .rect(cornerRadius: 18))
+                    .frame(width: 88, height: 88).glassEffect(.regular.tint(r.tint.opacity(0.25)), in: .rect(cornerRadius: 24, style: .continuous))
                     .transition(.scale.combined(with: .opacity))
                 VStack(spacing: 4) {
                     if case .collectible = r { Text("Rare collectible").font(.caption).foregroundStyle(.secondary) }
@@ -162,10 +162,10 @@ struct ChestSheet: View {
                     Text(r.title).font(.title2.weight(.semibold))
                     Text(r.subtitle).font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 }
-                Button("Nice") { dismiss() }.buttonStyle(.borderedProminent).controlSize(.large).keyboardShortcut(.defaultAction)
+                Button("Nice") { dismiss() }.buttonStyle(.glassProminent).controlSize(.large).keyboardShortcut(.defaultAction)
             } else {
-                Image(systemName: "shippingbox.fill").font(.system(size: 36)).foregroundStyle(.orange)
-                    .frame(width: 80, height: 80).background(Color.orange.opacity(0.12), in: .rect(cornerRadius: 18))
+                Image(systemName: "shippingbox.fill").font(.system(size: 36)).foregroundStyle(.warning)
+                    .frame(width: 88, height: 88).glassEffect(.regular.tint(Color.warning.opacity(0.2)), in: .rect(cornerRadius: 24, style: .continuous))
                     .rotationEffect(.degrees(shake ? 4 : -4))
                     .animation(.easeInOut(duration: 0.35).repeatForever(autoreverses: true), value: shake)
                     .onAppear { shake = true }
@@ -175,9 +175,9 @@ struct ChestSheet: View {
                         .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 }
                 HStack {
-                    Button("Later") { dismiss() }.keyboardShortcut(.cancelAction)
+                    Button("Later") { dismiss() }.keyboardShortcut(.cancelAction).buttonStyle(.glass)
                     Button("Open it") { withAnimation(.spring(duration: 0.4)) { reward = store.openChest(id) } }
-                        .buttonStyle(.borderedProminent).keyboardShortcut(.defaultAction)
+                        .buttonStyle(.glassProminent).keyboardShortcut(.defaultAction)
                 }
                 .controlSize(.large)
             }
@@ -208,14 +208,14 @@ struct ChestsView: View {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 12)], spacing: 12) {
                             ForEach(unopened) { c in
                                 HStack(spacing: 12) {
-                                    Image(systemName: "shippingbox.fill").foregroundStyle(.orange).font(.title3)
-                                        .frame(width: 40, height: 40).background(Color.orange.opacity(0.12), in: .rect(cornerRadius: 10))
+                                    Image(systemName: "shippingbox.fill").foregroundStyle(.warning).font(.title3)
+                                        .frame(width: 40, height: 40).background(Color.warning.opacity(0.12), in: .rect(cornerRadius: 10))
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(c.source == "boss" ? "Boss chest" : "Solve chest").fontWeight(.medium).fixedSize()
                                         Text("Earned \(short(c.ts))").font(.caption).foregroundStyle(.secondary).fixedSize()
                                     }
                                     Spacer()
-                                    Button("Open") { opening = c.id }.buttonStyle(.borderedProminent)
+                                    Button("Open") { opening = c.id }.buttonStyle(.glassProminent)
                                 }
                                 .card(padding: 12)
                             }
@@ -230,11 +230,11 @@ struct ChestsView: View {
                             let have = owned.contains(c.id)
                             VStack(spacing: 8) {
                                 Group {
-                                    if have { Image(systemName: c.icon).font(.title2).foregroundStyle(.orange) }
+                                    if have { Image(systemName: c.icon).font(.title2).foregroundStyle(.warning) }
                                     else { Text("?").font(.title2.weight(.semibold)).foregroundStyle(.quaternary) }
                                 }
                                 .frame(width: 48, height: 48)
-                                .background((have ? Color.orange : .primary).opacity(have ? 0.12 : 0.05), in: .rect(cornerRadius: 12))
+                                .background((have ? Color.warning : .primary).opacity(have ? 0.12 : 0.05), in: .rect(cornerRadius: 12))
                                 Text(have ? c.name : "Undiscovered").font(.callout.weight(.medium)).foregroundStyle(have ? .primary : .secondary)
                                 Text(have ? c.desc : "Keep opening chests").font(.caption).foregroundStyle(.secondary)
                                     .multilineTextAlignment(.center).lineLimit(2, reservesSpace: true)

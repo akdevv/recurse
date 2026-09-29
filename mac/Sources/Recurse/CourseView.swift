@@ -20,7 +20,7 @@ struct CourseView: View {
                     Summary(label: "Problems solved", value: solved, total: problems.count)
                     if let current {
                         VStack(alignment: .leading, spacing: 6) {
-                            Label("Continue", systemImage: "play.fill").font(.caption.weight(.medium)).foregroundStyle(Color.accentColor)
+                            Label("Continue", systemImage: "play.fill").font(.caption.weight(.medium)).foregroundStyle(Color.brand)
                             Text(current.module.title).font(.title3.weight(.semibold)).lineLimit(1)
                             Text(current.topics.first { !$0.status.complete }.map { "Next up: \($0.topic.title)" } ?? "All topics done")
                                 .font(.caption).foregroundStyle(.secondary).lineLimit(1)
@@ -35,6 +35,7 @@ struct CourseView: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
+            .backdrop(.brand, height: 260)
         }
         .navigationTitle("Course map")
     }
@@ -46,7 +47,7 @@ private struct Summary: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label).font(.caption.weight(.medium)).foregroundStyle(.secondary)
-            (Text("\(value)").font(.title.weight(.semibold)) + Text(" / \(total)").foregroundStyle(.secondary)).monospacedDigit()
+            Text("\(Text("\(value)").font(.title.weight(.semibold)))\(Text(" / \(total)").foregroundStyle(.secondary))").monospacedDigit()
             ProgressView(value: Double(value), total: Double(max(1, total)))
         }
         .card()
@@ -62,9 +63,9 @@ private struct ModuleCard: View {
             HStack(spacing: 12) {
                 Text(String(format: "%02d", m.module.number))
                     .font(.callout.monospacedDigit().weight(.semibold))
-                    .foregroundStyle(m.complete ? Color.green : m.unlocked ? Color.accentColor : .secondary)
+                    .foregroundStyle(m.complete ? Color.success : m.unlocked ? Color.brand : .secondary)
                     .frame(width: 36, height: 36)
-                    .background((m.complete ? Color.green : m.unlocked ? Color.accentColor : Color.primary).opacity(0.1), in: .rect(cornerRadius: 8))
+                    .background((m.complete ? Color.success : m.unlocked ? Color.brand : Color.primary).opacity(0.1), in: .rect(cornerRadius: 8))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(m.module.title).font(.headline)
                     Text(m.module.summary).font(.callout).foregroundStyle(.secondary).lineLimit(2)
@@ -79,7 +80,7 @@ private struct ModuleCard: View {
                     Button { nav.go(.topic(t.id)) } label: {
                         HStack {
                             Image(systemName: t.status.complete ? "checkmark.circle.fill" : "circle")
-                                .foregroundStyle(t.status.complete ? Color.green : .secondary)
+                                .foregroundStyle(t.status.complete ? Color.success : .secondary)
                             Text(t.topic.title).fontWeight(.medium)
                             if !t.topic.ready { Text("Soon").font(.caption2).foregroundStyle(.secondary) }
                             Spacer()
@@ -95,7 +96,7 @@ private struct ModuleCard: View {
             Divider()
             Button { nav.go(.boss(m.id)) } label: {
                 HStack {
-                    Image(systemName: "figure.fencing").foregroundStyle(m.complete ? Color.orange : .secondary)
+                    Image(systemName: "figure.fencing").foregroundStyle(m.complete ? Color.warning : .secondary)
                     VStack(alignment: .leading, spacing: 1) {
                         Text("Boss fight").fontWeight(.medium)
                         Text("Mock interview · \(m.module.boss.timeLimitMin) min · one problem, explained out loud")
@@ -104,7 +105,7 @@ private struct ModuleCard: View {
                     Spacer()
                     let left = m.topics.filter { !$0.status.complete }.count
                     Text(left == 0 ? "Ready" : "\(left) \(left == 1 ? "topic" : "topics") to go")
-                        .font(.caption).foregroundStyle(left == 0 ? Color.orange : .secondary)
+                        .font(.caption).foregroundStyle(left == 0 ? Color.warning : .secondary)
                     Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
                 }
                 .contentShape(.rect)

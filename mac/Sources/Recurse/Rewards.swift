@@ -56,7 +56,7 @@ struct Badge: Identifiable {
 
     static func metal(_ tier: Int, single: Bool) -> Color {
         if tier == 0 { return .secondary }
-        if single { return .green }
+        if single { return .success }
         return [Color(red: 0.79, green: 0.53, blue: 0.32), Color(red: 0.81, green: 0.84, blue: 0.86), Color(red: 0.95, green: 0.76, blue: 0.31)][tier - 1]
     }
     static let metalName = ["Locked", "Bronze", "Silver", "Gold"]
@@ -190,6 +190,7 @@ private struct PathTab: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
+            .backdrop(.warning)
         }
     }
 
@@ -222,12 +223,12 @@ private struct RewardArt: View {
     var body: some View {
         Image(systemName: icon)
             .font(.system(size: size * 0.5))
-            .foregroundStyle(status == .locked ? AnyShapeStyle(.tertiary) : AnyShapeStyle(Color.orange.gradient))
+            .foregroundStyle(status == .locked ? AnyShapeStyle(.tertiary) : AnyShapeStyle(Color.warning.gradient))
             .frame(width: size * 1.4, height: size * 1.4)
-            .background(RadialGradient(colors: [(status == .unlocked ? Color.orange : .primary).opacity(status == .unlocked ? 0.2 : 0.05), .clear],
+            .background(RadialGradient(colors: [(status == .unlocked ? Color.warning : .primary).opacity(status == .unlocked ? 0.2 : 0.05), .clear],
                                        center: .center, startRadius: 0, endRadius: size))
             .overlay(alignment: .topTrailing) {
-                if status == .availed { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
+                if status == .availed { Image(systemName: "checkmark.circle.fill").foregroundStyle(.success) }
                 else if status == .locked { Image(systemName: "lock.fill").font(.caption).foregroundStyle(.tertiary) }
             }
     }
@@ -246,19 +247,19 @@ private struct RewardCard: View {
             Spacer(minLength: 4)
             switch x.status {
             case .locked:
-                ProgressView(value: Double(x.done), total: Double(max(1, x.total))).tint(.orange)
+                ProgressView(value: Double(x.done), total: Double(max(1, x.total))).tint(.warning)
                 Text("\(x.done) of \(x.total) topics").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
             case .unlocked:
-                Button("Mark availed") { store.setAvailed(x.id, true) }.buttonStyle(.borderedProminent).controlSize(.small)
+                Button("Mark availed") { store.setAvailed(x.id, true) }.buttonStyle(.glassProminent).controlSize(.small)
             case .availed:
                 if hover { Button("Mark as pending") { store.setAvailed(x.id, false) }.buttonStyle(.link).font(.caption) }
-                else { Text("Availed \(short(x.availedAt ?? ""))").font(.caption).foregroundStyle(.green) }
+                else { Text("Availed \(short(x.availedAt ?? ""))").font(.caption).foregroundStyle(.success) }
             }
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 190)
-        .background(.background.secondary, in: .rect(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(x.status == .unlocked ? Color.orange.opacity(0.5) : Color(nsColor: .separatorColor).opacity(0.6)))
+        .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(x.status == .unlocked ? Color.warning.opacity(0.5) : Color(nsColor: .separatorColor).opacity(0.6)))
         .help(x.def.note)
         .onHover { hover = $0 }
     }
@@ -280,13 +281,13 @@ private struct NextReward: View {
                     Text(next?.def.title ?? "You finished the course").font(.title2.weight(.semibold))
                     if let next {
                         let left = next.total - next.done
-                        (Text("Finish \(next.requires.joined(separator: " + ")) · ") + Text("\(left) topic\(left == 1 ? "" : "s") to go").foregroundStyle(.primary))
+                        Text("\(Text("Finish \(next.requires.joined(separator: " + ")) · "))\(Text("\(left) topic\(left == 1 ? "" : "s") to go").foregroundStyle(.primary))")
                             .font(.callout).foregroundStyle(.secondary)
                     }
                 }
                 Spacer()
                 VStack(alignment: .trailing) {
-                    (Text("\(unlocked)").font(.title.weight(.semibold)) + Text("/\(path.count)").foregroundStyle(.secondary)).monospacedDigit()
+                    Text("\(Text("\(unlocked)").font(.title.weight(.semibold)))\(Text("/\(path.count)").foregroundStyle(.secondary))").monospacedDigit()
                     Text("unlocked").font(.caption).foregroundStyle(.secondary)
                 }
             }
@@ -294,19 +295,20 @@ private struct NextReward: View {
             if let w = waiting.first {
                 Divider()
                 HStack {
-                    Circle().fill(.orange).frame(width: 7, height: 7).shadow(color: .orange, radius: 4)
-                    (Text(w.def.title).fontWeight(.medium) + Text(" is unlocked" + (waiting.count > 1 ? " (+\(waiting.count - 1) more)" : "") + ". Enjoy it, then mark it as availed.")
-                        .foregroundStyle(.secondary)).font(.callout)
+                    Circle().fill(.warning).frame(width: 7, height: 7).shadow(color: .warning, radius: 4)
+                    let more = waiting.count > 1 ? " (+\(waiting.count - 1) more)" : ""
+                    Text("\(Text(w.def.title).fontWeight(.medium))\(Text(" is unlocked\(more). Enjoy it, then mark it as availed.").foregroundStyle(.secondary))")
+                        .font(.callout)
                     Spacer()
-                    Button("Mark as availed") { store.setAvailed(w.id, true) }.buttonStyle(.borderedProminent)
+                    Button("Mark as availed") { store.setAvailed(w.id, true) }.buttonStyle(.glassProminent)
                 }
                 .padding(.horizontal, 20).padding(.vertical, 12)
             } else if let next {
-                ProgressView(value: Double(next.done), total: Double(max(1, next.total))).tint(.orange).padding(.horizontal, 20).padding(.bottom, 14)
+                ProgressView(value: Double(next.done), total: Double(max(1, next.total))).tint(.warning).padding(.horizontal, 20).padding(.bottom, 14)
             }
         }
-        .background(.background.secondary, in: .rect(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(.separator.opacity(0.6)))
+        .background(.surface, in: .rect(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
     }
 }
 
@@ -334,13 +336,13 @@ private struct Finale: View {
                         Text("\(Int(pct * 100))%").font(.title.weight(.semibold).monospacedDigit())
                         Text(x.done == x.total ? "Now beat the DP boss" : "of the course done").font(.caption).foregroundStyle(.secondary)
                     }
-                case .unlocked: Button("Mark as availed") { store.setAvailed(x.id, true) }.buttonStyle(.borderedProminent)
-                case .availed: Text("Availed \(short(x.availedAt ?? ""))").foregroundStyle(.green)
+                case .unlocked: Button("Mark as availed") { store.setAvailed(x.id, true) }.buttonStyle(.glassProminent)
+                case .availed: Text("Availed \(short(x.availedAt ?? ""))").foregroundStyle(.success)
                 }
             }
             .padding(16)
-            .background(LinearGradient(colors: [Color.orange.opacity(0.08), .clear], startPoint: .leading, endPoint: .trailing), in: .rect(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.orange.opacity(0.3)))
+            .background(LinearGradient(colors: [Color.warning.opacity(0.08), .clear], startPoint: .leading, endPoint: .trailing), in: .rect(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.warning.opacity(0.3)))
         }
     }
 }
@@ -373,7 +375,7 @@ private struct TrophyCard: View {
                     Text(b.name).fontWeight(.semibold).foregroundStyle(earned ? .primary : .secondary).lineLimit(1)
                     Spacer()
                     if b.single {
-                        Text(earned ? "Earned" : "Locked").font(.caption).foregroundStyle(earned ? Color.accentColor : .secondary)
+                        Text(earned ? "Earned" : "Locked").font(.caption).foregroundStyle(earned ? Color.brand : .secondary)
                     } else {
                         HStack(spacing: 3) {
                             ForEach(1...3, id: \.self) { t in
@@ -385,13 +387,13 @@ private struct TrophyCard: View {
                     }
                 }
                 ProgressView(value: b.next.map { Double(min(b.value, $0)) / Double($0) } ?? 1)
-                    .tint(b.next == nil && !b.single ? .orange : .accentColor)
+                    .tint(b.next == nil && !b.single ? .warning : .brand)
                 HStack {
-                    (Text(b.next.map { "\(min(b.value, $0))/\($0)" } ?? "\(b.value)").foregroundStyle(.primary) + Text(" \(b.desc)"))
+                    Text("\(Text(b.next.map { "\(min(b.value, $0))/\($0)" } ?? "\(b.value)").foregroundStyle(.primary))\(Text(" \(b.desc)"))")
                         .lineLimit(1)
                     Spacer()
                     if !b.single {
-                        Text(b.next == nil ? "Complete" : "\(Badge.metalName[b.tier + 1]) next").foregroundStyle(b.next == nil ? Color.orange : .secondary)
+                        Text(b.next == nil ? "Complete" : "\(Badge.metalName[b.tier + 1]) next").foregroundStyle(b.next == nil ? Color.warning : .secondary)
                     }
                 }
                 .font(.caption.monospacedDigit()).foregroundStyle(.secondary)

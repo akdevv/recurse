@@ -8,7 +8,6 @@ struct RecurseApp: App {
     @State private var activity: Activity
     @State private var nav: Nav
     @State private var reminders: Reminders
-    @State private var palette = false
 
     init() {
         let db: DB
@@ -30,11 +29,13 @@ struct RecurseApp: App {
                 .environment(nav)
                 .environment(reminders)
                 .frame(minWidth: 980, minHeight: 640)
-                .sheet(isPresented: $palette) { CommandPalette().environment(store).environment(nav) }
+                .preferredColorScheme(.dark) // the palette is the web's, which is dark only
+                .tint(.brand)
+                .containerBackground(.canvas, for: .window)
         }
         .commands {
             CommandMenu("Go") {
-                Button("Search…") { palette = true }.keyboardShortcut("k")
+                Button("Search…") { withAnimation(.bouncy(duration: 0.3)) { nav.searching.toggle() } }.keyboardShortcut("k")
                 Divider()
                 Button("Today") { nav.go(.today) }.keyboardShortcut("t", modifiers: [.command, .shift])
                 Button("Review") { nav.go(.review) }.keyboardShortcut("r", modifiers: [.command, .shift])
@@ -49,7 +50,7 @@ struct RecurseApp: App {
         }
 
         SwiftUI.Settings {
-            SettingsView().environment(store).environment(reminders)
+            SettingsView().environment(store).environment(reminders).preferredColorScheme(.dark).tint(.brand)
         }
     }
 }
@@ -71,6 +72,8 @@ final class Nav {
         didSet { if selection != oldValue { path = [] } } // sidebar clicks pop back to the root
     }
     var path: [Route] = []
+    /// ⌘K palette open
+    var searching = false
 
     var current: Route? { path.last ?? selection }
 
@@ -109,6 +112,16 @@ struct RootView: View {
             if isProblem(r) != isProblem(old) { withAnimation { columns = isProblem(r) ? .detailOnly : .automatic } }
         }
         .overlay(alignment: .top) { Toast() }
+        .overlay(alignment: .top) {
+            if nav.searching {
+                ZStack(alignment: .top) {
+                    // click anywhere outside to close
+                    Color.black.opacity(0.12).ignoresSafeArea().onTapGesture { withAnimation { nav.searching = false } }
+                    CommandPalette().padding(.top, 90)
+                }
+                .transition(.opacity.combined(with: .scale(scale: 0.97, anchor: .top)))
+            }
+        }
         .task { await snapshots() }
         .sheet(item: Binding(get: { store.chestQueue.first.map(SheetID.init) }, set: { if $0 == nil, !store.chestQueue.isEmpty { store.chestQueue.removeFirst() } })) {
             ChestSheet(id: $0.id)
@@ -165,95 +178,6 @@ struct RootView: View {
     }
 }
 
-struct Sidebar: View {
-    @Environment(Store.self) private var store
-    @Environment(Nav.self) private var nav
-    @State private var expanded: Set<String> = []
-
-    var body: some View {
-        @Bindable var nav = nav
-        let modules = store.moduleViews()
-        let me = store.me()
-        List(selection: $nav.selection) {
-            Section {
-                Label("Today", systemImage: "sun.max").tag(Route.today)
-                Label("Review", systemImage: "arrow.counterclockwise")
-                    .badge(me.reviewsDue)
-                    .tag(Route.review)
-                Label("Course map", systemImage: "map").tag(Route.course)
-                Label("Problems", systemImage: "list.bullet").tag(Route.problems)
-                Label("Patterns", systemImage: "square.grid.3x3").tag(Route.patterns)
-                Label("Stats", systemImage: "chart.bar").tag(Route.stats)
-                Label("Rewards", systemImage: "gift")
-                    .badge(store.rewardsWaiting)
-                    .tag(Route.rewards)
-            }
-
-            Section("Modules") {
-                ForEach(modules) { m in
-                    DisclosureGroup(isExpanded: Binding(
-                        get: { expanded.contains(m.id) },
-                        set: { if $0 { expanded.insert(m.id) } else { expanded.remove(m.id) } }
-                    )) {
-                        ForEach(m.topics) { t in
-                            HStack(spacing: 6) {
-                                Image(systemName: t.status.complete ? "checkmark.circle.fill"
-                                      : t.status.lessonDone || t.status.solved > 0 ? "circle.dashed" : "circle")
-                                    .foregroundStyle(t.status.complete ? Color.green : .secondary)
-                                    .font(.caption)
-                                Text(t.topic.title).lineLimit(1)
-                            }
-                            .foregroundStyle(t.topic.ready ? .primary : .secondary)
-                            .tag(Route.topic(t.id))
-                        }
-                        Label("Boss fight", systemImage: "figure.fencing")
-                            .foregroundStyle(m.complete ? Color.orange : .secondary)
-                            .tag(Route.boss(m.id))
-                    } label: {
-                        HStack(spacing: 8) {
-                            Text(String(format: "%02d", m.module.number))
-                                .font(.caption.monospacedDigit().weight(.semibold))
-                                .foregroundStyle(m.complete ? Color.green : m.unlocked ? Color.accentColor : .secondary)
-                            Text(m.module.title).lineLimit(1)
-                            Spacer()
-                            if !m.unlocked { Image(systemName: "lock.fill").font(.caption2).foregroundStyle(.tertiary) }
-                        }
-                    }
-                }
-            }
-        }
-        .listStyle(.sidebar)
-        .safeAreaInset(edge: .bottom) { SidebarFooter(me: me) }
-        .onAppear {
-            // open the module you're working in
-            if expanded.isEmpty, let cur = modules.first(where: { $0.unlocked && !$0.complete }) { expanded = [cur.id] }
-        }
-        .onChange(of: nav.selection) { _, r in
-            if case .topic(let tid) = r, let m = modules.first(where: { $0.module.topics.contains(tid) }) { expanded.insert(m.id) }
-            if case .boss(let mid) = r { expanded.insert(mid) }
-        }
-    }
-}
-
-private struct SidebarFooter: View {
-    @Environment(Activity.self) private var activity
-    let me: Me
-
-    var body: some View {
-        let secs = me.streak.todaySeconds + activity.pending
-        let goal = Streak.dailyGoal
-        HStack(spacing: 10) {
-            Ring(pct: Double(secs) / Double(goal), size: 26, label: false)
-            VStack(alignment: .leading, spacing: 1) {
-                Text("\(secs / 60) / \(goal / 60) min today").font(.caption.weight(.medium).monospacedDigit())
-                Text("Level \(me.level.level) · \(me.streak.weekStreak)w streak").font(.caption2).foregroundStyle(.secondary)
-            }
-            Spacer()
-        }
-        .padding(12)
-    }
-}
-
 private struct Toast: View {
     @Environment(Store.self) private var store
     var body: some View {
@@ -262,7 +186,7 @@ private struct Toast: View {
                 Label(t, systemImage: "sparkles")
                     .font(.callout.weight(.semibold))
                     .padding(.horizontal, 14).padding(.vertical, 8)
-                    .glassOrMaterial()
+                    .glassEffect(.regular.tint(.brand.opacity(0.25)), in: .capsule)
                     .transition(.move(edge: .top).combined(with: .opacity))
                     .task(id: t) {
                         try? await Task.sleep(for: .seconds(2.2))
@@ -272,12 +196,5 @@ private struct Toast: View {
         }
         .padding(.top, 12)
         .animation(.spring(duration: 0.35), value: store.toast)
-    }
-}
-
-extension View {
-    @ViewBuilder func glassOrMaterial() -> some View {
-        if #available(macOS 26, *) { glassEffect(.regular, in: .capsule) }
-        else { background(.regularMaterial, in: .capsule) }
     }
 }
