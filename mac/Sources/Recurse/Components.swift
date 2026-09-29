@@ -62,15 +62,10 @@ extension View {
             .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.hairline))
     }
 
-    /// Soft tinted glow behind a page header; extends under the glass sidebar.
-    func backdrop(_ tint: Color, height: CGFloat = 320) -> some View {
-        background(alignment: .top) {
-            Backdrop(tint: tint).frame(height: height).ignoresSafeArea().backgroundExtensionEffect()
-        }
-    }
 }
 
-private struct Backdrop: View {
+/// Soft tinted glow at the top of a page, drawn behind the header too.
+struct Backdrop: View {
     let tint: Color
     var body: some View {
         MeshGradient(width: 3, height: 2, points: [[0, 0], [0.5, 0], [1, 0], [0, 1], [0.6, 1], [1, 1]], colors: [

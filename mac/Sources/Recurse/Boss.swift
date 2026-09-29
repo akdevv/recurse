@@ -188,7 +188,6 @@ struct BossView: View {
             .padding(28)
             .frame(maxWidth: 680)
             .frame(maxWidth: .infinity)
-            .backdrop(beaten ? .success : .warning, height: 420)
         }
         .navigationTitle("Boss fight")
         .navigationSubtitle(m.title)

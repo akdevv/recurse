@@ -135,7 +135,6 @@ private struct TopicPage: View {
                         .padding(.horizontal, 36).padding(.vertical, 32)
                         .frame(maxWidth: 780)
                         .frame(maxWidth: .infinity)
-                        .backdrop(status.complete ? .success : .brand, height: 300)
                     }
                     if geo.size.width > 1100 { OnThisPage(headings: headings, hasQuiz: !quiz.isEmpty, hasProblems: !problems.isEmpty, proxy: proxy) }
                 }

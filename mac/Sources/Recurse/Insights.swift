@@ -110,7 +110,6 @@ struct StatsView: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
-            .backdrop(Color(hex: 0x7aa2f7), height: 260)
         }
         .navigationTitle("Stats")
     }

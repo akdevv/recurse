@@ -61,7 +61,6 @@ struct ReviewView: View {
             .padding(28)
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
-            .backdrop(.success)
         }
         .navigationTitle("Review")
     }

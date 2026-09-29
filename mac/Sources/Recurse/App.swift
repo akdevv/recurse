@@ -104,6 +104,13 @@ struct RootView: View {
                 page(nav.selection ?? .today).pageChrome()
                     .navigationDestination(for: Route.self) { page($0).pageChrome() }
             }
+            .background(alignment: .top) {
+                // one glow for the whole page, from the very top of the window (under the header) down
+                if let tint = glow(nav.current ?? .today) {
+                    Backdrop(tint: tint).frame(height: 380).ignoresSafeArea().backgroundExtensionEffect()
+                        .animation(.easeInOut(duration: 0.4), value: tint)
+                }
+            }
         }
         .onChange(of: nav.current, initial: true) { old, r in
             activity.route(r)
@@ -159,6 +166,18 @@ struct RootView: View {
             try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: dir).appending(path: "\(i)-\(parts[0]).png"))
         }
         NSApp.terminate(nil)
+    }
+
+    private func glow(_ r: Route) -> Color? {
+        switch r {
+        case .today, .course: .brand
+        case .review: .success
+        case .stats: Color(hex: 0x7aa2f7)
+        case .rewards: .warning
+        case .boss(let mid): store.bossRuns(mid).contains { $0.passed == true } ? .success : .warning
+        case .topic(let id): Content.topic(id).map { store.topicStatus($0, store.problemStatuses()).complete } == true ? .success : .brand
+        case .problem, .problems, .patterns: nil // work screens stay calm
+        }
     }
 
     @ViewBuilder

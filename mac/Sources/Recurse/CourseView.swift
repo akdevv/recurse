@@ -35,7 +35,6 @@ struct CourseView: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
-            .backdrop(.brand, height: 260)
         }
         .navigationTitle("Course map")
     }

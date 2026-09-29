@@ -5,9 +5,11 @@ import SwiftUI
 extension View {
     func pageChrome() -> some View {
         toolbar(removing: .title) // the breadcrumbs say where you are
+            .scrollEdgeEffectStyle(.soft, for: .top) // content fades under the header instead of a hard band
             .toolbar {
-                ToolbarItem(placement: .navigation) { Breadcrumbs() }
-                ToolbarItem(placement: .principal) { SearchBar() }.sharedBackgroundVisibility(.hidden)
+                ToolbarItem(placement: .navigation) { Breadcrumbs() }.sharedBackgroundVisibility(.hidden)
+                // right end, like the web header (the center slot isn't shown in this window style)
+                ToolbarItem(placement: .primaryAction) { SearchBar() }.sharedBackgroundVisibility(.hidden)
             }
     }
 }
@@ -22,10 +24,10 @@ private struct Breadcrumbs: View {
 
     var body: some View {
         let (icon, crumbs) = trail(nav.current ?? .today)
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             ForEach(Array(crumbs.enumerated()), id: \.offset) { i, c in
                 let last = i == crumbs.count - 1
-                if i > 0 { Image(systemName: "chevron.right").font(.system(size: 9, weight: .semibold)).foregroundStyle(.muted.opacity(0.6)) }
+                if i > 0 { Image(systemName: "chevron.right").font(.system(size: 10, weight: .semibold)).foregroundStyle(.muted.opacity(0.5)) }
                 Group {
                     if let r = c.route, !last {
                         Button { nav.go(r) } label: { label(c.label, icon: i == 0 ? icon : nil) }.buttonStyle(.plain)
@@ -38,14 +40,14 @@ private struct Breadcrumbs: View {
                 .lineLimit(1)
             }
         }
-        .font(.callout)
-        .padding(.horizontal, 6)
-        .frame(maxWidth: 380, alignment: .leading)
+        .font(.system(size: 13))
+        .padding(.leading, 12)
+        .fixedSize()
     }
 
     private func label(_ text: String, icon: String?) -> some View {
-        HStack(spacing: 6) {
-            if let icon { Image(systemName: icon).foregroundStyle(.brand) }
+        HStack(spacing: 7) {
+            if let icon { Image(systemName: icon).font(.system(size: 12, weight: .semibold)).foregroundStyle(.brand) }
             Text(text)
         }
         .contentShape(.rect)
@@ -94,7 +96,7 @@ private struct SearchBar: View {
             .font(.callout)
             .foregroundStyle(hover ? .primary : Color.muted)
             .padding(.leading, 12).padding(.trailing, 6)
-            .frame(width: 300, height: 32)
+            .frame(width: 260, height: 32)
             .contentShape(.capsule)
         }
         .buttonStyle(.plain)

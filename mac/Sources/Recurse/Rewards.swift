@@ -187,7 +187,6 @@ private struct PathTab: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
-            .backdrop(.warning)
         }
     }
 

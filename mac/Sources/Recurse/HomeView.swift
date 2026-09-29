@@ -57,7 +57,6 @@ struct HomeView: View {
             .padding(28)
             .frame(maxWidth: 920)
             .frame(maxWidth: .infinity)
-            .backdrop(.brand)
         }
         .navigationTitle("Today")
     }
