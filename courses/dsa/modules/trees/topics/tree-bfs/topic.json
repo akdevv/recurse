@@ -1,0 +1,41 @@
+{
+  "id": "tree-bfs",
+  "title": "Tree BFS (level order)",
+  "status": "ready",
+  "learn": "queue-based level traversal, level size loop, right view / zigzag / min depth",
+  "hook": "Binary Tree Level Order Traversal and Right Side View are extremely common, and BFS is also how you find the nearest leaf quickly. The level-size loop you learn here returns in graphs as multi-source BFS.",
+  "patterns": [
+    "bfs"
+  ],
+  "problems": [
+    {
+      "id": "average-of-levels-in-binary-tree",
+      "role": "optional"
+    },
+    {
+      "id": "minimum-depth-of-binary-tree",
+      "role": "guided"
+    },
+    {
+      "id": "binary-tree-level-order-traversal",
+      "role": "core"
+    },
+    {
+      "id": "binary-tree-right-side-view",
+      "role": "core"
+    },
+    {
+      "id": "binary-tree-zigzag-level-order-traversal",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain level order traversal: how the queue is used and how you know where one level ends.",
+    "keyPoints": [
+      "start with the root in a queue; repeatedly pop from the front and push children at the back",
+      "at the start of each round, len(queue) is the number of nodes on the current level",
+      "process exactly that many nodes to collect one level",
+      "O(n) time, O(w) space for the queue (w = widest level); use collections.deque"
+    ]
+  }
+}

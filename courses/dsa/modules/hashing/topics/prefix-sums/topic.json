@@ -1,0 +1,38 @@
+{
+  "id": "prefix-sums",
+  "title": "Prefix sums",
+  "status": "ready",
+  "learn": "prefix[i] = sum up to i, range sum in O(1), prefix + hash map for subarray-sum problems, prefix/suffix products",
+  "hook": "\"How many subarrays sum to k?\" is a favourite follow-up because the obvious sliding window fails on negative numbers. Prefix sums plus a hash map solve it in one pass.",
+  "patterns": [
+    "prefix-sum",
+    "hash-map"
+  ],
+  "problems": [
+    {
+      "id": "range-sum-query-immutable",
+      "role": "guided"
+    },
+    {
+      "id": "find-pivot-index",
+      "role": "core"
+    },
+    {
+      "id": "product-of-array-except-self",
+      "role": "core"
+    },
+    {
+      "id": "subarray-sum-equals-k",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain prefix sums, and how you'd count the subarrays that sum to k when the array can contain negative numbers.",
+    "keyPoints": [
+      "prefix[i] = sum of the first i numbers, so sum(l..r) = prefix[r + 1] − prefix[l] in O(1)",
+      "a subarray ending at i sums to k when some earlier prefix equals s − k",
+      "keep a hash map of how often each prefix sum appeared, seeded with {0: 1}",
+      "O(n) time and space; a sliding window doesn't work because negatives break monotonic sums"
+    ]
+  }
+}

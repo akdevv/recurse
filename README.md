@@ -1,86 +1,82 @@
-# ⚔️ DSA A2Z
+<p align="center">
+  <img src="public/icon-192.png" width="96" alt="Recurse icon" />
+</p>
 
-![Python](https://img.shields.io/badge/python-3776AB?logo=python&logoColor=white)
-![Progress](https://img.shields.io/badge/progress-33%2F474-1f6feb)
-![Streak](https://img.shields.io/badge/streak-0%20days-8b949e)
+<h1 align="center">Recurse</h1>
 
-Working through [Striver's A2Z sheet](https://takeuforward.org/dsa/strivers-a2z-sheet-learn-dsa-a-to-z) (474 problems) in Python. This is attempt two — I bailed on the first one after a week.
+<p align="center">A personal, local-first app for learning data structures and algorithms in Python, one focused half hour a day.</p>
 
-> I quit after day 5. Last solved 11 Jun, then 41 days dry. Now I'm back — **5 problems a day, 5 days a week.** Only thing to remember: never miss two days in a row. That's the only rule.
+---
 
-## 📊 Progress
+## What's inside
 
-<!-- progress:start -->
-**33 / 474 · 7.0%**
+- **A full course:** 16 modules, 51 topics and 235 LeetCode problems, from Python basics through graphs and dynamic programming. Each topic has a short lesson, step-through visualizations and a quiz.
+- **A local judge:** solve problems in the browser. Your Python runs against generated tests, with timing limits that catch slow solutions.
+- **Learning that sticks:** a ladder of hints, spaced-repetition reviews, explain-back answers graded by Claude, and a Socratic tutor that asks questions instead of giving answers.
+- **Honest progress:** time counts only while you're actively learning on a lesson or problem. A 30-minute daily goal feeds a day streak and a weekly streak, the weekly one with earned freezes.
+- **Rewards for effort only:** XP and levels, boss fights at the end of each module, mystery chests, topic "Wrapped" cards, and real-world rewards unlocked by finishing modules.
+- **Installable PWA:** app shortcuts, push reminders that pick their timing around your day, and a clear offline page when the local server is down.
 
-```
-██░░░░░░░░░░░░░░░░░░░░░░░
-```
+## Stack
 
-⚠️ 💤 **streak broken** · longest **3** · **41 days** since last solve (11 Jun)
+React 19, React Router and Tailwind v4 on the front end. Hono on Node 24 (running TypeScript directly) with SQLite (`node:sqlite`) on the back end. A Python judge, plus the `claude` CLI for AI grading and the tutor.
 
-```
-        M T W T F S S
-Jun  1  ⬜⬜⬜⬜⬜⬜🟦
-Jun  8  🟦🟪⬜🟦⬜⬜⬜
-Jun 15  ⬜⬜⬜⬜⬜⬜⬜
-Jun 22  ⬜⬜⬜⬜⬜⬜⬜
-Jun 29  ⬜⬜⬜⬜⬜⬜⬜
-Jul  6  ⬜⬜⬜⬜⬜⬜⬜
-Jul 13  ⬜⬜⬜⬜⬜⬜⬜
-Jul 20  ⬜⬜          
-```
+## Getting started
 
-🟦 hit target (5+) · 🟪 partial (1–4) · ⬜ none
+Requirements: Node 24+, Python 3 (the judge runs your code with it), and optionally the [`claude` CLI](https://claude.com/claude-code) for AI grading and the tutor.
 
-- **Basics** — 29 solved
-- **Sorting** — 4 solved
-<!-- progress:end -->
-
-## 📅 Daily log
-
-<details>
-<summary>expand</summary>
-
-<br>
-
-**Day 1 · 7 Jun · 15 solved**\
-basics — nested-loop patterns
-
-**Day 2 · 8 Jun · 11 solved**\
-basic maths + recursion intro
-
-**Day 3 · 9 Jun · 3 solved**\
-recursion
-
-**Day 4 · 10 Jun · 1 solved**\
-hashing
-
-**Day 5 · 11 Jun · 4 solved**\
-sorting — selection, bubble, insertion, merge
-
-**quit · 41 days · 0 solved**\
-the gap. don't add a second one.
-
-**Day 6 · 22 Jul · back**\
-restart — clear the peeked backlog first
-
-</details>
-
-## ⚙️ How it works
-
-- Brute force first, optimize after.
-- Give it 20–40 min before looking anything up.
-- If I peeked, I re-solve it cold the next day — otherwise it doesn't count.
-- One line on the pattern, in my own words, once it's solved.
-- Never miss twice. One off-day is noise; two in a row is how this died last time.
-
-What still needs re-solving:
-
-```bash
-grep -rl "peeked: yes\|peeked: hint" .
+```sh
+npm install
+npm run dev        # API on :3001 + Vite on :5173
 ```
 
-## 🔄 Updating the tracker
+Open http://localhost:5173.
 
-`python progress.py` recounts the solved files and redraws the whole progress block above — the bar, the streak, and the calendar all update together. The daily log I keep by hand.
+### Daily use
+
+For the installed PWA and reminders that arrive with the browser closed, run the built app all the time with the launchd agent. The plist has this machine's paths (project folder, Homebrew `node@24`, `~/.local/bin` for `claude`), so edit them first if yours differ.
+
+```sh
+npm run build
+cp launchd/dev.akdevv.rcx.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.akdevv.rcx.plist
+```
+
+It serves http://localhost:3000 and logs to `data/server.log`. Install the PWA from there and turn on reminders in Settings.
+
+```sh
+npm run build && launchctl kickstart -k gui/$(id -u)/dev.akdevv.rcx   # after changing app code
+launchctl bootout gui/$(id -u)/dev.akdevv.rcx                          # stop it
+```
+
+Only this production server sends reminders, so running `npm run dev` alongside it never doubles them (`REMINDERS=1` forces them on in dev).
+
+## Scripts
+
+| Command           | What it does                                            |
+| ----------------- | ------------------------------------------------------- |
+| `npm run dev`     | Dev servers with hot reload                             |
+| `npm run build`   | Production build into `dist/`                           |
+| `npm start`       | Serve the built app (`PORT=3000` to match the agent)    |
+| `npm run check`   | Type-check, lint, engine self-check, content validation |
+| `npm run content` | Rebuild visualization traces and tests, then validate   |
+| `npm run format`  | Prettier, except `courses/` (it would break problem.md) |
+
+## Project layout
+
+```
+src/          React app (pages, components, activity tracker)
+server/       Hono API, SQLite, engine (streaks, XP, spaced review), judge, AI, reminders
+shared/       Types shared by client and server
+courses/dsa/  The course: modules → topics (lesson, quiz, viz) → problems
+scripts/      Content tooling: import problems and solutions, generate tests, build viz, validate
+public/       Service worker, manifest, icons, offline page
+launchd/      macOS agent that keeps the app running
+```
+
+Problems live in `courses/dsa/problems/<id>-<slug>/`, as a `problem.md` (statement, starter, hints, solutions, test generator) and a generated `tests.json`. See [`CLAUDE.md`](CLAUDE.md) for the full content format and conventions.
+
+## Notes
+
+- Everything runs locally, and progress is stored in `data/learn.db`, which git ignores.
+- Problem statements are copied from LeetCode for personal study, and some solutions and explanations come from [doocs/leetcode](https://github.com/doocs/leetcode) (CC BY-SA 4.0). Keep this repo private.

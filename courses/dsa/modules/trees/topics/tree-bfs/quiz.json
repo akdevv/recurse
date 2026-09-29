@@ -1,0 +1,80 @@
+[
+ {
+  "id": "queue",
+  "kind": "concept",
+  "q": "Why does BFS use a queue rather than a stack?",
+  "options": [
+   "Queues are faster",
+   "FIFO order processes nodes in the order they were discovered: level by level",
+   "Stacks can't hold nodes",
+   "No reason"
+  ],
+  "answer": 1,
+  "why": "A stack would dive deep first (that's DFS)."
+ },
+ {
+  "id": "size",
+  "kind": "concept",
+  "q": "Why snapshot `len(q)` before processing a level?",
+  "options": [
+   "For speed",
+   "Children are appended during the loop, so the length changes",
+   "To avoid errors on empty trees",
+   "It's optional"
+  ],
+  "answer": 1,
+  "why": "Without the snapshot you'd mix the next level into this one."
+ },
+ {
+  "id": "min",
+  "kind": "pattern",
+  "q": "Minimum depth of a tree with 100,000 nodes where one leaf sits at depth 2. Better approach?",
+  "options": [
+   "DFS",
+   "BFS, stop at the first leaf",
+   "Inorder traversal",
+   "Sort the nodes"
+  ],
+  "answer": 1,
+  "why": "BFS reaches depth 2 almost immediately; DFS might explore the whole tree first."
+ },
+ {
+  "id": "right",
+  "kind": "concept",
+  "q": "Right side view: can a node from a LEFT subtree be visible?",
+  "options": [
+   "Never",
+   "Yes, when the right side has fewer levels",
+   "Only for the root",
+   "Only in BSTs"
+  ],
+  "answer": 1,
+  "why": "The view is the last node of each level, wherever it sits."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "Level order of 3 → (9, 20), 20 → (15, 7)?",
+  "options": [
+   "[[3], [9, 20], [15, 7]]",
+   "[3, 9, 20, 15, 7]",
+   "[[3, 9, 15], [20, 7]]",
+   "[[9, 3, 15, 20, 7]]"
+  ],
+  "answer": 0,
+  "why": "One list per level."
+ },
+ {
+  "id": "space",
+  "kind": "complexity",
+  "q": "BFS queue size on a perfect binary tree of n nodes can reach…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "about n/2",
+   "n²"
+  ],
+  "answer": 2,
+  "why": "The last level of a perfect tree holds about half the nodes."
+ }
+]

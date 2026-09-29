@@ -1,0 +1,24 @@
+{
+  "id": "math-and-logic-building",
+  "title": "Math & logic building",
+  "status": "ready",
+  "learn": "digit extraction (% 10, // 10), reversing numbers, GCD (Euclid), primes (sieve), overflow awareness",
+  "hook": "Palindrome Number and Reverse Integer are some of the most common warm-up questions. They test whether you can manipulate numbers without reaching for strings.",
+  "patterns": ["digit-math", "number-theory"],
+  "problems": [
+    { "id": "palindrome-number", "role": "guided" },
+    { "id": "add-digits", "role": "core" },
+    { "id": "find-greatest-common-divisor-of-array", "role": "core" },
+    { "id": "reverse-integer", "role": "optional" },
+    { "id": "count-primes", "role": "optional" }
+  ],
+  "explain": {
+    "prompt": "Explain how to reverse the digits of an integer without converting it to a string, and what the complexity is.",
+    "keyPoints": [
+      "x % 10 gives the last digit, x // 10 removes it",
+      "build the result with rev = rev * 10 + digit",
+      "number of iterations = number of digits = O(log₁₀ n)",
+      "handle the sign separately; watch for 32-bit overflow in fixed-width languages"
+    ]
+  }
+}

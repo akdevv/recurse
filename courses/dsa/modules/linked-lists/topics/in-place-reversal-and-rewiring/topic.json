@@ -1,0 +1,51 @@
+{
+  "id": "in-place-reversal-and-rewiring",
+  "title": "In-place reversal & rewiring",
+  "status": "ready",
+  "learn": "reverse a sublist, split/merge lists, carry arithmetic, hash map + list combos",
+  "hook": "Reorder List, Add Two Numbers and LRU Cache are some of the most frequently asked linked list mediums. They combine the basic moves (find, cut, reverse, reconnect, merge) and LRU Cache is one of the most common design questions of all.",
+  "patterns": [
+    "list-reversal",
+    "hash-map"
+  ],
+  "problems": [
+    {
+      "id": "intersection-of-two-linked-lists",
+      "role": "guided"
+    },
+    {
+      "id": "reverse-linked-list-ii",
+      "role": "optional"
+    },
+    {
+      "id": "reorder-list",
+      "role": "core"
+    },
+    {
+      "id": "add-two-numbers",
+      "role": "core"
+    },
+    {
+      "id": "copy-list-with-random-pointer",
+      "role": "optional"
+    },
+    {
+      "id": "lru-cache",
+      "role": "core"
+    },
+    {
+      "id": "reverse-nodes-in-k-group",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how an LRU cache gets O(1) get and put, and which data structures you'd combine.",
+    "keyPoints": [
+      "a hash map from key to node gives O(1) lookup",
+      "a doubly linked list keeps nodes ordered by recency; moving or removing a node is O(1)",
+      "get: look up, move the node to the most-recent end",
+      "put: update or insert at the most-recent end; if over capacity, remove the least-recent node and its key",
+      "sentinel head/tail nodes avoid edge cases"
+    ]
+  }
+}

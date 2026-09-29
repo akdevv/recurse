@@ -1,0 +1,80 @@
+[
+ {
+  "id": "end",
+  "kind": "concept",
+  "q": "After inserting only \"apple\", why does search(\"app\") return False?",
+  "options": [
+   "\"app\" isn't a path",
+   "The node for the last 'p' isn't marked as a word end",
+   "Tries can't store prefixes",
+   "It returns True"
+  ],
+  "answer": 1,
+  "why": "The path exists, but no word ends there."
+ },
+ {
+  "id": "prefix",
+  "kind": "output",
+  "q": "After inserting only \"apple\", what does startsWith(\"app\") return?",
+  "options": [
+   "True",
+   "False",
+   "Error",
+   "Depends on the end flag"
+  ],
+  "answer": 0,
+  "why": "startsWith only checks that the path exists."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Searching a word of length L in a trie holding n words costs…",
+  "options": [
+   "O(n)",
+   "O(L)",
+   "O(n · L)",
+   "O(log n)"
+  ],
+  "answer": 1,
+  "why": "One step per character, regardless of n."
+ },
+ {
+  "id": "vs-set",
+  "kind": "pattern",
+  "q": "Which question does a trie answer much faster than a hash set?",
+  "options": [
+   "Is \"cat\" stored?",
+   "Is any stored word starting with \"ca\"?",
+   "How many words are stored?",
+   "Insert a word"
+  ],
+  "answer": 1,
+  "why": "A set would have to check every word for the prefix."
+ },
+ {
+  "id": "wild",
+  "kind": "concept",
+  "q": "Search with '.' wildcards (Add and Search Words): what happens at a '.'?",
+  "options": [
+   "Skip the character",
+   "Recurse into every child of the current node",
+   "Return False",
+   "Match only 'a'"
+  ],
+  "answer": 1,
+  "why": "The dot can be any letter, so every branch has to be tried."
+ },
+ {
+  "id": "ws2",
+  "kind": "pattern",
+  "q": "Why use a trie for Word Search II (many words, one board)?",
+  "options": [
+   "It sorts the words",
+   "One DFS follows all words at once and stops as soon as no word has the current prefix",
+   "It uses less memory than the board",
+   "It's required by the grader"
+  ],
+  "answer": 1,
+  "why": "Running a separate search per word repeats the same walks many times."
+ }
+]

@@ -1,0 +1,37 @@
+{
+  "id": "top-k-kth-element",
+  "title": "Top-K / Kth element",
+  "status": "ready",
+  "learn": "size-k heap, heap vs sort vs quickselect trade-offs",
+  "hook": "Kth Largest Element, K Closest Points and Top K Frequent are asked constantly, usually with the follow-up \"can you beat O(n log n)?\". The size-k heap and quickselect are the two answers you need.",
+  "patterns": [
+    "top-k-heap"
+  ],
+  "problems": [
+    {
+      "id": "kth-largest-element-in-an-array",
+      "role": "guided"
+    },
+    {
+      "id": "k-closest-points-to-origin",
+      "role": "core"
+    },
+    {
+      "id": "top-k-frequent-words",
+      "role": "core"
+    },
+    {
+      "id": "task-scheduler",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd find the k-th largest element, comparing sorting, a size-k heap and quickselect.",
+    "keyPoints": [
+      "sorting: O(n log n), then index",
+      "min-heap of size k: push each value, pop when size exceeds k; the root is the k-th largest; O(n log k) time, O(k) space",
+      "use a MIN-heap for the k LARGEST (the root is the one to beat)",
+      "quickselect: partition around a pivot and recurse into the side with the target index; O(n) average, O(n²) worst"
+    ]
+  }
+}

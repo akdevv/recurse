@@ -1,0 +1,81 @@
+[
+ {
+  "id": "dims",
+  "kind": "concept",
+  "q": "For `matrix = [[1, 2, 3], [4, 5, 6]]`, what are `len(matrix)` and `len(matrix[0])`?",
+  "options": [
+   "3 and 2",
+   "2 and 3",
+   "6 and 3",
+   "2 and 2"
+  ],
+  "answer": 1,
+  "why": "`len(matrix)` counts rows (2), `len(matrix[0])` counts columns (3)."
+ },
+ {
+  "id": "alias",
+  "kind": "output",
+  "q": "What does `g` hold after this runs?",
+  "code": "g = [[0] * 2] * 2\ng[0][0] = 1",
+  "options": [
+   "[[1, 0], [0, 0]]",
+   "[[1, 0], [1, 0]]",
+   "[[1, 1], [0, 0]]",
+   "An error"
+  ],
+  "answer": 1,
+  "why": "`[row] * 2` repeats the same list object, so both rows change. Use `[[0] * 2 for _ in range(2)]`."
+ },
+ {
+  "id": "rotate-rule",
+  "kind": "concept",
+  "q": "Rotating an n×n matrix 90° clockwise moves cell (r, c) to…",
+  "options": [
+   "(c, r)",
+   "(n-1-r, c)",
+   "(c, n-1-r)",
+   "(n-1-c, n-1-r)"
+  ],
+  "answer": 2,
+  "why": "Row r becomes column n-1-r. Check on 3×3: the top-left (0,0) goes to the top-right (0,2)."
+ },
+ {
+  "id": "rotate-steps",
+  "kind": "pattern",
+  "q": "Which pair of in-place steps rotates a square matrix clockwise?",
+  "options": [
+   "Reverse each row, then reverse each column",
+   "Transpose, then reverse each row",
+   "Transpose twice",
+   "Reverse the row order, then reverse each row"
+  ],
+  "answer": 1,
+  "why": "Transpose turns rows into columns; reversing each row then gives the clockwise turn."
+ },
+ {
+  "id": "diag",
+  "kind": "complexity",
+  "q": "Summing both diagonals of an n×n matrix directly takes…",
+  "options": [
+   "O(1)",
+   "O(n)",
+   "O(n²)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "why": "Each row contributes two cells, (i, i) and (i, n-1-i): 2n reads."
+ },
+ {
+  "id": "zeroes",
+  "kind": "concept",
+  "q": "Set Matrix Zeroes: why not zero a row and column the moment you find a 0?",
+  "options": [
+   "It's too slow",
+   "The new zeros look like original ones and wipe out extra rows and columns",
+   "Python can't modify lists while looping",
+   "It uses too much memory"
+  ],
+  "answer": 1,
+  "why": "Record first, write second. Otherwise cells you zeroed trigger more zeroing later in the scan."
+ }
+]

@@ -1,105 +1,64 @@
-# CLAUDE.md
+# Recurse (rcx): personal DSA learning tool (single user: akdevv)
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+The curriculum (16 modules, 51 topics, 235 problems) lives in `courses/dsa/`; it is the source of truth.
 
----
+## Run
 
-## What This Repo Is
+- `npm run dev`: API (node --watch, :3001) + Vite (:5173, proxies /api and /content)
+- Daily use: the launchd agent runs the built app on http://localhost:3000 (installed PWA lives there). After changing app code: `npm run build`, then `launchctl kickstart -k gui/$(id -u)/dev.akdevv.rcx`
+- `npm run build && npm start`: the same daily-use server by hand, on :3001 (use `PORT=3000` if the agent is stopped)
+- Only production servers send reminders (`REMINDERS=1` forces them on in dev), so dev + the agent never double-notify
+- `npm run check`: tsc + eslint + engine selfcheck + content validation
+- `npm run content`: rebuild viz traces + tests.json, then validate
+- Test against a throwaway DB: `DB_PATH=/tmp/x.db PORT=3998 node server/index.ts` (never test on `data/learn.db`, that's real progress)
 
-Striver's A2Z DSA sheet — 474 problems, solved in Python. This is a **learning repo**, not a production codebase. The user is here to build understanding, not to get answers handed to them.
+## Layout
 
-This is the user's second run at the sheet (they quit after day 5 in June, restarted 22 Jul). There's no deadline — the pace is **5 problems a day, 5 days a week**, and the one rule that matters is never missing two days in a row. Reinforce that, don't pile on extra pressure.
+- `src/`: React 19 + react-router 8 + Tailwind v4 (dark only, shadcn-style tokens in `index.css`), icons from `react-icons/lu`. Pages in `src/pages`, layout and shared UI (`stat-cell`, `segmented`, `search-input`, `button`…) in `src/components/common`, the active-time tracker in `src/lib/activity.ts`, global state via `store()` in `src/lib/ui-state.ts`, difficulty colors in `src/lib/difficulty.ts`
+  - Imports use `@/…` (src) and `@shared/…`, never `../..`. File names are kebab-case (`sidebar-layout.tsx`)
+- `server/`: Hono on Node 24 (runs .ts directly, so imports need the `.ts` extension; no enums/param properties)
+  - `engine/`: pure logic (streak, xp, srs, hints) + `selfcheck.ts`. Keep it free of DB/HTTP
+  - `content.ts`: reads `courses/` from disk on every call (no restart needed after content edits)
+  - `progress.ts`: completion / unlock / "me" derived from DB + content
+  - `ai.ts`: every AI call (`claude -p`) goes through here: explain-back grading (Opus, `AI_MODEL`), Socratic tutor chat (Sonnet, `AI_TUTOR_MODEL`)
+  - `chests.ts`: mystery chests (earned by boss wins / clean first solves, never bought), rewards incl. streak freezes passed to `computeStreak` as bonus freezes
+  - `boss.ts` (module boss fights), `rewards.ts` (real-world reward path unlocked by finishing modules, tiered trophies), `stats.ts` (stats + patterns), `settings.ts` (settings table, defaults)
+  - `notify.ts`: web-push reminder loop (one setTimeout, timing in `engine/reminders.ts`); VAPID keys in `data/vapid.json`
+  - `judge/pyjudge.py`: Python judge core (used live and by scripts); `judge.ts` spawns it
+  - `schema.sql`: SQLite via `node:sqlite`, DB at `data/learn.db` (gitignored)
+- `shared/types.ts`: content + API types
+- `public/`: `sw.js` (push + notification clicks; caches hashed `/assets` and shows `offline.html` when the server is down; never caches `/api` or `/content`), `manifest.webmanifest` (icons, maskable icons, shortcuts, screenshots), icon PNGs (Liquid Glass render of the Recurse icon), `avatar.svg`
+- `launchd/`: agent that runs the built app at login on :3000 so reminders fire with the browser closed (logs: `data/server.log`). Install: `npm run build`, copy the plist to `~/Library/LaunchAgents/`, `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.akdevv.rcx.plist`
+- `courses/dsa/`: all course content (format below)
+- `scripts/`: python content tooling (`import_lc.py`, `gen_tests.py`, `build_viz.py`, `validate.py`; shared CLI/paths in `common.py`). `gen_tests` runs problems in parallel with `PYTHONHASHSEED=0`, so tests.json is reproducible
 
----
+## Content format (courses/dsa)
 
-## Your Role: Learning Coach, Not Solution Provider
+- IDs are slugs and are **never renamed** (progress is keyed by them). Order lives in parent lists, not folder names
+- `course.json` → `modules/<id>/module.json` (prereqs, ordered topics) → `topics/<id>/topic.json`
+- Topic `status`: `stub` (skeleton only) | `ready` (needs lesson.md, quiz.json, problems exist)
+- `lesson.md` sections: Core idea, Intuition, Visualization, Template code, Complexity, When to use it, Common traps.
+  Embed a viz with a fenced block: ` ```viz\n<name>\n``` ` → `viz/<name>.py` prints a trace JSON → `scripts/build_viz.py` writes `viz/<name>.json`.
+  Views: `array` (array, pointers, highlight, dim, vars; optional `stack` + `stackLabel` drawn beside it), `stack` (stack, stackLabel),
+  `tree` (nodes {id, label, parent, hidden?}, active, highlight, values: shown inline for call labels like `fib(3)`, else as a tag under the node; `highlight` wins over values for styling),
+  `grid` (grid, highlight/dim as [r, c], pointers name → [r, c]; `compact: true` for small cells; a "█" cell renders filled, for timelines),
+  `list` (nodes = values, links[i] = next index or null, pointers, highlight, dim; cycles are listed below the row),
+  `graph` (nodes {id, label?, x, y} in grid units, edges {from, to, w?}, directed, active, highlight, dim, edgeHighlight [[from, to]], values: tag at a node's top-right)
+  Tree viz scripts can import `courses/dsa/vizlib.py` (build a tree from LeetCode level order, lay it out with hidden placeholders)
+- Problems live in a shared pool `problems/<lc id>-<slug>/` (e.g. `0001-two-sum/`); the problem id is the slug. Referenced by topics with a role (guided|core|optional). Two files:
+  - `problem.md`: frontmatter (`key: <json>` per line: lc, title, difficulty, patterns, lcTags, entry, examples, optional compare/timeLimitMs/lcHints), then the statement (markdown), then `# Starter`, `# Hints` (numbered), `# Key points` (bullets), one `# Solution: <id> · <title> · <time> · <space> · [reference] [slow]` per solution (explanation, then the code as the last ```python block), `# Tests` (python: `edge()`, `random_case(rng)`, optional `perf(rng)`)
+  - `tests.json`: generated, never edited
+  - Parsed by `pyjudge.load_problem` (Python) and `loadProblem` in `server/content.ts`; keep the two in sync
+  - Exactly one solution is `reference`; `slow` = expected to fail perf tests. Compare modes: exact, unordered, groups (order-free at both levels), float (also lists), check (custom). Design problems (LRU cache, …): `entry.design`, `entry.method` = class name; void methods' return values are ignored like on LeetCode
+  - Empty `# Tests` block → `scripts/autogen.py` builds inputs from `entry` types + the Constraints list; it refuses (gen_tests prints MANUAL) when a constraint promises structure (sorted, unique, BST, valid, graph…), then write the block by hand
+  - `# Tests` code doubles as judge hooks (loaded when compare is "check" or `entry.interactive`): `check(args, got, expected)`, `prepare(args) -> (call_args, globals)` for cycles/shared nodes/APIs like isBadVersion, optional `output(ret)`
+  - The judge pre-imports what LeetCode's Python does (collections, heapq, bisect, math, itertools, functools, operator, string, random); no numpy/sortedcontainers
+  - A problem is playable once `tests.json` exists; imported-but-unauthored ones are listed but locked
+- Adding a problem: `python3 scripts/import_lc.py <slug>` (or `--all` for every topic ref) → `python3 scripts/import_solutions.py <slug>` (solutions + explanations from doocs/leetcode, CC-BY-SA; uses `gh api` when available) → write hints, key points, and `# Tests` if autogen can't → `python3 scripts/gen_tests.py <slug>` → reference it in a topic.json
+- Expected outputs always come from the reference solution, never written by hand
 
-This is the most important section. Read it fully before doing anything.
+## Rules
 
-**Never write or complete a solution function.** This is a hard rule with no exceptions:
-- Do not fill in `solve()`, `pattern()`, or any problem-solving function body.
-- Do not write pseudocode that is one step away from a solution.
-- Do not "show an example" that effectively gives away the approach.
-
-**What you CAN edit:**
-- The solution file header comments (`# pattern:`, `# peeked:`, `# brute:`, `# optimal:`)
-- `README.md` files (but the block between `<!-- progress:start -->` and `<!-- progress:end -->` is generated by `progress.py` — don't hand-edit it; run the script instead)
-- The daily-log entries in the root README (added by hand)
-- `patterns/` concept notes
-- `CLAUDE.md` itself
-
-**When the user asks for help on a problem**, give them one or more of:
-- A question that points them toward the right insight ("What happens if you try iterating from the end?")
-- A concept name to look up ("This is a classic two-pointer setup — do you know when two pointers are useful?")
-- A simpler analogous problem ("Can you solve it for a sorted array first?")
-- A way to think about it ("Draw the state at each step on paper. What changes?")
-- A pattern trigger ("What does the problem have in common with a sliding window?")
-
-Never the answer itself.
-
-**When the user asks to explain a concept**, explain it simply:
-- Use plain language and real-world analogies before any formal definition.
-- Give a concrete tiny example (n=3 or n=4, not abstract).
-- Connect it to something they've likely already seen.
-- Check their understanding with a question at the end.
-
----
-
-## Solution File Format
-
-Every solution file follows `_solution_template.py`:
-
-```python
-# NNNN - Problem Name
-# <link>
-# pattern: <which pattern>
-# peeked: no          # no / hint / yes  <- re-solve flag
-# brute:   O(?) - one line idea
-# optimal: O(?) time, O(?) space - one line idea
-
-def solve():
-    pass
-
-if __name__ == "__main__":
-    # quick manual tests: empty, single, duplicates, edge
-    pass
-```
-
-The `peeked:` field is the user's honesty flag. If `peeked: yes` or `peeked: hint`, the problem must be re-solved cold before it counts.
-
-Find all problems that need re-solving:
-```bash
-grep -rl "peeked: yes\|peeked: hint" .
-```
-
----
-
-## Running a Solution
-
-```bash
-python <file>.py
-```
-
-No test framework, no build step. Manual test cases go in `if __name__ == "__main__":`.
-
----
-
-## Repo Structure
-
-- `NN_topic/` — one folder per topic, solved top-to-bottom per the sheet
-- `patterns/` — reusable pattern notes (trigger, skeleton, examples, gotchas)
-- `README.md` — progress tracker (auto-generated block + hand-kept daily log) and the ground rules
-- `progress.py` — recounts solved files and redraws the README progress block (bar, streak, calendar, badges). Run it after solving; a file still stubbed with `pass` doesn't count.
-- `_solution_template.py` — copy this for every new problem
-
----
-
-## The User's Learning Rules (from README)
-
-1. Brute force first, always. Optimize after.
-2. Struggle 20–40 min before peeking a hint.
-3. Re-solve anything peeked, cold, the next day — otherwise it doesn't count.
-4. Write a one-line pattern note in your own words after solving.
-5. Never miss two days in a row. One off-day is noise; two is how the first attempt died.
-
-Reinforce these when relevant. Never shortcut them on the user's behalf.
+- Every reward is tied to effort (solves, quiz improvement, explanations, reviews), never to time alone
+- Active time counts only when the window is visible + focused + used; no timers while idle
+- Never run prettier on `courses/` (it splits problem.md frontmatter, which must stay one `key: <json>` per line)

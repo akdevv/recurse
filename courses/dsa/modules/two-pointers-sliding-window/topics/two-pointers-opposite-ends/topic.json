@@ -1,0 +1,45 @@
+{
+  "id": "two-pointers-opposite-ends",
+  "title": "Two pointers: opposite ends",
+  "status": "ready",
+  "learn": "left/right moving inward, needs sorted input or symmetric property, pair-sum logic",
+  "hook": "Two Sum II, 3Sum, Container With Most Water and Valid Palindrome are all interview classics, and all the same move: start at both ends and let each comparison throw one element away.",
+  "patterns": [
+    "two-pointers"
+  ],
+  "problems": [
+    {
+      "id": "valid-palindrome",
+      "role": "guided"
+    },
+    {
+      "id": "squares-of-a-sorted-array",
+      "role": "core"
+    },
+    {
+      "id": "two-sum-ii-input-array-is-sorted",
+      "role": "core"
+    },
+    {
+      "id": "3sum",
+      "role": "core"
+    },
+    {
+      "id": "container-with-most-water",
+      "role": "core"
+    },
+    {
+      "id": "trapping-rain-water",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the two-pointer technique on a sorted array, and why it finds a pair with a target sum in O(n) without missing any pair.",
+    "keyPoints": [
+      "pointers start at both ends and move toward each other",
+      "sum too small → move left (the smallest can't pair with anything); too big → move right",
+      "each step eliminates one element for good, so no valid pair is skipped",
+      "O(n) time, O(1) space; needs sorted input or a symmetry"
+    ]
+  }
+}

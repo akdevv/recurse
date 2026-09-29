@@ -1,0 +1,17 @@
+{
+  "id": "heaps",
+  "number": 9,
+  "title": "Heaps / Priority Queues",
+  "summary": "Always-get-the-best-next element. Top-K and scheduling problems.",
+  "prereqs": [
+    "trees"
+  ],
+  "topics": [
+    "heap-basics",
+    "top-k-kth-element",
+    "two-heaps-and-k-way-merge"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

@@ -1,0 +1,81 @@
+[
+ {
+  "id": "key",
+  "kind": "concept",
+  "q": "Which key groups anagrams correctly?",
+  "options": [
+   "len(word)",
+   "word[0]",
+   "\"\".join(sorted(word))",
+   "set(word)"
+  ],
+  "answer": 2,
+  "why": "All anagrams sort to the same string. A set would merge \"aab\" and \"ab\"; length or first letter group too much."
+ },
+ {
+  "id": "tuple-key",
+  "kind": "output",
+  "q": "Why convert the 26 counts to a tuple before using them as a key?",
+  "options": [
+   "Tuples are faster to build",
+   "Lists aren't hashable, tuples are",
+   "Tuples sort the counts",
+   "It saves memory"
+  ],
+  "answer": 1,
+  "why": "Dict keys must be hashable. A list can change, a tuple can't."
+ },
+ {
+  "id": "topk",
+  "kind": "complexity",
+  "q": "Top K Frequent with bucket sort (index = frequency) runs in…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n log k)",
+   "O(k²)"
+  ],
+  "answer": 0,
+  "why": "Counting is O(n), a frequency is at most n so it can be an index, and reading buckets from high to low is O(n)."
+ },
+ {
+  "id": "consecutive",
+  "kind": "complexity",
+  "q": "Longest Consecutive Sequence: why is the set solution O(n) despite a while loop inside the for loop?",
+  "options": [
+   "The while loop runs at most once",
+   "Runs only start where x − 1 is missing, so each number is walked over once overall",
+   "Sets are sorted",
+   "It isn't, it's O(n²)"
+  ],
+  "answer": 1,
+  "why": "The inner walk only happens from the start of each run, so the total walking across all runs is n steps."
+ },
+ {
+  "id": "counter",
+  "kind": "output",
+  "q": "What does this print?",
+  "code": "from collections import Counter\nprint(Counter(\"banana\").most_common(1))",
+  "options": [
+   "[('a', 3)]",
+   "[('a', 3), ('n', 2)]",
+   "{'a': 3}",
+   "['a']"
+  ],
+  "answer": 0,
+  "why": "`most_common(1)` returns a list with the single most frequent (element, count) pair."
+ },
+ {
+  "id": "sudoku",
+  "kind": "pattern",
+  "q": "In Valid Sudoku, which expression gives the 3×3 box of cell (r, c)?",
+  "options": [
+   "r // 3 + c // 3",
+   "(r // 3, c // 3)",
+   "(r % 3, c % 3)",
+   "r * 3 + c"
+  ],
+  "answer": 1,
+  "why": "The pair of block row and block column identifies the box. The sum would put different boxes (like (0, 1) and (1, 0)) together."
+ }
+]

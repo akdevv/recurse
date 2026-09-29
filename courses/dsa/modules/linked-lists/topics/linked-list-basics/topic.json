@@ -1,0 +1,45 @@
+{
+  "id": "linked-list-basics",
+  "title": "Linked list basics",
+  "status": "ready",
+  "learn": "nodes & pointers, singly vs doubly, insert/delete, dummy head node, traversal, vs arrays",
+  "hook": "Reverse Linked List and Merge Two Sorted Lists are two of the most asked easy questions. Linked lists test carefulness more than cleverness: can you rewire pointers without losing the rest of the list?",
+  "patterns": [
+    "list-reversal"
+  ],
+  "problems": [
+    {
+      "id": "remove-linked-list-elements",
+      "role": "guided"
+    },
+    {
+      "id": "remove-duplicates-from-sorted-list",
+      "role": "core"
+    },
+    {
+      "id": "reverse-linked-list",
+      "role": "core"
+    },
+    {
+      "id": "merge-two-sorted-lists",
+      "role": "core"
+    },
+    {
+      "id": "convert-binary-number-in-a-linked-list-to-integer",
+      "role": "optional"
+    },
+    {
+      "id": "design-linked-list",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd reverse a singly linked list in place, and why a dummy node makes deletions and merges simpler.",
+    "keyPoints": [
+      "walk with prev, cur and next: save next, point cur.next at prev, advance",
+      "prev ends at the old tail, which is the new head; O(n) time, O(1) space",
+      "a dummy node before the head removes the special case of deleting or inserting at the head",
+      "return dummy.next at the end"
+    ]
+  }
+}

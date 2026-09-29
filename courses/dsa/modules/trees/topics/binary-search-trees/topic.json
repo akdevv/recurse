@@ -1,0 +1,55 @@
+{
+  "id": "binary-search-trees",
+  "title": "Binary search trees",
+  "status": "ready",
+  "learn": "BST property, search/insert/delete O(h), inorder = sorted, validate with bounds",
+  "hook": "Validate BST, Kth Smallest in a BST and LCA of a BST are classic mediums. They reward knowing two facts cold: the ordering applies to whole subtrees, and inorder traversal is sorted.",
+  "patterns": [
+    "binary-search",
+    "tree-dfs"
+  ],
+  "problems": [
+    {
+      "id": "search-in-a-binary-search-tree",
+      "role": "guided"
+    },
+    {
+      "id": "convert-sorted-array-to-binary-search-tree",
+      "role": "core"
+    },
+    {
+      "id": "minimum-absolute-difference-in-bst",
+      "role": "optional"
+    },
+    {
+      "id": "lowest-common-ancestor-of-a-binary-search-tree",
+      "role": "core"
+    },
+    {
+      "id": "insert-into-a-binary-search-tree",
+      "role": "core"
+    },
+    {
+      "id": "validate-binary-search-tree",
+      "role": "core"
+    },
+    {
+      "id": "kth-smallest-element-in-a-bst",
+      "role": "core"
+    },
+    {
+      "id": "delete-node-in-a-bst",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how to validate a binary search tree, and why comparing each node only with its children isn't enough.",
+    "keyPoints": [
+      "BST property: every value in the left subtree < node < every value in the right subtree",
+      "comparing with direct children misses violations deeper down (a small value deep in a right subtree)",
+      "pass down an allowed (low, high) range; left child gets high = node, right child gets low = node",
+      "alternatively check that inorder traversal is strictly increasing",
+      "O(n) time, O(h) space"
+    ]
+  }
+}

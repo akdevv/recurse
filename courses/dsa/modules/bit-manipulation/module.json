@@ -1,0 +1,15 @@
+{
+  "id": "bit-manipulation",
+  "number": 14,
+  "title": "Bit Manipulation",
+  "summary": "Small topic, shows up as easy warm-ups.",
+  "prereqs": [
+    "foundations"
+  ],
+  "topics": [
+    "bit-manipulation"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

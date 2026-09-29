@@ -1,0 +1,34 @@
+{
+  "id": "shortest-paths",
+  "title": "Shortest paths",
+  "status": "ready",
+  "learn": "Dijkstra (heap), Bellman-Ford (negative edges, k-edge limit), when BFS is enough. A* concept only",
+  "hook": "Network Delay Time is the textbook Dijkstra question, and Cheapest Flights Within K Stops is the classic twist that breaks plain Dijkstra. Knowing which shortest-path algorithm fits which constraint is a strong interview signal.",
+  "patterns": [
+    "dijkstra"
+  ],
+  "problems": [
+    {
+      "id": "network-delay-time",
+      "role": "guided"
+    },
+    {
+      "id": "path-with-minimum-effort",
+      "role": "optional"
+    },
+    {
+      "id": "cheapest-flights-within-k-stops",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain Dijkstra's algorithm, why it needs non-negative weights, and its complexity with a heap.",
+    "keyPoints": [
+      "keep the best known distance to every node; start with the source at 0",
+      "repeatedly pop the unsettled node with the smallest distance from a min-heap and relax its edges",
+      "with non-negative weights, the popped node's distance can't improve later, so it's final",
+      "O((V + E) log V) with a heap; skip stale heap entries",
+      "negative weights or an edge-count limit → Bellman-Ford; unweighted → plain BFS"
+    ]
+  }
+}

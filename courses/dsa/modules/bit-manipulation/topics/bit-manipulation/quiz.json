@@ -1,0 +1,80 @@
+[
+ {
+  "id": "xor",
+  "kind": "output",
+  "q": "What is 5 ^ 3 ^ 5?",
+  "options": [
+   "0",
+   "3",
+   "5",
+   "13"
+  ],
+  "answer": 1,
+  "why": "5 ^ 5 = 0, and 0 ^ 3 = 3."
+ },
+ {
+  "id": "clear",
+  "kind": "output",
+  "q": "What is 12 & 11 (1100 & 1011)?",
+  "options": [
+   "8",
+   "11",
+   "12",
+   "0"
+  ],
+  "answer": 0,
+  "why": "12 & (12 − 1) clears the lowest set bit of 12: 1100 → 1000 = 8."
+ },
+ {
+  "id": "pow2",
+  "kind": "concept",
+  "q": "Which expression checks that n (> 0) is a power of two?",
+  "options": [
+   "n % 2 == 0",
+   "n & (n − 1) == 0",
+   "n ^ 1 == 0",
+   "n >> 1 == 0"
+  ],
+  "answer": 1,
+  "why": "A power of two has exactly one set bit; clearing it leaves 0."
+ },
+ {
+  "id": "prec",
+  "kind": "concept",
+  "q": "Why is `n & 1 == 0` a bug in Python?",
+  "options": [
+   "& is slower",
+   "== binds tighter, so it means n & (1 == 0)",
+   "It works fine",
+   "1 must be written 0b1"
+  ],
+  "answer": 1,
+  "why": "Parenthesise: (n & 1) == 0."
+ },
+ {
+  "id": "countbits",
+  "kind": "concept",
+  "q": "Counting Bits for 0..n in O(n): ans[i] = …",
+  "options": [
+   "ans[i − 1] + 1",
+   "ans[i >> 1] + (i & 1)",
+   "i % 2",
+   "bin(i)"
+  ],
+  "answer": 1,
+  "why": "i >> 1 is i without its last bit (already computed), plus that last bit."
+ },
+ {
+  "id": "mask",
+  "kind": "pattern",
+  "q": "Enumerate all subsets of a 4-element set without recursion. How?",
+  "options": [
+   "Sort the set",
+   "Loop mask from 0 to 15; bit i of mask means element i is included",
+   "Use XOR of all elements",
+   "It's impossible"
+  ],
+  "answer": 1,
+  "why": "Each of the 2⁴ masks is exactly one subset."
+ }
+]

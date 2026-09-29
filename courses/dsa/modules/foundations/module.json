@@ -1,0 +1,16 @@
+{
+  "id": "foundations",
+  "number": 0,
+  "title": "Foundations",
+  "summary": "Tools you think with. Python fluency + reasoning about cost of code.",
+  "prereqs": [],
+  "topics": [
+    "python-for-dsa",
+    "complexity-analysis",
+    "math-and-logic-building",
+    "recursion-basics"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "advanced-data-structures",
+  "title": "Advanced data structures (explain-level)",
+  "status": "ready",
+  "learn": "segment tree & Fenwick tree (range queries), skip list, suffix trees/arrays, B-trees & B+ trees (DB indexing), AVL/red-black recap, A*, randomized algorithms, bloom filters",
+  "hook": "Segment trees, Fenwick trees, B-trees and Bloom filters come up in senior and system design interviews as \"do you know this exists and when to use it?\". Being able to explain them clearly sets you apart even if you never code one.",
+  "patterns": [],
+  "problems": [],
+  "explain": {
+    "prompt": "Pick two advanced structures (for example a segment tree and a Bloom filter) and explain what problem each solves, how, and its trade-offs.",
+    "keyPoints": [
+      "segment tree: nodes store aggregates of ranges; range query and point update in O(log n); for arrays that change",
+      "Fenwick tree: simpler O(log n) prefix sums with point updates, 1-based, uses i & −i",
+      "B+ trees keep many keys per node so database indexes need few disk reads",
+      "Bloom filter: k hash functions set bits; answers \"definitely not\" or \"probably yes\"; tiny memory, false positives, no deletes",
+      "prefer simpler tools (prefix sums, hash sets, sorted lists) when there are no updates or memory isn't tight"
+    ]
+  }
+}

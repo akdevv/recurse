@@ -1,0 +1,54 @@
+{
+  "id": "subsets-combinations-permutations",
+  "title": "Subsets, combinations, permutations",
+  "status": "ready",
+  "learn": "choose / explore / un-choose template, decision tree, handling duplicates (sort + skip), complexity O(2ⁿ)/O(n!)",
+  "hook": "Subsets, Permutations, Combination Sum and Generate Parentheses are staples of every interview list, and they're all the same three lines: choose, explore, un-choose.",
+  "patterns": [
+    "backtracking"
+  ],
+  "problems": [
+    {
+      "id": "subsets",
+      "role": "guided"
+    },
+    {
+      "id": "combinations",
+      "role": "optional"
+    },
+    {
+      "id": "permutations",
+      "role": "core"
+    },
+    {
+      "id": "subsets-ii",
+      "role": "core"
+    },
+    {
+      "id": "combination-sum",
+      "role": "core"
+    },
+    {
+      "id": "combination-sum-ii",
+      "role": "optional"
+    },
+    {
+      "id": "letter-combinations-of-a-phone-number",
+      "role": "core"
+    },
+    {
+      "id": "generate-parentheses",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the backtracking template using Subsets or Permutations: the decision tree, the choose/explore/un-choose steps, and the complexity.",
+    "keyPoints": [
+      "build answers one decision at a time; the decisions form a tree and DFS walks it",
+      "choose (append), explore (recurse), un-choose (pop) so the next branch starts clean",
+      "subsets: pick or skip each element → 2ⁿ results, O(n·2ⁿ)",
+      "permutations: any unused element at each position → n! results, O(n·n!)",
+      "copy the path when recording; sort and skip equal values at the same depth to avoid duplicates"
+    ]
+  }
+}

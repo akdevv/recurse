@@ -1,0 +1,80 @@
+[
+ {
+  "id": "same",
+  "kind": "concept",
+  "q": "Two elements are in the same group when…",
+  "options": [
+   "They have the same parent",
+   "They have the same root (find)",
+   "They were unioned directly",
+   "Their indexes are equal"
+  ],
+  "answer": 1,
+  "why": "Parents can differ; roots decide. Always compare find(a) and find(b)."
+ },
+ {
+  "id": "cycle",
+  "kind": "concept",
+  "q": "Adding undirected edges one by one, when does an edge close a cycle?",
+  "options": [
+   "When it's the longest",
+   "When both endpoints already have the same root",
+   "When a node has degree 3",
+   "Never"
+  ],
+  "answer": 1,
+  "why": "They were already connected, so this edge adds a second path."
+ },
+ {
+  "id": "compress",
+  "kind": "concept",
+  "q": "What does path compression do?",
+  "options": [
+   "Deletes nodes",
+   "Points every node on the find path straight at the root",
+   "Sorts the parent array",
+   "Merges all groups"
+  ],
+  "answer": 1,
+  "why": "Later finds from those nodes take one step."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "With path compression and union by rank, each operation is about…",
+  "options": [
+   "O(n)",
+   "O(log n)",
+   "O(α(n)), effectively constant",
+   "O(n log n)"
+  ],
+  "answer": 2,
+  "why": "The inverse Ackermann function is at most 4 for any realistic input size."
+ },
+ {
+  "id": "network",
+  "kind": "output",
+  "q": "6 computers, 5 cables, and after all unions there are 2 groups. Minimum operations to connect everything?",
+  "options": [
+   "0",
+   "1",
+   "2",
+   "−1"
+  ],
+  "answer": 1,
+  "why": "With at least n − 1 = 5 cables, you need groups − 1 = 1 move."
+ },
+ {
+  "id": "limits",
+  "kind": "pattern",
+  "q": "Which question can union-find NOT answer directly?",
+  "options": [
+   "Are a and b connected?",
+   "How many groups are there?",
+   "What's the shortest path from a to b?",
+   "Does this edge make a cycle?"
+  ],
+  "answer": 2,
+  "why": "It tracks membership, not paths or distances. Use BFS/Dijkstra for that."
+ }
+]

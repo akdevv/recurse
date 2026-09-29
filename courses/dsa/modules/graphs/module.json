@@ -1,0 +1,22 @@
+{
+  "id": "graphs",
+  "number": 10,
+  "title": "Graphs",
+  "summary": "Trees without the rules. Grids are graphs too.",
+  "prereqs": [
+    "trees",
+    "stacks-queues"
+  ],
+  "topics": [
+    "graph-basics",
+    "grid-traversal",
+    "graph-dfs-bfs",
+    "topological-sort",
+    "union-find",
+    "shortest-paths",
+    "minimum-spanning-tree"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

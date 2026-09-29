@@ -1,0 +1,34 @@
+{
+  "id": "binary-search-on-the-answer",
+  "title": "Binary search on the answer",
+  "status": "ready",
+  "learn": "search over the answer range with a feasibility check (monotonic predicate)",
+  "hook": "Koko Eating Bananas and Capacity to Ship Packages look nothing like binary search: there's no sorted array to search. Spotting that you can binary search the answer itself is one of the most satisfying \"aha\" moments in interview prep.",
+  "patterns": [
+    "binary-search-answer"
+  ],
+  "problems": [
+    {
+      "id": "koko-eating-bananas",
+      "role": "guided"
+    },
+    {
+      "id": "capacity-to-ship-packages-within-d-days",
+      "role": "core"
+    },
+    {
+      "id": "split-array-largest-sum",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain \"binary search on the answer\" using Koko Eating Bananas or Capacity to Ship Packages.",
+    "keyPoints": [
+      "search over the possible answers (speeds, capacities), not over an array",
+      "a feasibility check tells whether a candidate works, usually one greedy O(n) pass",
+      "feasibility is monotonic: if X works, every larger X works → binary search for the smallest X that works",
+      "bounds come from the input (e.g. max(weights)..sum(weights))",
+      "O(n log(range)) total"
+    ]
+  }
+}

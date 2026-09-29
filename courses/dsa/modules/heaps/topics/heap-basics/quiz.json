@@ -1,0 +1,80 @@
+[
+ {
+  "id": "peek",
+  "kind": "complexity",
+  "q": "Getting the minimum of a min-heap (without removing it) costs…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 0,
+  "why": "It's always at index 0."
+ },
+ {
+  "id": "push",
+  "kind": "complexity",
+  "q": "heapq.heappush on a heap of n items costs…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "why": "At most one swap per level while sifting up."
+ },
+ {
+  "id": "parent",
+  "kind": "concept",
+  "q": "In the array layout, the parent of index 9 is…",
+  "options": [
+   "3",
+   "4",
+   "5",
+   "8"
+  ],
+  "answer": 1,
+  "why": "(9 − 1) // 2 = 4."
+ },
+ {
+  "id": "max",
+  "kind": "concept",
+  "q": "How do you get a max-heap with Python's heapq?",
+  "options": [
+   "heapq.maxheap()",
+   "Push negated values and negate when reading",
+   "Sort descending first",
+   "It's not possible"
+  ],
+  "answer": 1,
+  "why": "The smallest negated value is the largest original value."
+ },
+ {
+  "id": "sorted",
+  "kind": "output",
+  "q": "After heapify, which element is guaranteed to be at h[1]?",
+  "options": [
+   "The second smallest",
+   "A child of the root, no more than that",
+   "The largest",
+   "The median"
+  ],
+  "answer": 1,
+  "why": "Only the root is guaranteed. The second smallest is one of the root's two children, but not necessarily h[1]."
+ },
+ {
+  "id": "heapify",
+  "kind": "complexity",
+  "q": "heapq.heapify on n items costs…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(log n)",
+   "O(n²)"
+  ],
+  "answer": 0,
+  "why": "Sift-down from the bottom up; most nodes only move a level or two."
+ }
+]

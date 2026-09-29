@@ -1,0 +1,80 @@
+[
+ {
+  "id": "unmark",
+  "kind": "concept",
+  "q": "Why unmark a grid cell when backtracking out of it?",
+  "options": [
+   "To save memory",
+   "So a different path can use that cell later",
+   "It's optional",
+   "To detect cycles"
+  ],
+  "answer": 1,
+  "why": "The cell was only off-limits for the current path."
+ },
+ {
+  "id": "prune",
+  "kind": "concept",
+  "q": "What does pruning mean in backtracking?",
+  "options": [
+   "Deleting the input",
+   "Stopping a branch as soon as it can't lead to a valid answer",
+   "Sorting the results",
+   "Memoizing results"
+  ],
+  "answer": 1,
+  "why": "Cutting dead branches early is what makes backtracking practical."
+ },
+ {
+  "id": "diag",
+  "kind": "concept",
+  "q": "N-Queens: two queens at (r1, c1) and (r2, c2) share the \"\\\" diagonal when…",
+  "options": [
+   "r1 + c1 == r2 + c2",
+   "r1 − c1 == r2 − c2",
+   "r1 == c2",
+   "c1 == c2"
+  ],
+  "answer": 1,
+  "why": "Moving down-right keeps r − c constant; the other diagonal keeps r + c constant."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Word Search worst case, board m×n, word length L?",
+  "options": [
+   "O(m·n)",
+   "O(m·n·3^L)",
+   "O(L²)",
+   "O(4^(m·n))"
+  ],
+  "answer": 1,
+  "why": "Each start cell explores up to 3 new directions per letter (it can't go back)."
+ },
+ {
+  "id": "partition",
+  "kind": "output",
+  "q": "How many ways are there to partition \"aab\" into palindromes?",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "answer": 1,
+  "why": "[\"a\", \"a\", \"b\"] and [\"aa\", \"b\"]."
+ },
+ {
+  "id": "trie",
+  "kind": "pattern",
+  "q": "Word Search II: find MANY words on the same board. Improvement?",
+  "options": [
+   "Run Word Search per word",
+   "Put all words in a trie and run one DFS that follows the trie",
+   "Sort the words",
+   "BFS per word"
+  ],
+  "answer": 1,
+  "why": "The trie lets all words share one walk and prunes paths no word continues."
+ }
+]

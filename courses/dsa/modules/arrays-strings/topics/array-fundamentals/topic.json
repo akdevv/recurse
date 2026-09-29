@@ -1,0 +1,41 @@
+{
+  "id": "array-fundamentals",
+  "title": "Array fundamentals",
+  "status": "ready",
+  "learn": "static vs dynamic arrays, indexing O(1), insert/delete O(n), in-place updates, iteration patterns",
+  "hook": "Arrays are the most asked category in coding interviews, and the follow-up is almost always \"can you do it in place?\" Knowing why inserting in the middle costs O(n), and how to avoid it, is the whole game.",
+  "patterns": [
+    "two-pointers"
+  ],
+  "problems": [
+    {
+      "id": "merge-sorted-array",
+      "role": "guided"
+    },
+    {
+      "id": "remove-element",
+      "role": "core"
+    },
+    {
+      "id": "max-consecutive-ones",
+      "role": "core"
+    },
+    {
+      "id": "majority-element",
+      "role": "core"
+    },
+    {
+      "id": "rotate-array",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "An interviewer asks: why is inserting at the front of an array slow, and how would you remove every copy of a value from an array in place?",
+    "keyPoints": [
+      "arrays are contiguous, so indexing is O(1) but inserting or deleting in the middle shifts everything after it: O(n)",
+      "deleting inside a loop is O(n) per delete, O(n²) total",
+      "a read pointer scans every value and a write pointer marks where the next kept value goes",
+      "the write-pointer pass is O(n) time and O(1) extra space"
+    ]
+  }
+}

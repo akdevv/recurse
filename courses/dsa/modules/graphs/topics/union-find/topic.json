@@ -1,0 +1,34 @@
+{
+  "id": "union-find",
+  "title": "Union-Find (DSU)",
+  "status": "ready",
+  "learn": "parent array, find with path compression, union by rank/size, cycle detection in undirected graphs",
+  "hook": "Redundant Connection, Number of Operations to Make Network Connected and Accounts Merge are union-find problems, and union-find also powers Kruskal's MST. It's a small data structure that's easy to write from memory.",
+  "patterns": [
+    "union-find"
+  ],
+  "problems": [
+    {
+      "id": "redundant-connection",
+      "role": "guided"
+    },
+    {
+      "id": "number-of-operations-to-make-network-connected",
+      "role": "core"
+    },
+    {
+      "id": "accounts-merge",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain union-find: what find and union do, and how path compression and union by rank keep it fast.",
+    "keyPoints": [
+      "every element points to a parent; a root points to itself and names the group",
+      "find follows parents to the root; union links one root under the other",
+      "two elements are connected iff they have the same root",
+      "path compression points nodes on the find path directly at the root; union by rank/size hangs the smaller tree under the larger",
+      "together: nearly O(1) per operation (inverse Ackermann)"
+    ]
+  }
+}

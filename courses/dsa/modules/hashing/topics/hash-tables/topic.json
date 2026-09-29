@@ -1,0 +1,49 @@
+{
+  "id": "hash-tables",
+  "title": "Hash tables",
+  "status": "ready",
+  "learn": "hash functions, collisions (chaining/open addressing), load factor, average O(1) vs worst O(n), set vs map, `Counter`, `defaultdict`",
+  "hook": "Hash maps are the single most useful tool in coding interviews: they turn \"search the array again\" into \"look it up\". Two Sum, the most famous interview question of all, is a hash map question.",
+  "patterns": [
+    "hash-map"
+  ],
+  "problems": [
+    {
+      "id": "contains-duplicate",
+      "role": "guided"
+    },
+    {
+      "id": "valid-anagram",
+      "role": "core"
+    },
+    {
+      "id": "two-sum",
+      "role": "core"
+    },
+    {
+      "id": "ransom-note",
+      "role": "core"
+    },
+    {
+      "id": "first-unique-character-in-a-string",
+      "role": "core"
+    },
+    {
+      "id": "isomorphic-strings",
+      "role": "optional"
+    },
+    {
+      "id": "word-pattern",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "An interviewer asks: how does a hash table give O(1) lookups, and when does it stop being O(1)? Use Two Sum as your example.",
+    "keyPoints": [
+      "a hash function maps a key to a bucket index, so a lookup jumps straight to one bucket",
+      "collisions (two keys, same bucket) are handled by chaining or open addressing",
+      "average O(1) insert/lookup/delete; worst case O(n) if many keys collide; resizing keeps the load factor low",
+      "Two Sum: store value → index while scanning and look up target − x: O(n) time, O(n) space vs O(n²) for all pairs"
+    ]
+  }
+}

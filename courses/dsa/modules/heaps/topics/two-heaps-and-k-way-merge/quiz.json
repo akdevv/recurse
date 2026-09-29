@@ -1,0 +1,80 @@
+[
+ {
+  "id": "halves",
+  "kind": "concept",
+  "q": "In the running-median design, the lower half lives in a…",
+  "options": [
+   "Min-heap",
+   "Max-heap",
+   "Sorted array",
+   "Queue"
+  ],
+  "answer": 1,
+  "why": "You need the LARGEST of the lower half quickly, so it's a max-heap."
+ },
+ {
+  "id": "median",
+  "kind": "output",
+  "q": "Lower heap holds {1, 3} and upper heap holds {5, 8}. The median is…",
+  "options": [
+   "3",
+   "4",
+   "5",
+   "4.5"
+  ],
+  "answer": 1,
+  "why": "Equal sizes: average of the tops, (3 + 5) / 2 = 4."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Adding one number to the two-heap median structure costs…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "why": "A constant number of heap pushes/pops."
+ },
+ {
+  "id": "kway",
+  "kind": "complexity",
+  "q": "Merging k sorted lists with N elements in total using a heap costs…",
+  "options": [
+   "O(N k)",
+   "O(N log k)",
+   "O(N log N)",
+   "O(k log N)"
+  ],
+  "answer": 1,
+  "why": "Every element is pushed and popped once on a heap of size ≤ k."
+ },
+ {
+  "id": "tie",
+  "kind": "concept",
+  "q": "Why push (value, index, node) instead of (value, node)?",
+  "options": [
+   "Faster",
+   "When values tie, Python compares the next field; ListNode objects can't be compared",
+   "To sort by list",
+   "Memory"
+  ],
+  "answer": 1,
+  "why": "The unique index breaks ties before Python ever tries to compare nodes."
+ },
+ {
+  "id": "two",
+  "kind": "pattern",
+  "q": "You only need to merge TWO sorted lists. Best approach?",
+  "options": [
+   "Heap",
+   "Two pointers",
+   "Sort the concatenation",
+   "Hash map"
+  ],
+  "answer": 1,
+  "why": "A heap adds nothing for k = 2; a simple two-pointer merge is O(n + m)."
+ }
+]

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "lru",
+  "kind": "concept",
+  "q": "Why does an LRU cache need a DOUBLY linked list?",
+  "options": [
+   "For sorting",
+   "To remove a node from the middle in O(1), you need its previous node",
+   "To store two values",
+   "It doesn't"
+  ],
+  "answer": 1,
+  "why": "The map gives you the node; unlinking it needs prev as well as next."
+ },
+ {
+  "id": "lru-get",
+  "kind": "concept",
+  "q": "In an LRU cache, what does a successful get(key) do besides returning the value?",
+  "options": [
+   "Nothing",
+   "Moves the key to the most-recently-used end",
+   "Evicts the key",
+   "Resets the capacity"
+  ],
+  "answer": 1,
+  "why": "Reading counts as using it, so it's no longer the least recent."
+ },
+ {
+  "id": "carry",
+  "kind": "output",
+  "q": "Add Two Numbers: l1 = [9, 9], l2 = [1] (i.e. 99 + 1). What's the result list?",
+  "options": [
+   "[0, 0]",
+   "[0, 0, 1]",
+   "[1, 0, 0]",
+   "[10, 9]"
+  ],
+  "answer": 1,
+  "why": "Digits are stored in reverse: 100 → [0, 0, 1]. The final carry needs its own node."
+ },
+ {
+  "id": "reorder",
+  "kind": "pattern",
+  "q": "Reorder List (L0 → Ln → L1 → Ln−1 …) in O(1) space. Which steps?",
+  "options": [
+   "Sort the list",
+   "Find the middle, reverse the second half, interleave the two halves",
+   "Copy values into an array",
+   "Rotate the list"
+  ],
+  "answer": 1,
+  "why": "Three standard moves, each O(n), none needing extra space."
+ },
+ {
+  "id": "sublist-cx",
+  "kind": "complexity",
+  "q": "Reversing nodes between positions left and right takes…",
+  "options": [
+   "O(right − left) time after reaching left, O(1) space",
+   "O(n²)",
+   "O(n) space",
+   "O(log n)"
+  ],
+  "answer": 0,
+  "why": "Walk to the node before left, then right − left O(1) moves."
+ },
+ {
+  "id": "random",
+  "kind": "concept",
+  "q": "Copy List with Random Pointer: why two passes with a map?",
+  "options": [
+   "The map sorts nodes",
+   "A random pointer may point to a node whose copy doesn't exist yet",
+   "One pass is O(n²)",
+   "To free memory"
+  ],
+  "answer": 1,
+  "why": "Create every copy first (old → new), then set next and random through the map."
+ }
+]

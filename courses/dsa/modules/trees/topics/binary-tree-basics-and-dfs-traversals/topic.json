@@ -1,0 +1,57 @@
+{
+  "id": "binary-tree-basics-and-dfs-traversals",
+  "title": "Binary tree basics & DFS traversals",
+  "status": "ready",
+  "learn": "terminology (root, leaf, height, depth), pre/in/post-order (recursive + iterative with stack), 'ask children, combine' recursion",
+  "hook": "Trees are the most asked topic after arrays, and almost every tree question is solved by the same recursive shape: handle the empty tree, ask both children, combine. Maximum Depth, Invert Tree and Same Tree are that shape in three lines.",
+  "patterns": [
+    "tree-dfs"
+  ],
+  "problems": [
+    {
+      "id": "binary-tree-preorder-traversal",
+      "role": "guided"
+    },
+    {
+      "id": "binary-tree-inorder-traversal",
+      "role": "core"
+    },
+    {
+      "id": "binary-tree-postorder-traversal",
+      "role": "core"
+    },
+    {
+      "id": "maximum-depth-of-binary-tree",
+      "role": "core"
+    },
+    {
+      "id": "same-tree",
+      "role": "core"
+    },
+    {
+      "id": "invert-binary-tree",
+      "role": "core"
+    },
+    {
+      "id": "symmetric-tree",
+      "role": "core"
+    },
+    {
+      "id": "path-sum",
+      "role": "core"
+    },
+    {
+      "id": "binary-tree-paths",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd compute the maximum depth of a binary tree recursively, and how preorder, inorder and postorder traversals differ.",
+    "keyPoints": [
+      "recursive shape: empty tree is the base case, recurse on left and right, combine at the node",
+      "max depth = 1 + max(depth(left), depth(right)), depth(None) = 0",
+      "preorder visits node before children, inorder between them, postorder after them",
+      "O(n) time, O(h) space for the recursion (h = height, up to n when skewed)"
+    ]
+  }
+}

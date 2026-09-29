@@ -1,0 +1,18 @@
+{
+  "id": "two-pointers-sliding-window",
+  "number": 3,
+  "title": "Two Pointers & Sliding Window",
+  "summary": "The two most common array/string patterns. Turn nested loops into one pass.",
+  "prereqs": [
+    "hashing"
+  ],
+  "topics": [
+    "two-pointers-opposite-ends",
+    "two-pointers-same-direction",
+    "sliding-window-fixed-size",
+    "sliding-window-variable-size"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

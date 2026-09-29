@@ -1,0 +1,54 @@
+{
+  "id": "1d-dp",
+  "title": "1D DP",
+  "status": "ready",
+  "learn": "dp[i] from previous states: take/skip, linear sequences",
+  "hook": "House Robber, Coin Change, Word Break, Decode Ways and Longest Increasing Subsequence are the core 1D DP set on every interview list. Each one is a choice of what dp[i] means and one line of recurrence.",
+  "patterns": [
+    "dynamic-programming"
+  ],
+  "problems": [
+    {
+      "id": "house-robber",
+      "role": "guided"
+    },
+    {
+      "id": "house-robber-ii",
+      "role": "core"
+    },
+    {
+      "id": "decode-ways",
+      "role": "core"
+    },
+    {
+      "id": "coin-change",
+      "role": "core"
+    },
+    {
+      "id": "word-break",
+      "role": "core"
+    },
+    {
+      "id": "longest-increasing-subsequence",
+      "role": "core"
+    },
+    {
+      "id": "maximum-product-subarray",
+      "role": "optional"
+    },
+    {
+      "id": "longest-palindromic-substring",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the DP solution to Coin Change: the state, the recurrence, the base case, and why greedy doesn't work.",
+    "keyPoints": [
+      "state: dp[a] = fewest coins to make amount a",
+      "recurrence: try every coin as the last one: dp[a] = min(dp[a − c] + 1) over coins c ≤ a",
+      "base case dp[0] = 0, everything else starts at infinity; unreachable → −1",
+      "greedy (biggest coin first) fails for coins like [1, 3, 4] and amount 6",
+      "O(amount × coins) time, O(amount) space"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "hashing",
+  "number": 2,
+  "title": "Hashing",
+  "summary": "Hash map/set is the #1 interview tool: turns O(n²) lookups into O(1).",
+  "prereqs": [
+    "arrays-strings"
+  ],
+  "topics": [
+    "hash-tables",
+    "grouping-and-counting",
+    "prefix-sums"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

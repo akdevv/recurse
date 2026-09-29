@@ -1,0 +1,15 @@
+{
+  "id": "tries",
+  "number": 13,
+  "title": "Tries",
+  "summary": "Prefix trees for word/prefix search.",
+  "prereqs": [
+    "trees"
+  ],
+  "topics": [
+    "trie"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

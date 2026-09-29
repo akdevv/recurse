@@ -1,0 +1,81 @@
+[
+ {
+  "id": "count",
+  "kind": "complexity",
+  "q": "How many subsets does a set of n distinct elements have?",
+  "options": [
+   "n",
+   "n²",
+   "2ⁿ",
+   "n!"
+  ],
+  "answer": 2,
+  "why": "Each element is independently in or out: 2 · 2 · … · 2 = 2ⁿ."
+ },
+ {
+  "id": "perms",
+  "kind": "complexity",
+  "q": "How many permutations of 4 distinct elements are there?",
+  "options": [
+   "16",
+   "24",
+   "12",
+   "4"
+  ],
+  "answer": 1,
+  "why": "4! = 4 · 3 · 2 · 1 = 24."
+ },
+ {
+  "id": "copy",
+  "kind": "output",
+  "q": "What is `res` after this runs with nums = [1, 2]?",
+  "code": "res, path = [], []\ndef bt(start):\n    res.append(path)\n    for i in range(start, len(nums)):\n        path.append(nums[i])\n        bt(i + 1)\n        path.pop()\nbt(0)",
+  "options": [
+   "[[], [1], [1, 2], [2]]",
+   "[[], [], [], []]",
+   "[[1, 2]]",
+   "An error"
+  ],
+  "answer": 1,
+  "why": "Every append stores the SAME list object, which is empty after all the pops. Append `path[:]` instead."
+ },
+ {
+  "id": "reuse",
+  "kind": "concept",
+  "q": "Combination Sum lets you reuse a candidate. What changes in the recursion?",
+  "options": [
+   "Recurse with i instead of i + 1",
+   "Recurse with 0",
+   "Sort descending",
+   "Nothing"
+  ],
+  "answer": 0,
+  "why": "Staying at i allows the same candidate again; never going below i avoids duplicate orderings."
+ },
+ {
+  "id": "dups",
+  "kind": "concept",
+  "q": "Subsets II (input has duplicates, sorted): which skip rule avoids duplicate subsets?",
+  "options": [
+   "if i > 0 and nums[i] == nums[i-1]: continue",
+   "if i > start and nums[i] == nums[i-1]: continue",
+   "if nums[i] in path: continue",
+   "Use a set of tuples only"
+  ],
+  "answer": 1,
+  "why": "At one depth, only the first of equal values starts a branch. `i > 0` would also block [1, 1] where the second 1 is picked deeper."
+ },
+ {
+  "id": "parens",
+  "kind": "concept",
+  "q": "Generate Parentheses: when may you add ')'?",
+  "options": [
+   "Always",
+   "When close < open",
+   "When open == n",
+   "Only at the end"
+  ],
+  "answer": 1,
+  "why": "A closing bracket must close something already opened."
+ }
+]

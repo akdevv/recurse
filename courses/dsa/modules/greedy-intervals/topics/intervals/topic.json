@@ -1,0 +1,43 @@
+{
+  "id": "intervals",
+  "title": "Intervals",
+  "status": "ready",
+  "learn": "sort by start, merge overlapping, sweep, counting overlaps, sort by end for scheduling",
+  "hook": "Merge Intervals is one of the most asked mediums at big tech companies, and Insert Interval, Non-overlapping Intervals and meeting-room questions follow the same playbook: sort, then sweep once.",
+  "patterns": [
+    "merge-intervals",
+    "greedy"
+  ],
+  "problems": [
+    {
+      "id": "summary-ranges",
+      "role": "guided"
+    },
+    {
+      "id": "merge-intervals",
+      "role": "core"
+    },
+    {
+      "id": "insert-interval",
+      "role": "core"
+    },
+    {
+      "id": "non-overlapping-intervals",
+      "role": "core"
+    },
+    {
+      "id": "minimum-number-of-arrows-to-burst-balloons",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd merge overlapping intervals and how you'd find the minimum number of intervals to remove so the rest don't overlap.",
+    "keyPoints": [
+      "merge: sort by start; if an interval starts before the last merged one ends, extend that end with max, otherwise start a new one",
+      "remove fewest / keep most: sort by END and greedily keep each interval that starts after the last kept end",
+      "choosing the earliest-ending interval leaves the most room for the rest (exchange argument)",
+      "O(n log n) for sorting plus an O(n) scan",
+      "check whether touching endpoints count as overlapping"
+    ]
+  }
+}

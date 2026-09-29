@@ -1,0 +1,80 @@
+[
+ {
+  "id": "why",
+  "kind": "concept",
+  "q": "Why can Dijkstra finalise the node it pops from the heap?",
+  "options": [
+   "It's the first node",
+   "All other routes are at least as long, and non-negative edges can't make them shorter",
+   "Heaps are sorted",
+   "Because of BFS"
+  ],
+  "answer": 1,
+  "why": "Any other path already costs ≥ this distance before adding more non-negative edges."
+ },
+ {
+  "id": "neg",
+  "kind": "concept",
+  "q": "What goes wrong with negative edge weights?",
+  "options": [
+   "Nothing",
+   "A settled node could later be reached more cheaply",
+   "The heap overflows",
+   "Only runtime increases"
+  ],
+  "answer": 1,
+  "why": "The \"popped = final\" guarantee fails."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Dijkstra with a binary heap costs…",
+  "options": [
+   "O(V + E)",
+   "O((V + E) log V)",
+   "O(V · E)",
+   "O(V²)"
+  ],
+  "answer": 1,
+  "why": "Each edge may push to the heap; each push/pop is O(log V)."
+ },
+ {
+  "id": "unweighted",
+  "kind": "pattern",
+  "q": "All edges have the same cost. What's simplest?",
+  "options": [
+   "Dijkstra",
+   "Bellman-Ford",
+   "BFS",
+   "Floyd-Warshall"
+  ],
+  "answer": 2,
+  "why": "BFS already finds fewest-edge paths in O(V + E)."
+ },
+ {
+  "id": "k",
+  "kind": "concept",
+  "q": "Cheapest Flights with at most k stops: why relax from a COPY of last round's distances?",
+  "options": [
+   "Speed",
+   "So one round extends paths by at most one flight",
+   "To avoid negative weights",
+   "Python needs it"
+  ],
+  "answer": 1,
+  "why": "Updating in place could chain several flights in a single round and break the stop limit."
+ },
+ {
+  "id": "delay",
+  "kind": "output",
+  "q": "Network Delay: distances from the source are [0, 3, 5, 2]. Answer?",
+  "options": [
+   "2",
+   "3",
+   "5",
+   "10"
+  ],
+  "answer": 2,
+  "why": "The signal reaches everyone when the farthest node gets it: the maximum distance."
+ }
+]

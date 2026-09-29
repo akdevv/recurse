@@ -1,0 +1,82 @@
+[
+ {
+  "id": "avg",
+  "kind": "complexity",
+  "q": "What is the average cost of `x in s` when `s` is a Python set?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 0,
+  "why": "The hash picks the bucket directly. On average buckets hold very few keys, so the check is O(1)."
+ },
+ {
+  "id": "list-in",
+  "kind": "complexity",
+  "q": "What is the time complexity of this loop?",
+  "code": "seen = []\nfor x in nums:\n    if x in seen:\n        return True\n    seen.append(x)",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²)",
+   "O(1)"
+  ],
+  "answer": 2,
+  "why": "`x in seen` on a list scans it: O(n) per check, O(n²) overall. Making `seen` a set brings it down to O(n)."
+ },
+ {
+  "id": "worst",
+  "kind": "concept",
+  "q": "When can a hash table lookup cost O(n)?",
+  "options": [
+   "When the table is empty",
+   "When many keys land in the same bucket",
+   "When keys are strings",
+   "Never, it's always O(1)"
+  ],
+  "answer": 1,
+  "why": "If most keys collide into one bucket, a lookup has to walk that whole chain. Good hash functions and resizing make this rare."
+ },
+ {
+  "id": "unhashable",
+  "kind": "output",
+  "q": "What happens here?",
+  "code": "d = {}\nd[[1, 2]] = 'x'",
+  "options": [
+   "It works",
+   "`KeyError`",
+   "`TypeError: unhashable type: 'list'`",
+   "It stores the key as a tuple"
+  ],
+  "answer": 2,
+  "why": "Lists can change, so they have no stable hash. Use `tuple([1, 2])` as the key instead."
+ },
+ {
+  "id": "two-sum-order",
+  "kind": "concept",
+  "q": "In one-pass Two Sum, why check `target - x in index` before storing `x`?",
+  "options": [
+   "It's faster",
+   "So x can't pair with itself",
+   "Dicts can't be updated inside a loop",
+   "To keep the answer sorted"
+  ],
+  "answer": 1,
+  "why": "If x were stored first, target = 2x would find x itself, e.g. [3, 2, 4] with target 6 would return [0, 0]."
+ },
+ {
+  "id": "pattern",
+  "kind": "pattern",
+  "q": "Which clue most strongly suggests a hash map?",
+  "options": [
+   "The input is sorted",
+   "You need to repeatedly ask \"have I seen this value?\"",
+   "You need the k-th smallest element",
+   "The input is a tree"
+  ],
+  "answer": 1,
+  "why": "Repeated membership or lookup questions are exactly what hash maps make O(1)."
+ }
+]

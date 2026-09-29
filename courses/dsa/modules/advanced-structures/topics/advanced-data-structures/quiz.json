@@ -1,0 +1,80 @@
+[
+ {
+  "id": "seg",
+  "kind": "complexity",
+  "q": "A segment tree answers a range-sum query in…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "why": "It combines O(log n) stored ranges."
+ },
+ {
+  "id": "prefix",
+  "kind": "pattern",
+  "q": "Range sums on an array that never changes. Best tool?",
+  "options": [
+   "Segment tree",
+   "Prefix sums",
+   "Bloom filter",
+   "B-tree"
+  ],
+  "answer": 1,
+  "why": "O(1) per query after O(n) setup; a segment tree only pays off when there are updates."
+ },
+ {
+  "id": "bloom",
+  "kind": "concept",
+  "q": "A Bloom filter says an item is NOT present. Can it be wrong?",
+  "options": [
+   "Yes, often",
+   "No: a zero bit means it was never added",
+   "Only after deletions",
+   "Only with one hash"
+  ],
+  "answer": 1,
+  "why": "False negatives are impossible; only false positives happen."
+ },
+ {
+  "id": "bloom-fp",
+  "kind": "concept",
+  "q": "Why can a Bloom filter give a false positive?",
+  "options": [
+   "Hash functions are random",
+   "Other items may have set every bit this item hashes to",
+   "It stores items in a list",
+   "It forgets items"
+  ],
+  "answer": 1,
+  "why": "All k bits can be 1 because of different items."
+ },
+ {
+  "id": "btree",
+  "kind": "concept",
+  "q": "Why do databases use B+ trees for indexes?",
+  "options": [
+   "They're binary",
+   "Wide nodes make the tree very shallow, so a lookup needs few disk reads",
+   "They never need balancing",
+   "They use hashing"
+  ],
+  "answer": 1,
+  "why": "Disk reads dominate the cost; a height of 3–4 covers billions of rows."
+ },
+ {
+  "id": "fenwick",
+  "kind": "output",
+  "q": "In a Fenwick tree, what is i & −i for i = 12 (1100)?",
+  "options": [
+   "1",
+   "4",
+   "8",
+   "12"
+  ],
+  "answer": 1,
+  "why": "It isolates the lowest set bit: 0100 = 4."
+ }
+]

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "fail",
+  "kind": "concept",
+  "q": "Coins [1, 3, 4], amount 6. How many coins does 'take the biggest that fits' use?",
+  "options": [
+   "2",
+   "3",
+   "4",
+   "6"
+  ],
+  "answer": 1,
+  "why": "4 + 1 + 1. The optimum is 3 + 3, so greedy fails here."
+ },
+ {
+  "id": "exchange",
+  "kind": "concept",
+  "q": "What is an exchange argument?",
+  "options": [
+   "Swapping array elements",
+   "Showing any optimal solution can be changed to include the greedy choice without getting worse",
+   "Trying all options",
+   "Memoization"
+  ],
+  "answer": 1,
+  "why": "It proves the greedy choice is always safe to make."
+ },
+ {
+  "id": "jump",
+  "kind": "output",
+  "q": "Jump Game on nums = [3, 2, 1, 0, 4]: can you reach the last index?",
+  "options": [
+   "Yes",
+   "No",
+   "Only with 2 jumps",
+   "Only backwards"
+  ],
+  "answer": 1,
+  "why": "Every path lands on index 3 (value 0); farthest reachable stays 3 < 4."
+ },
+ {
+  "id": "kadane",
+  "kind": "concept",
+  "q": "In Kadane's algorithm, when does the running sum restart at the current element?",
+  "options": [
+   "Never",
+   "When cur + x is smaller than x alone (the old sum is negative)",
+   "When x is negative",
+   "Every k steps"
+  ],
+  "answer": 1,
+  "why": "A negative running sum can only drag down any subarray that continues it."
+ },
+ {
+  "id": "stock2",
+  "kind": "concept",
+  "q": "Best Time to Buy and Sell Stock II (unlimited trades). The answer is…",
+  "options": [
+   "max − min",
+   "The sum of every positive day-to-day increase",
+   "The biggest single increase",
+   "0"
+  ],
+  "answer": 1,
+  "why": "Any rise can be captured by buying the day before and selling that day."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Assign Cookies with sorting costs…",
+  "options": [
+   "O(n)",
+   "O(n log n + m log m)",
+   "O(n·m)",
+   "O(2ⁿ)"
+  ],
+  "answer": 1,
+  "why": "Two sorts, then one linear pass."
+ }
+]

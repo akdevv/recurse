@@ -1,0 +1,81 @@
+[
+ {
+  "id": "range",
+  "kind": "concept",
+  "q": "With prefix[0] = 0 and prefix[i + 1] = prefix[i] + nums[i], the sum of nums[2..5] is…",
+  "options": [
+   "prefix[5] − prefix[2]",
+   "prefix[6] − prefix[2]",
+   "prefix[6] − prefix[3]",
+   "prefix[5] − prefix[1]"
+  ],
+  "answer": 1,
+  "why": "prefix[6] covers nums[0..5]; subtract prefix[2], which covers nums[0..1]."
+ },
+ {
+  "id": "query-cost",
+  "kind": "complexity",
+  "q": "After building prefix sums once, each range sum query costs…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(r − l)"
+  ],
+  "answer": 0,
+  "why": "It's one subtraction of two stored values."
+ },
+ {
+  "id": "seed",
+  "kind": "concept",
+  "q": "In Subarray Sum Equals K, why start with seen = {0: 1}?",
+  "options": [
+   "To avoid a KeyError",
+   "So subarrays starting at index 0 are counted",
+   "Because k can be 0",
+   "It makes the loop faster"
+  ],
+  "answer": 1,
+  "why": "A subarray nums[0..i] sums to k when the running sum s equals k, which means s − k = 0 must already be \"seen\"."
+ },
+ {
+  "id": "negatives",
+  "kind": "pattern",
+  "q": "Why not use a sliding window for Subarray Sum Equals K?",
+  "options": [
+   "Windows only work on strings",
+   "With negative numbers, shrinking the window doesn't reliably lower the sum",
+   "It would be O(n²)",
+   "It needs sorted input"
+  ],
+  "answer": 1,
+  "why": "Sliding windows need a monotonic sum: growing only increases it, shrinking only decreases it. Negatives break that."
+ },
+ {
+  "id": "pivot",
+  "kind": "output",
+  "q": "What does this return for nums = [1, 7, 3, 6, 5, 6]?",
+  "code": "total, left = sum(nums), 0\nfor i, x in enumerate(nums):\n    if left == total - left - x:\n        return i\n    left += x\nreturn -1",
+  "options": [
+   "2",
+   "3",
+   "4",
+   "-1"
+  ],
+  "answer": 1,
+  "why": "At index 3: left = 1 + 7 + 3 = 11, right = 5 + 6 = 11."
+ },
+ {
+  "id": "product",
+  "kind": "concept",
+  "q": "Product of Array Except Self without division: answer[i] is…",
+  "options": [
+   "total product / nums[i]",
+   "product of everything left of i × product of everything right of i",
+   "prefix[i + 1] − prefix[i]",
+   "nums[i − 1] × nums[i + 1]"
+  ],
+  "answer": 1,
+  "why": "Prefix products from the left and suffix products from the right, multiplied together. No division, so zeros are fine."
+ }
+]

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "search",
+  "kind": "complexity",
+  "q": "Searching a balanced BST with n nodes takes…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 1,
+  "why": "Each comparison discards one subtree; the height is about log₂ n."
+ },
+ {
+  "id": "inorder",
+  "kind": "concept",
+  "q": "What does an inorder traversal of a BST produce?",
+  "options": [
+   "Random order",
+   "Values in sorted order",
+   "Reverse insertion order",
+   "Level order"
+  ],
+  "answer": 1,
+  "why": "Left (smaller), node, right (bigger), recursively."
+ },
+ {
+  "id": "invalid",
+  "kind": "concept",
+  "q": "Root 5, right child 6, and 6 has a left child 2. Is it a BST?",
+  "options": [
+   "Yes, 2 < 6",
+   "No, 2 is in 5's right subtree so it must be > 5",
+   "Yes, all children are valid",
+   "Only if 2 is a leaf"
+  ],
+  "answer": 1,
+  "why": "The property is about all descendants, not only direct children."
+ },
+ {
+  "id": "delete",
+  "kind": "concept",
+  "q": "Deleting a node with two children: common approach?",
+  "options": [
+   "Remove it and its subtrees",
+   "Replace its value with the inorder successor (min of the right subtree), then delete that node",
+   "Swap it with the root",
+   "Rebuild the tree"
+  ],
+  "answer": 1,
+  "why": "The successor keeps the ordering and has at most one child, so it's easy to remove."
+ },
+ {
+  "id": "lca",
+  "kind": "pattern",
+  "q": "LCA in a BST: both p and q are smaller than the current node. Where next?",
+  "options": [
+   "Right",
+   "Left",
+   "Stop here",
+   "Both sides"
+  ],
+  "answer": 1,
+  "why": "Both are in the left subtree, so their LCA is too."
+ },
+ {
+  "id": "sorted",
+  "kind": "concept",
+  "q": "Convert a sorted array to a height-balanced BST. Which element becomes the root?",
+  "options": [
+   "The first",
+   "The middle",
+   "The last",
+   "Any"
+  ],
+  "answer": 1,
+  "why": "The middle splits the rest into two equal halves, recursively."
+ }
+]

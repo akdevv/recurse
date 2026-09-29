@@ -1,0 +1,17 @@
+{
+  "id": "linked-lists",
+  "number": 5,
+  "title": "Linked Lists",
+  "summary": "Pointer manipulation. Tests carefulness more than cleverness.",
+  "prereqs": [
+    "arrays-strings"
+  ],
+  "topics": [
+    "linked-list-basics",
+    "fast-and-slow-pointers",
+    "in-place-reversal-and-rewiring"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

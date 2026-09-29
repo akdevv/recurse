@@ -1,0 +1,30 @@
+{
+  "id": "topological-sort",
+  "title": "Topological sort",
+  "status": "ready",
+  "learn": "DAGs, Kahn's algorithm (in-degree BFS), DFS-based order, cycle detection in directed graphs",
+  "hook": "Course Schedule I and II are asked all the time: \"can you finish all courses\" and \"in what order\". Topological sort is the answer, and it doubles as cycle detection for directed graphs.",
+  "patterns": [
+    "topological-sort"
+  ],
+  "problems": [
+    {
+      "id": "course-schedule",
+      "role": "guided"
+    },
+    {
+      "id": "course-schedule-ii",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain topological sort with Kahn's algorithm and how it tells you whether the courses can all be finished.",
+    "keyPoints": [
+      "directed edge pre → course means pre must come first",
+      "compute in-degrees; start a queue with every node of in-degree 0",
+      "pop a node, append it to the order, decrement its neighbours' in-degrees and queue those that reach 0",
+      "if the order contains all V nodes it's valid; otherwise the leftovers are in a cycle",
+      "O(V + E) time and space"
+    ]
+  }
+}

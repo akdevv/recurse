@@ -1,0 +1,80 @@
+[
+ {
+  "id": "skew",
+  "kind": "complexity",
+  "q": "Inserting 1, 2, 3, …, n in order into a plain BST gives search cost…",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 2,
+  "why": "Each value becomes the right child of the previous one: a linked list."
+ },
+ {
+  "id": "avl",
+  "kind": "concept",
+  "q": "The AVL balance rule says that at every node…",
+  "options": [
+   "Both subtrees have the same size",
+   "The heights of the two subtrees differ by at most 1",
+   "All leaves are at the same depth",
+   "The tree is complete"
+  ],
+  "answer": 1,
+  "why": "That's enough to keep the height O(log n)."
+ },
+ {
+  "id": "rot",
+  "kind": "complexity",
+  "q": "How much work is a single rotation?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(h²)"
+  ],
+  "answer": 0,
+  "why": "Only a few pointers near the imbalance change."
+ },
+ {
+  "id": "keep",
+  "kind": "concept",
+  "q": "After a rotation, what must still hold?",
+  "options": [
+   "The tree is perfect",
+   "The BST ordering (inorder sequence unchanged)",
+   "The root is unchanged",
+   "All leaves at one level"
+  ],
+  "answer": 1,
+  "why": "Rotations rearrange shape without changing sorted order."
+ },
+ {
+  "id": "btree",
+  "kind": "pattern",
+  "q": "Why do databases use B+ trees instead of binary trees for indexes?",
+  "options": [
+   "They're simpler",
+   "Many keys per node → a very shallow tree → few slow disk reads",
+   "They use less memory",
+   "They don't need balancing"
+  ],
+  "answer": 1,
+  "why": "Disk reads are the expensive part; wide nodes minimise how many are needed."
+ },
+ {
+  "id": "python",
+  "kind": "concept",
+  "q": "Which built-in Python structure is a balanced search tree?",
+  "options": [
+   "dict",
+   "set",
+   "heapq",
+   "None of them"
+  ],
+  "answer": 3,
+  "why": "dict/set are hash tables, heapq is a binary heap. Use a library (e.g. sortedcontainers) for sorted-map behaviour."
+ }
+]

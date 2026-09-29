@@ -1,0 +1,29 @@
+{
+  "id": "elementary-sorts",
+  "title": "Elementary sorts",
+  "status": "ready",
+  "learn": "bubble, selection, insertion: how they work, O(n²), stability, when insertion sort wins (nearly sorted)",
+  "hook": "\"Walk me through insertion sort\" and \"which sorts are stable?\" still come up in interviews, and knowing why these sorts are O(n²) is what makes O(n log n) sorts make sense.",
+  "patterns": [
+    "simulation"
+  ],
+  "problems": [
+    {
+      "id": "height-checker",
+      "role": "guided"
+    },
+    {
+      "id": "sort-an-array",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how insertion sort works, its best and worst case, and when you'd actually choose it.",
+    "keyPoints": [
+      "keeps a sorted prefix; each new element shifts larger ones right and drops into place",
+      "worst/average O(n²) (reverse-sorted input), best O(n) on already sorted input",
+      "O(1) extra space and stable",
+      "good for tiny or nearly sorted arrays; Timsort uses it on small runs"
+    ]
+  }
+}

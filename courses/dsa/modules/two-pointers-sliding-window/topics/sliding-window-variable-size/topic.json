@@ -1,0 +1,47 @@
+{
+  "id": "sliding-window-variable-size",
+  "title": "Sliding window: variable size",
+  "status": "ready",
+  "learn": "expand right, shrink left while invalid, track best; window state in a hash map",
+  "hook": "Longest Substring Without Repeating Characters is one of the most asked questions anywhere. Variable-size windows (expand right, shrink left) solve it and a whole family of \"longest/shortest subarray such that…\" problems in O(n).",
+  "patterns": [
+    "sliding-window",
+    "hash-map"
+  ],
+  "problems": [
+    {
+      "id": "best-time-to-buy-and-sell-stock",
+      "role": "guided"
+    },
+    {
+      "id": "longest-substring-without-repeating-characters",
+      "role": "core"
+    },
+    {
+      "id": "minimum-size-subarray-sum",
+      "role": "core"
+    },
+    {
+      "id": "longest-repeating-character-replacement",
+      "role": "core"
+    },
+    {
+      "id": "permutation-in-string",
+      "role": "optional"
+    },
+    {
+      "id": "minimum-window-substring",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the variable-size sliding window using Longest Substring Without Repeating Characters, and why it's O(n) even with a loop inside a loop.",
+    "keyPoints": [
+      "expand the right edge one step at a time and add the new element to the window state",
+      "while the window breaks the rule, remove from the left and shrink",
+      "record longest after fixing the window (shortest: while valid, before shrinking)",
+      "each pointer only moves forward, at most n times each → O(n) total",
+      "needs a monotonic condition; negative numbers in sum problems break it"
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "sort-merge",
+  "kind": "concept",
+  "q": "To merge overlapping intervals, sort by…",
+  "options": [
+   "End",
+   "Start",
+   "Length",
+   "No sort needed"
+  ],
+  "answer": 1,
+  "why": "Then overlapping intervals are adjacent and you only compare with the last merged one."
+ },
+ {
+  "id": "sort-keep",
+  "kind": "concept",
+  "q": "To keep the MOST non-overlapping intervals, sort by…",
+  "options": [
+   "Start",
+   "End",
+   "Length, longest first",
+   "Midpoint"
+  ],
+  "answer": 1,
+  "why": "The one that finishes first leaves the most room for the others."
+ },
+ {
+  "id": "max",
+  "kind": "output",
+  "q": "Merge [[1, 10], [2, 3]]. Result?",
+  "options": [
+   "[[1, 3]]",
+   "[[1, 10]]",
+   "[[1, 10], [2, 3]]",
+   "[[2, 10]]"
+  ],
+  "answer": 1,
+  "why": "[2, 3] lies inside [1, 10]; the end stays max(10, 3) = 10."
+ },
+ {
+  "id": "touch",
+  "kind": "concept",
+  "q": "Merge Intervals: are [1, 4] and [4, 5] merged?",
+  "options": [
+   "Yes, they share point 4",
+   "No",
+   "Only if sorted",
+   "Only in insert"
+  ],
+  "answer": 0,
+  "why": "LeetCode's Merge Intervals treats touching as overlapping. Always check each problem's definition."
+ },
+ {
+  "id": "arrows",
+  "kind": "output",
+  "q": "Balloons [[1, 6], [2, 8], [7, 12], [10, 16]]. Minimum arrows?",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "answer": 1,
+  "why": "Sorted by end: shoot at 6 (bursts [1,6], [2,8]), then at 12 (bursts [7,12], [10,16])."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Insert Interval into an already sorted, non-overlapping list costs…",
+  "options": [
+   "O(log n)",
+   "O(n)",
+   "O(n log n)",
+   "O(n²)"
+  ],
+  "answer": 1,
+  "why": "One pass in three phases; no sort needed."
+ }
+]

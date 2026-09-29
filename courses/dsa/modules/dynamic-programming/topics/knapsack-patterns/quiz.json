@@ -1,0 +1,80 @@
+[
+ {
+  "id": "reduce",
+  "kind": "concept",
+  "q": "Partition Equal Subset Sum is equivalent to…",
+  "options": [
+   "Sorting the array",
+   "Finding a subset that sums to total / 2",
+   "Finding the median",
+   "Two Sum"
+  ],
+  "answer": 1,
+  "why": "If one half sums to total / 2, the rest does too."
+ },
+ {
+  "id": "dir",
+  "kind": "concept",
+  "q": "Why iterate capacity DOWNWARD in 0/1 knapsack?",
+  "options": [
+   "Faster",
+   "So can[s − x] still refers to the previous round and x isn't used twice",
+   "To find the maximum",
+   "It doesn't matter"
+  ],
+  "answer": 1,
+  "why": "Going upward would read values already updated with x in this round."
+ },
+ {
+  "id": "order",
+  "kind": "concept",
+  "q": "Coin Change II (count combinations): which loop is outer?",
+  "options": [
+   "Amounts",
+   "Coins",
+   "Either",
+   "Neither"
+  ],
+  "answer": 1,
+  "why": "Coins outer builds each combination in one fixed coin order; amounts outer counts permutations."
+ },
+ {
+  "id": "target",
+  "kind": "output",
+  "q": "Target Sum: nums = [1, 1, 1, 1, 1], target = 3. Subset sum you count?",
+  "options": [
+   "3",
+   "4",
+   "5",
+   "8"
+  ],
+  "answer": 1,
+  "why": "(total + target) / 2 = (5 + 3) / 2 = 4."
+ },
+ {
+  "id": "pseudo",
+  "kind": "complexity",
+  "q": "Why is subset-sum DP called pseudo-polynomial?",
+  "options": [
+   "It's exponential",
+   "Its cost depends on the numeric value of the target, not just the input length",
+   "It uses recursion",
+   "It's O(n²)"
+  ],
+  "answer": 1,
+  "why": "A target of 10⁹ makes the table huge even for a short list."
+ },
+ {
+  "id": "odd",
+  "kind": "output",
+  "q": "Partition Equal Subset Sum on [1, 2, 4]?",
+  "options": [
+   "True",
+   "False",
+   "Depends on order",
+   "Error"
+  ],
+  "answer": 1,
+  "why": "The total is 7, which is odd: no equal split."
+ }
+]

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "fifo",
+  "kind": "concept",
+  "q": "Which structure removes the element that was added FIRST?",
+  "options": [
+   "Stack",
+   "Queue",
+   "Heap",
+   "Set"
+  ],
+  "answer": 1,
+  "why": "FIFO: first in, first out."
+ },
+ {
+  "id": "pop0",
+  "kind": "complexity",
+  "q": "What does `lst.pop(0)` cost on a Python list of n elements?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n²)"
+  ],
+  "answer": 2,
+  "why": "Every remaining element shifts one slot left."
+ },
+ {
+  "id": "deque",
+  "kind": "complexity",
+  "q": "`deque.popleft()` costs…",
+  "options": [
+   "O(1)",
+   "O(n)",
+   "O(log n)",
+   "Amortized O(n)"
+  ],
+  "answer": 0,
+  "why": "A deque is built for O(1) operations at both ends."
+ },
+ {
+  "id": "wrap",
+  "kind": "output",
+  "q": "Circular queue with k = 4, head = 3, count = 2. Where does the next enqueue write?",
+  "options": [
+   "Index 5",
+   "Index 1",
+   "Index 0",
+   "It's full"
+  ],
+  "answer": 1,
+  "why": "(head + count) % k = (3 + 2) % 4 = 1."
+ },
+ {
+  "id": "full",
+  "kind": "concept",
+  "q": "Why track `count` in a circular queue instead of only head and tail?",
+  "options": [
+   "It's faster",
+   "head == tail happens both when empty and when full; count tells them apart",
+   "To allow resizing",
+   "Python needs it"
+  ],
+  "answer": 1,
+  "why": "Without a count (or a spare slot) the two states look identical."
+ },
+ {
+  "id": "bfs",
+  "kind": "pattern",
+  "q": "Which algorithm relies on a queue?",
+  "options": [
+   "Depth-first search",
+   "Breadth-first search",
+   "Binary search",
+   "Quick sort"
+  ],
+  "answer": 1,
+  "why": "BFS explores nodes in the order they were discovered, level by level."
+ }
+]

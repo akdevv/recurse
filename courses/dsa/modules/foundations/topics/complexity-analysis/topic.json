@@ -1,0 +1,19 @@
+{
+  "id": "complexity-analysis",
+  "title": "Complexity analysis",
+  "status": "ready",
+  "learn": "Big-O / Θ / Ω, common runtimes, time vs space, how to calculate (loops, nested loops, recursion), best/avg/worst, amortized",
+  "hook": "Every interview answer ends with \"what's the time and space complexity?\" Getting it wrong, or not being able to explain *why*, sinks otherwise good solutions.",
+  "patterns": [],
+  "problems": [],
+  "explain": {
+    "prompt": "Explain what Big-O notation means and walk through how you'd find the complexity of a function with a loop inside a loop.",
+    "keyPoints": [
+      "Big-O describes how cost grows as input size n grows (upper bound, worst case by convention)",
+      "drop constants and smaller terms: 3n² + 5n → O(n²)",
+      "sequential blocks add, nested loops multiply",
+      "space complexity counts extra memory, including the recursion stack",
+      "a loop that halves the problem each step is O(log n)"
+    ]
+  }
+}

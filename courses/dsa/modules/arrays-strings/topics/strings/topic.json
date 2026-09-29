@@ -1,0 +1,42 @@
+{
+  "id": "strings",
+  "title": "Strings",
+  "status": "ready",
+  "learn": "immutability in Python, `''.join` vs `+=`, char codes (`ord`/`chr`), counting chars, splitting/parsing",
+  "hook": "String questions look easy and hide traps: an innocent `s += c` in a loop is O(n²), and parsing questions like atoi are all about edge cases. Interviewers use them to see how carefully you handle details.",
+  "patterns": [
+    "simulation",
+    "hash-map"
+  ],
+  "problems": [
+    {
+      "id": "length-of-last-word",
+      "role": "guided"
+    },
+    {
+      "id": "longest-common-prefix",
+      "role": "core"
+    },
+    {
+      "id": "roman-to-integer",
+      "role": "core"
+    },
+    {
+      "id": "reverse-words-in-a-string",
+      "role": "core"
+    },
+    {
+      "id": "string-to-integer-atoi",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain why building a string with `+=` in a loop can be slow in Python, and what you'd do instead.",
+    "keyPoints": [
+      "Python strings are immutable, so every change creates a new string",
+      "`s += c` can copy the whole string each time, O(n²) over n appends",
+      "collect pieces in a list and call \"\".join once: O(n) total",
+      "reading `s[i]` is still O(1), like any array"
+    ]
+  }
+}

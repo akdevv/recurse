@@ -1,0 +1,80 @@
+[
+ {
+  "id": "levels",
+  "kind": "complexity",
+  "q": "Why is merge sort O(n log n)?",
+  "options": [
+   "It compares every pair once",
+   "There are log n levels of halving and each level does O(n) merging",
+   "Merging is O(log n)",
+   "It sorts n/2 elements log n times"
+  ],
+  "answer": 1,
+  "why": "Halving n repeatedly takes log₂ n levels; all merges on one level together touch every element once."
+ },
+ {
+  "id": "quick-worst",
+  "kind": "concept",
+  "q": "When does quick sort hit O(n²)?",
+  "options": [
+   "Random input",
+   "When the pivot is always the smallest or largest element",
+   "When n is odd",
+   "Never"
+  ],
+  "answer": 1,
+  "why": "Then each partition only removes one element: n + (n − 1) + … = O(n²). A random pivot makes this extremely unlikely."
+ },
+ {
+  "id": "space",
+  "kind": "complexity",
+  "q": "Extra space used by standard merge sort on an array?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n log n)"
+  ],
+  "answer": 2,
+  "why": "Merging needs a temporary buffer for the merged output."
+ },
+ {
+  "id": "pivot",
+  "kind": "concept",
+  "q": "After one Lomuto partition, what is guaranteed?",
+  "options": [
+   "The array is sorted",
+   "The pivot is at its final sorted position, smaller values to its left",
+   "Both halves are sorted",
+   "The pivot is the median"
+  ],
+  "answer": 1,
+  "why": "Everything left of the pivot is smaller and everything right is ≥ it, so the pivot never moves again."
+ },
+ {
+  "id": "select",
+  "kind": "pattern",
+  "q": "You need the k-th largest element, not the whole sorted array. Which idea from this topic helps?",
+  "options": [
+   "Merge step",
+   "Quickselect: partition and recurse into only one side",
+   "Stable sorting",
+   "Counting inversions"
+  ],
+  "answer": 1,
+  "why": "Recursing into one side only gives n + n/2 + n/4 + … = O(n) average."
+ },
+ {
+  "id": "merge-out",
+  "kind": "output",
+  "q": "Merging [1, 4, 7] and [2, 3, 9] takes the fronts in which order?",
+  "options": [
+   "1, 2, 3, 4, 7, 9",
+   "1, 4, 7, 2, 3, 9",
+   "2, 3, 1, 4, 7, 9",
+   "1, 2, 4, 3, 7, 9"
+  ],
+  "answer": 0,
+  "why": "Always take the smaller front element; when one list runs out, append the rest of the other."
+ }
+]

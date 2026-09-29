@@ -1,0 +1,17 @@
+{
+  "id": "stacks-queues",
+  "number": 6,
+  "title": "Stacks & Queues",
+  "summary": "LIFO/FIFO. Parsing, 'most recent' questions, and the monotonic stack pattern.",
+  "prereqs": [
+    "linked-lists"
+  ],
+  "topics": [
+    "stack",
+    "queue-and-deque",
+    "monotonic-stack-and-deque"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "lifo",
+  "kind": "concept",
+  "q": "A stack returns elements in which order?",
+  "options": [
+   "First in, first out",
+   "Last in, first out",
+   "Sorted order",
+   "Random"
+  ],
+  "answer": 1,
+  "why": "The most recently pushed element is the first one popped."
+ },
+ {
+  "id": "valid",
+  "kind": "output",
+  "q": "Is \"([)]\" valid parentheses?",
+  "options": [
+   "Yes",
+   "No: ')' arrives while '[' is the most recent open bracket",
+   "Yes, counts match",
+   "Only if empty strings are valid"
+  ],
+  "answer": 1,
+  "why": "Equal counts aren't enough; the nesting order must match."
+ },
+ {
+  "id": "empty-end",
+  "kind": "concept",
+  "q": "The loop finished without any mismatch. What else must be true for the string to be valid?",
+  "options": [
+   "Nothing",
+   "The stack must be empty",
+   "The string length is even",
+   "The last char is a closer"
+  ],
+  "answer": 1,
+  "why": "\"((\" never mismatches but leaves openers on the stack."
+ },
+ {
+  "id": "rpn",
+  "kind": "output",
+  "q": "Evaluate the RPN tokens [\"2\", \"1\", \"+\", \"3\", \"*\"].",
+  "options": [
+   "5",
+   "6",
+   "9",
+   "7"
+  ],
+  "answer": 2,
+  "why": "(2 + 1) * 3 = 9."
+ },
+ {
+  "id": "min",
+  "kind": "concept",
+  "q": "How does Min Stack return the minimum in O(1) after pops?",
+  "options": [
+   "It scans the stack",
+   "Each entry stores the minimum of everything at or below it",
+   "It keeps a sorted copy",
+   "It uses a heap"
+  ],
+  "answer": 1,
+  "why": "When you pop, the entry below still remembers the minimum as it was before the popped push."
+ },
+ {
+  "id": "queue2",
+  "kind": "complexity",
+  "q": "A queue built from two stacks (refill the out-stack only when it's empty) has what cost per operation?",
+  "options": [
+   "O(n) each",
+   "Amortized O(1)",
+   "O(log n)",
+   "O(n²) total"
+  ],
+  "answer": 1,
+  "why": "Each element is moved from the in-stack to the out-stack at most once."
+ }
+]

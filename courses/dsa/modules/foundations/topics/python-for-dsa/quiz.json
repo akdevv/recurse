@@ -1,0 +1,45 @@
+[
+  {
+    "id": "set-vs-list",
+    "kind": "complexity",
+    "q": "What is the time complexity of this function?",
+    "code": "def has_dup(nums):\n    seen = []\n    for x in nums:\n        if x in seen:\n            return True\n        seen.append(x)\n    return False",
+    "options": ["O(n)", "O(n log n)", "O(n²)", "O(1)"],
+    "answer": 2,
+    "why": "`x in seen` scans the list: O(n) per check, done n times → O(n²). Make `seen` a set and it becomes O(n)."
+  },
+  {
+    "id": "pop-front",
+    "kind": "concept",
+    "q": "You need a queue: add at the back, remove from the front, 10⁵ times. Which is best?",
+    "options": ["list with append() and pop(0)", "collections.deque with append() and popleft()", "string concatenation", "a set"],
+    "answer": 1,
+    "why": "`list.pop(0)` shifts every element (O(n)). `deque.popleft()` is O(1)."
+  },
+  {
+    "id": "grid-trap",
+    "kind": "predict-output",
+    "q": "What does this print?",
+    "code": "grid = [[0] * 2] * 2\ngrid[0][0] = 1\nprint(grid)",
+    "options": ["[[1, 0], [0, 0]]", "[[1, 0], [1, 0]]", "[[1, 1], [0, 0]]", "Error"],
+    "answer": 1,
+    "why": "`* 2` copies the *reference* to the same inner list, so both rows are one object. Use `[[0] * 2 for _ in range(2)]`."
+  },
+  {
+    "id": "counter",
+    "kind": "predict-output",
+    "q": "What does this print?",
+    "code": "from collections import Counter\nc = Counter('banana')\nprint(c['a'], c['z'])",
+    "options": ["3 0", "3 KeyError", "2 0", "3 None"],
+    "answer": 0,
+    "why": "Counter counts each character ('a' appears 3 times) and returns 0 for missing keys instead of raising KeyError."
+  },
+  {
+    "id": "join",
+    "kind": "complexity",
+    "q": "Building a string of n characters with `s += c` in a loop can cost…",
+    "options": ["O(n) always", "up to O(n²), because strings are immutable and each += may copy", "O(log n)", "O(1)"],
+    "answer": 1,
+    "why": "Each += may create a new string and copy the old one. Append pieces to a list and call ''.join(parts) once: O(n)."
+  }
+]

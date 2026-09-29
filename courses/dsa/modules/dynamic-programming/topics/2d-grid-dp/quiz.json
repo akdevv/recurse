@@ -1,0 +1,80 @@
+[
+ {
+  "id": "paths",
+  "kind": "output",
+  "q": "Unique Paths on a 3×3 grid (moves right/down) returns…",
+  "options": [
+   "4",
+   "6",
+   "9",
+   "3"
+  ],
+  "answer": 1,
+  "why": "C(4, 2) = 6 paths: 2 rights and 2 downs in any order."
+ },
+ {
+  "id": "rec",
+  "kind": "concept",
+  "q": "Unique Paths recurrence?",
+  "options": [
+   "dp[r][c] = dp[r−1][c−1]",
+   "dp[r][c] = dp[r−1][c] + dp[r][c−1]",
+   "dp[r][c] = max(up, left)",
+   "dp[r][c] = r + c"
+  ],
+  "answer": 1,
+  "why": "You arrive either from above or from the left."
+ },
+ {
+  "id": "lcs-match",
+  "kind": "concept",
+  "q": "LCS: when a[i−1] == b[j−1], dp[i][j] = …",
+  "options": [
+   "max(up, left)",
+   "dp[i−1][j−1] + 1",
+   "dp[i−1][j] + 1",
+   "0"
+  ],
+  "answer": 1,
+  "why": "The matching character extends the LCS of both shorter prefixes."
+ },
+ {
+  "id": "edit",
+  "kind": "concept",
+  "q": "Edit Distance base case dp[i][0] (turn the first i letters into an empty string) =",
+  "options": [
+   "0",
+   "1",
+   "i",
+   "j"
+  ],
+  "answer": 2,
+  "why": "Delete all i letters."
+ },
+ {
+  "id": "space",
+  "kind": "complexity",
+  "q": "Unique Paths on m×n with one row of memory uses…",
+  "options": [
+   "O(1)",
+   "O(n)",
+   "O(m·n)",
+   "O(m + n)"
+  ],
+  "answer": 1,
+  "why": "Each row only reads the previous row (in place) and the current row's left value."
+ },
+ {
+  "id": "subseq",
+  "kind": "concept",
+  "q": "Difference between subsequence and substring?",
+  "options": [
+   "None",
+   "A subsequence can skip characters; a substring must be contiguous",
+   "Substrings can skip characters",
+   "Subsequences must be sorted"
+  ],
+  "answer": 1,
+  "why": "LCS allows gaps; longest common substring doesn't, and has a different recurrence."
+ }
+]

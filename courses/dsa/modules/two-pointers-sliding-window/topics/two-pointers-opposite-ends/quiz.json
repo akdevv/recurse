@@ -1,0 +1,81 @@
+[
+ {
+  "id": "sorted",
+  "kind": "concept",
+  "q": "Why does moving `l` right when the sum is too small never skip the answer?",
+  "options": [
+   "Because the array has no duplicates",
+   "nums[l] plus the largest remaining value is still too small, so nums[l] can't be in any answer",
+   "Because r also moves",
+   "It can skip it, you need a second pass"
+  ],
+  "answer": 1,
+  "why": "Every partner left for nums[l] is ≤ nums[r], and even nums[r] wasn't enough. So nums[l] is safely discarded."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Two pointers from both ends on a sorted array of n numbers takes…",
+  "options": [
+   "O(log n)",
+   "O(n)",
+   "O(n log n)",
+   "O(n²)"
+  ],
+  "answer": 1,
+  "why": "Each step moves one pointer inward by one, and they stop when they meet: at most n steps."
+ },
+ {
+  "id": "unsorted",
+  "kind": "pattern",
+  "q": "The array is unsorted and you need all triplets summing to 0. First step?",
+  "options": [
+   "Build a prefix sum",
+   "Sort it",
+   "Use a sliding window",
+   "Binary search each element"
+  ],
+  "answer": 1,
+  "why": "Sorting (O(n log n)) makes two pointers valid and makes skipping duplicates easy. The total stays O(n²)."
+ },
+ {
+  "id": "container",
+  "kind": "concept",
+  "q": "In Container With Most Water, which pointer moves?",
+  "options": [
+   "The taller line",
+   "The shorter line",
+   "Always the left",
+   "Both"
+  ],
+  "answer": 1,
+  "why": "The shorter line caps the height. Keeping it while narrowing can only lose area, so it's the one to drop."
+ },
+ {
+  "id": "palin",
+  "kind": "output",
+  "q": "What does this return for s = \"racecar\"?",
+  "code": "l, r = 0, len(s) - 1\nwhile l < r:\n    if s[l] != s[r]:\n        return False\n    l, r = l + 1, r - 1\nreturn True",
+  "options": [
+   "True",
+   "False",
+   "IndexError",
+   "3"
+  ],
+  "answer": 0,
+  "why": "Mirrored characters match all the way to the middle."
+ },
+ {
+  "id": "threesum-cx",
+  "kind": "complexity",
+  "q": "3Sum with sort + fix one element + two pointers runs in…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²)",
+   "O(n³)"
+  ],
+  "answer": 2,
+  "why": "n choices for the fixed element, each followed by an O(n) two-pointer scan. Sorting's O(n log n) is smaller."
+ }
+]

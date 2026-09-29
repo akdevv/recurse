@@ -1,0 +1,80 @@
+[
+ {
+  "id": "insertion-best",
+  "kind": "complexity",
+  "q": "Insertion sort on an already sorted array of n elements takes…",
+  "options": [
+   "O(1)",
+   "O(n)",
+   "O(n log n)",
+   "O(n²)"
+  ],
+  "answer": 1,
+  "why": "Each new element is compared once with its left neighbour and stays put: n − 1 comparisons, no shifts."
+ },
+ {
+  "id": "selection-best",
+  "kind": "complexity",
+  "q": "Selection sort on an already sorted array takes…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²)",
+   "O(1)"
+  ],
+  "answer": 2,
+  "why": "It still scans the whole remaining part to find each minimum: about n²/2 comparisons regardless of order."
+ },
+ {
+  "id": "stable",
+  "kind": "concept",
+  "q": "Which of these is NOT stable?",
+  "options": [
+   "Insertion sort",
+   "Bubble sort",
+   "Selection sort",
+   "Merge sort"
+  ],
+  "answer": 2,
+  "why": "Selection sort's long-distance swap can move an element past an equal one, changing their order."
+ },
+ {
+  "id": "stable-why",
+  "kind": "concept",
+  "q": "Why does stability matter?",
+  "options": [
+   "It makes sorting faster",
+   "Sorting by a second key keeps the order from a previous sort among equal elements",
+   "It uses less memory",
+   "It's required for binary search"
+  ],
+  "answer": 1,
+  "why": "E.g. sort by name, then stable-sort by age: people with the same age stay alphabetical."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "What is `a` after ONE pass of the outer loop (i = 1) of insertion sort on [5, 2, 4, 6]?",
+  "options": [
+   "[2, 5, 4, 6]",
+   "[2, 4, 5, 6]",
+   "[5, 2, 4, 6]",
+   "[4, 2, 5, 6]"
+  ],
+  "answer": 0,
+  "why": "i = 1 picks up 2, shifts 5 right and puts 2 at index 0. The rest is untouched."
+ },
+ {
+  "id": "choose",
+  "kind": "pattern",
+  "q": "An array of 10⁶ numbers is almost sorted: only a handful of elements are out of place. Which elementary sort fits best?",
+  "options": [
+   "Selection sort",
+   "Insertion sort",
+   "Bubble sort without early exit",
+   "None of them ever"
+  ],
+  "answer": 1,
+  "why": "Insertion sort's cost is proportional to how far elements are out of place, so nearly sorted input is close to O(n)."
+ }
+]

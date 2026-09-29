@@ -1,0 +1,58 @@
+{
+  "id": "binary-search",
+  "title": "Binary search",
+  "status": "ready",
+  "learn": "linear vs binary search, lo/hi/mid template, off-by-one rules, lower/upper bound, `bisect`, rotated arrays, 2D as 1D",
+  "hook": "Binary search is the most reusable O(log n) idea in interviews, and also the easiest to get subtly wrong. Getting the loop condition and the boundaries right every time is what this topic is about.",
+  "patterns": [
+    "binary-search"
+  ],
+  "problems": [
+    {
+      "id": "binary-search",
+      "role": "guided"
+    },
+    {
+      "id": "search-insert-position",
+      "role": "core"
+    },
+    {
+      "id": "first-bad-version",
+      "role": "core"
+    },
+    {
+      "id": "sqrtx",
+      "role": "core"
+    },
+    {
+      "id": "find-first-and-last-position-of-element-in-sorted-array",
+      "role": "core"
+    },
+    {
+      "id": "search-in-rotated-sorted-array",
+      "role": "core"
+    },
+    {
+      "id": "find-minimum-in-rotated-sorted-array",
+      "role": "core"
+    },
+    {
+      "id": "search-a-2d-matrix",
+      "role": "optional"
+    },
+    {
+      "id": "find-peak-element",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain binary search, why it's O(log n), and how you'd find the first position of a target in a sorted array with duplicates.",
+    "keyPoints": [
+      "compare the target with the middle element and discard the half that can't contain it",
+      "the range halves every step → O(log n), O(1) space iteratively",
+      "lower bound: if a[mid] < target move lo = mid + 1, else hi = mid; lo ends at the first index ≥ target",
+      "keep one consistent template (lo <= hi with mid ± 1, or lo < hi with hi = mid)",
+      "the real requirement is a yes/no condition that flips once, not just sortedness"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "id": "grid-traversal",
+  "title": "Grid traversal (islands)",
+  "status": "ready",
+  "learn": "grid as graph, 4-direction moves, DFS/BFS flood fill, visited marking, multi-source BFS",
+  "hook": "Number of Islands is one of the most asked interview questions anywhere, and Rotting Oranges, Max Area of Island and 01 Matrix are right behind it. They're graph problems where the graph is a grid.",
+  "patterns": [
+    "island-traversal",
+    "bfs"
+  ],
+  "problems": [
+    {
+      "id": "flood-fill",
+      "role": "guided"
+    },
+    {
+      "id": "island-perimeter",
+      "role": "optional"
+    },
+    {
+      "id": "number-of-islands",
+      "role": "core"
+    },
+    {
+      "id": "max-area-of-island",
+      "role": "core"
+    },
+    {
+      "id": "rotting-oranges",
+      "role": "core"
+    },
+    {
+      "id": "01-matrix",
+      "role": "core"
+    },
+    {
+      "id": "surrounded-regions",
+      "role": "optional"
+    },
+    {
+      "id": "pacific-atlantic-water-flow",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd count the islands in a grid, and when you'd use multi-source BFS instead of a plain flood fill.",
+    "keyPoints": [
+      "treat each cell as a node with 4 neighbours",
+      "scan all cells; each unvisited land cell starts a new island, then DFS/BFS marks its whole region visited",
+      "each cell is processed a constant number of times → O(m·n)",
+      "for 'distance or time from the nearest source', put all sources in the queue at once: each BFS level is one step"
+    ]
+  }
+}

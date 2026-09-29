@@ -1,0 +1,80 @@
+[
+ {
+  "id": "robber",
+  "kind": "concept",
+  "q": "House Robber recurrence?",
+  "options": [
+   "dp[i] = dp[i−1] + nums[i]",
+   "dp[i] = max(dp[i−1], dp[i−2] + nums[i])",
+   "dp[i] = max(nums)",
+   "dp[i] = dp[i−2] + dp[i−1]"
+  ],
+  "answer": 1,
+  "why": "Skip house i (keep dp[i−1]) or rob it (nums[i] + dp[i−2])."
+ },
+ {
+  "id": "circle",
+  "kind": "concept",
+  "q": "House Robber II (houses in a circle): how do you reuse House Robber I?",
+  "options": [
+   "Rob every other house",
+   "max(rob(nums[1:]), rob(nums[:-1]))",
+   "Double the array",
+   "It needs a 2D table"
+  ],
+  "answer": 1,
+  "why": "The first and last houses can't both be robbed, so exclude one or the other."
+ },
+ {
+  "id": "coin",
+  "kind": "output",
+  "q": "Coin Change with coins [2] and amount 3 returns…",
+  "options": [
+   "1",
+   "2",
+   "0",
+   "-1"
+  ],
+  "answer": 3,
+  "why": "3 can't be made from 2s; dp[3] stays infinity → −1."
+ },
+ {
+  "id": "decode",
+  "kind": "output",
+  "q": "How many ways to decode \"226\"?",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "answer": 2,
+  "why": "2-2-6, 22-6, 2-26."
+ },
+ {
+  "id": "lis",
+  "kind": "concept",
+  "q": "In O(n²) LIS, where is the answer?",
+  "options": [
+   "dp[-1]",
+   "max(dp)",
+   "dp[0]",
+   "len(nums)"
+  ],
+  "answer": 1,
+  "why": "dp[i] is the longest increasing subsequence ENDING at i; the best can end anywhere."
+ },
+ {
+  "id": "product",
+  "kind": "concept",
+  "q": "Maximum Product Subarray: why track the minimum product too?",
+  "options": [
+   "For speed",
+   "A negative number turns the smallest product into the largest",
+   "To detect zeros",
+   "It's not needed"
+  ],
+  "answer": 1,
+  "why": "The best product ending here can come from the previous minimum times a negative."
+ }
+]

@@ -1,0 +1,49 @@
+{
+  "id": "stack",
+  "title": "Stack",
+  "status": "ready",
+  "learn": "LIFO, list as stack, matching brackets, undo-style problems, expression evaluation",
+  "hook": "Valid Parentheses is one of the most asked interview questions of all, and Min Stack and Evaluate RPN follow close behind. They all hinge on one question: do I need the most recent unfinished thing?",
+  "patterns": [
+    "stack"
+  ],
+  "problems": [
+    {
+      "id": "valid-parentheses",
+      "role": "guided"
+    },
+    {
+      "id": "baseball-game",
+      "role": "optional"
+    },
+    {
+      "id": "remove-all-adjacent-duplicates-in-string",
+      "role": "core"
+    },
+    {
+      "id": "implement-queue-using-stacks",
+      "role": "core"
+    },
+    {
+      "id": "min-stack",
+      "role": "core"
+    },
+    {
+      "id": "evaluate-reverse-polish-notation",
+      "role": "core"
+    },
+    {
+      "id": "decode-string",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd check that a string of brackets is valid, and why a stack is the right structure.",
+    "keyPoints": [
+      "each closing bracket must match the most recent unmatched opening bracket: LIFO",
+      "push openers; on a closer, the stack must be non-empty and its top must be the matching opener, then pop",
+      "at the end the stack must be empty",
+      "O(n) time, O(n) space"
+    ]
+  }
+}

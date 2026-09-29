@@ -1,0 +1,41 @@
+{
+  "id": "matrices",
+  "title": "Matrices (2D arrays)",
+  "status": "ready",
+  "learn": "row/col indexing, traversal orders, transpose, in-place rotation, direction arrays",
+  "hook": "Rotate Image and Spiral Matrix are classic interview questions, and grids come back later as islands, mazes and shortest paths. Being fluent with (row, col) indexing now pays off all the way to Module 10.",
+  "patterns": [
+    "simulation"
+  ],
+  "problems": [
+    {
+      "id": "transpose-matrix",
+      "role": "guided"
+    },
+    {
+      "id": "matrix-diagonal-sum",
+      "role": "core"
+    },
+    {
+      "id": "rotate-image",
+      "role": "core"
+    },
+    {
+      "id": "spiral-matrix",
+      "role": "core"
+    },
+    {
+      "id": "set-matrix-zeroes",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Walk me through how you'd rotate an n×n matrix 90° clockwise in place, and why it works.",
+    "keyPoints": [
+      "clockwise rotation moves (r, c) to (c, n-1-r)",
+      "transpose (swap across the diagonal) and then reverse each row gives that mapping",
+      "only swap cells above the diagonal when transposing, or pairs swap back",
+      "O(n²) time and O(1) extra space"
+    ]
+  }
+}

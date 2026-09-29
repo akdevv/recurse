@@ -1,0 +1,81 @@
+[
+ {
+  "id": "leave",
+  "kind": "concept",
+  "q": "When index r enters a window of size k, which index leaves?",
+  "options": [
+   "r − k + 1",
+   "r − k",
+   "r − 1",
+   "k"
+  ],
+  "answer": 1,
+  "why": "The new window is [r − k + 1, r], so the element at r − k just dropped out."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Max sum over all windows of size k using a sliding sum costs…",
+  "options": [
+   "O(n·k)",
+   "O(n)",
+   "O(k)",
+   "O(n log k)"
+  ],
+  "answer": 1,
+  "why": "One O(k) setup and then O(1) per slide for n − k slides."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "What is best for nums = [1, 4, 2, 10, 2, 3], k = 2?",
+  "code": "s = best = sum(nums[:k])\nfor r in range(k, len(nums)):\n    s += nums[r] - nums[r - k]\n    best = max(best, s)",
+  "options": [
+   "12",
+   "13",
+   "14",
+   "10"
+  ],
+  "answer": 0,
+  "why": "Window sums are 5, 6, 12, 12, 5. The best is 12."
+ },
+ {
+  "id": "perm",
+  "kind": "pattern",
+  "q": "\"Does s2 contain a permutation of s1?\" What should the window hold?",
+  "options": [
+   "The sum of character codes",
+   "26 letter counts, window size len(s1)",
+   "A sorted copy of the window",
+   "A stack"
+  ],
+  "answer": 1,
+  "why": "A permutation has the same letter counts. Compare two 26-slot arrays as the window slides."
+ },
+ {
+  "id": "set",
+  "kind": "concept",
+  "q": "Contains Duplicate II keeps a set of the last k values. When is a value removed?",
+  "options": [
+   "Never",
+   "When the set holds more than k values: remove nums[i − k]",
+   "When a duplicate is found",
+   "Every step"
+  ],
+  "answer": 1,
+  "why": "The set must only hold values within distance k of the current index."
+ },
+ {
+  "id": "avg",
+  "kind": "concept",
+  "q": "Maximum average of a length-k window: what do you track?",
+  "options": [
+   "The average at every step",
+   "The maximum sum; divide by k once at the end",
+   "The maximum element",
+   "The median"
+  ],
+  "answer": 1,
+  "why": "All windows have the same length, so the largest sum gives the largest average. Dividing once avoids float noise."
+ }
+]

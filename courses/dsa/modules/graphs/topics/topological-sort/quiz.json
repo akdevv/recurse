@@ -1,0 +1,80 @@
+[
+ {
+  "id": "start",
+  "kind": "concept",
+  "q": "Kahn's algorithm starts with which nodes?",
+  "options": [
+   "The node with the most edges",
+   "All nodes with in-degree 0",
+   "Node 0",
+   "Leaves only"
+  ],
+  "answer": 1,
+  "why": "They have no prerequisites left, so they can go first."
+ },
+ {
+  "id": "cycle",
+  "kind": "concept",
+  "q": "How does Kahn's algorithm detect a cycle?",
+  "options": [
+   "The queue overflows",
+   "Fewer than V nodes end up in the order",
+   "A node gets in-degree −1",
+   "It can't"
+  ],
+  "answer": 1,
+  "why": "Nodes on a cycle wait on each other and never reach in-degree 0."
+ },
+ {
+  "id": "dir",
+  "kind": "concept",
+  "q": "Course Schedule gives [a, b] meaning \"to take a you must first take b\". Which edge?",
+  "options": [
+   "a → b",
+   "b → a",
+   "both",
+   "none"
+  ],
+  "answer": 1,
+  "why": "Edges point from prerequisite to the course that needs it."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Topological sort costs…",
+  "options": [
+   "O(V log V)",
+   "O(V + E)",
+   "O(V · E)",
+   "O(E²)"
+  ],
+  "answer": 1,
+  "why": "Each node is queued once and each edge decremented once."
+ },
+ {
+  "id": "unique",
+  "kind": "concept",
+  "q": "Is the topological order of a DAG unique?",
+  "options": [
+   "Always",
+   "Not in general; many valid orders can exist",
+   "Only if connected",
+   "Only for trees"
+  ],
+  "answer": 1,
+  "why": "Any order respecting all edges is valid."
+ },
+ {
+  "id": "undirected",
+  "kind": "pattern",
+  "q": "You need to detect a cycle in an UNDIRECTED graph. Is Kahn's algorithm the right tool?",
+  "options": [
+   "Yes",
+   "No: in-degrees are for directed graphs; use union-find or DFS with a parent check",
+   "Only with weights",
+   "Only if sorted"
+  ],
+  "answer": 1,
+  "why": "Undirected edges have no direction for in-degrees to measure."
+ }
+]

@@ -1,0 +1,81 @@
+[
+ {
+  "id": "meet",
+  "kind": "concept",
+  "q": "Why must fast and slow meet if there is a cycle?",
+  "options": [
+   "Fast skips nodes",
+   "Inside the cycle, fast closes the gap by exactly one step per move",
+   "The cycle is always short",
+   "They start at the same node"
+  ],
+  "answer": 1,
+  "why": "A gap that shrinks by 1 each step must reach 0; fast can't jump over slow."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Space used by Floyd's cycle detection?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n²)"
+  ],
+  "answer": 0,
+  "why": "Just two pointers. The visited-set approach is O(n)."
+ },
+ {
+  "id": "middle",
+  "kind": "output",
+  "q": "For 1 → 2 → 3 → 4, which node does this return?",
+  "code": "slow = fast = head\nwhile fast and fast.next:\n    slow, fast = slow.next, fast.next.next\nreturn slow",
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ],
+  "answer": 2,
+  "why": "With `while fast and fast.next`, even lengths give the second middle."
+ },
+ {
+  "id": "gap",
+  "kind": "pattern",
+  "q": "Remove the n-th node from the end in one pass. Idea?",
+  "options": [
+   "Reverse the list first",
+   "Two pointers with a gap of n, move together until the front hits the end",
+   "Binary search",
+   "A stack of all nodes"
+  ],
+  "answer": 1,
+  "why": "When the leading pointer reaches the end, the trailing one is right before the target (with a dummy start)."
+ },
+ {
+  "id": "identity",
+  "kind": "concept",
+  "q": "In cycle detection, why compare nodes with `is` rather than values?",
+  "options": [
+   "It's faster",
+   "Different nodes can hold the same value",
+   "Values can be None",
+   "Python requires it"
+  ],
+  "answer": 1,
+  "why": "Two distinct nodes with value 5 aren't the same position in the list."
+ },
+ {
+  "id": "happy",
+  "kind": "pattern",
+  "q": "Happy Number: why can Floyd's algorithm be used when there's no linked list?",
+  "options": [
+   "It can't",
+   "Repeatedly applying \"sum of squared digits\" forms an implicit list that either reaches 1 or cycles",
+   "Numbers are stored as lists",
+   "Because n is small"
+  ],
+  "answer": 1,
+  "why": "Any sequence x → f(x) behaves like a linked list; a repeat means a cycle."
+ }
+]

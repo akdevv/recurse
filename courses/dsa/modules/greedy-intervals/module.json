@@ -1,0 +1,16 @@
+{
+  "id": "greedy-intervals",
+  "number": 11,
+  "title": "Greedy & Intervals",
+  "summary": "Make the locally best choice, and be able to say why it's safe.",
+  "prereqs": [
+    "sorting-searching"
+  ],
+  "topics": [
+    "greedy",
+    "intervals"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

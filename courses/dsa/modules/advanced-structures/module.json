@@ -1,0 +1,16 @@
+{
+  "id": "advanced-structures",
+  "number": 15,
+  "title": "Awareness: Advanced structures",
+  "summary": "No problems. Be able to say what each is and when you'd use it (roadmap coverage).",
+  "prereqs": [
+    "heaps",
+    "graphs"
+  ],
+  "topics": [
+    "advanced-data-structures"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

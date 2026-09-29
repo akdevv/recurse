@@ -1,0 +1,80 @@
+[
+ {
+  "id": "returns",
+  "kind": "concept",
+  "q": "In the diameter solution, what does the recursive function return?",
+  "options": [
+   "The diameter",
+   "The height of the subtree",
+   "The number of nodes",
+   "The path itself"
+  ],
+  "answer": 1,
+  "why": "The parent can only extend a straight path through the child, so it needs the height."
+ },
+ {
+  "id": "naive",
+  "kind": "complexity",
+  "q": "isBalanced that calls a separate height() at every node costs, on a skewed tree…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²)",
+   "O(log n)"
+  ],
+  "answer": 2,
+  "why": "height() is O(n) and it's called for n nodes. Returning height with a −1 failure signal makes it O(n)."
+ },
+ {
+  "id": "lca",
+  "kind": "concept",
+  "q": "In the LCA recursion, a node receives non-null results from BOTH children. Meaning?",
+  "options": [
+   "Error",
+   "p and q are in different subtrees, so this node is the LCA",
+   "Both are in the left subtree",
+   "Keep searching upward"
+  ],
+  "answer": 1,
+  "why": "This is the split point: the lowest node with p on one side and q on the other."
+ },
+ {
+  "id": "neg",
+  "kind": "concept",
+  "q": "Binary Tree Maximum Path Sum: why take max(gain(child), 0)?",
+  "options": [
+   "To avoid recursion",
+   "A branch with a negative sum only lowers the total, so skip it",
+   "Node values are positive",
+   "To count nodes"
+  ],
+  "answer": 1,
+  "why": "It's always allowed to not extend into a subtree."
+ },
+ {
+  "id": "down",
+  "kind": "pattern",
+  "q": "Count Good Nodes (no bigger value on the path from the root): what goes into the recursion?",
+  "options": [
+   "Only the node",
+   "The node and the maximum value seen on the path so far",
+   "The height",
+   "A global list"
+  ],
+  "answer": 1,
+  "why": "A condition that depends on ancestors is passed down as a parameter."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "Diameter of the tree 1 → (2, 3), 2 → (4, 5)?",
+  "options": [
+   "2",
+   "3",
+   "4",
+   "5"
+  ],
+  "answer": 1,
+  "why": "Longest path 4-2-1-3 (or 5-2-1-3) has 3 edges."
+ }
+]

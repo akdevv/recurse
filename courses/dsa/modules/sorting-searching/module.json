@@ -1,0 +1,19 @@
+{
+  "id": "sorting-searching",
+  "number": 4,
+  "title": "Sorting & Searching",
+  "summary": "Know how sorts work (interviews ask), then binary search: the most reusable O(log n) idea.",
+  "prereqs": [
+    "arrays-strings"
+  ],
+  "topics": [
+    "elementary-sorts",
+    "merge-sort-and-quick-sort",
+    "counting-and-cyclic-sort",
+    "binary-search",
+    "binary-search-on-the-answer"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

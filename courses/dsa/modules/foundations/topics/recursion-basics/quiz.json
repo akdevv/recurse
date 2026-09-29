@@ -1,0 +1,62 @@
+[
+  {
+    "id": "base-case",
+    "kind": "concept",
+    "q": "What happens if a recursive function has no reachable base case?",
+    "options": ["It returns None", "It recurses until the call stack overflows (RecursionError in Python)", "Python detects it and optimizes it into a loop", "It runs once"],
+    "answer": 1,
+    "why": "Each call adds a stack frame. Without a stopping point, frames pile up until the recursion limit is hit."
+  },
+  {
+    "id": "trace",
+    "kind": "predict-output",
+    "q": "What does this print?",
+    "code": "def f(n):\n    if n == 0:\n        return 0\n    return n + f(n - 1)\n\nprint(f(4))",
+    "options": ["4", "10", "24", "0"],
+    "answer": 1,
+    "why": "4 + 3 + 2 + 1 + 0 = 10: each call adds its n to the result of the smaller call."
+  },
+  {
+    "id": "order",
+    "kind": "predict-output",
+    "q": "What does this print?",
+    "code": "def f(n):\n    if n == 0:\n        return\n    f(n - 1)\n    print(n, end=' ')\n\nf(3)",
+    "options": ["3 2 1", "1 2 3", "3", "0 1 2 3"],
+    "answer": 1,
+    "why": "The print happens *after* the recursive call returns, so the deepest call (n=1) prints first."
+  },
+  {
+    "id": "fib-complexity",
+    "kind": "complexity",
+    "q": "Time complexity of naive recursive Fibonacci?",
+    "code": "def fib(n):\n    if n < 2:\n        return n\n    return fib(n - 1) + fib(n - 2)",
+    "options": ["O(n)", "O(n²)", "O(2ⁿ)", "O(log n)"],
+    "answer": 2,
+    "why": "Each call branches into two, so the tree has about 2ⁿ nodes (the same subproblems are recomputed)."
+  },
+  {
+    "id": "space",
+    "kind": "complexity",
+    "q": "Space complexity of naive recursive fib(n)?",
+    "options": ["O(2ⁿ)", "O(n)", "O(1)", "O(log n)"],
+    "answer": 1,
+    "why": "Only one root-to-leaf path is on the call stack at a time, and the deepest path has n calls."
+  },
+  {
+    "id": "half-twice",
+    "kind": "complexity",
+    "q": "Time complexity?",
+    "code": "def power(x, n):\n    if n == 0:\n        return 1\n    return power(x, n // 2) * power(x, n // 2) * (x if n % 2 else 1)",
+    "options": ["O(log n)", "O(n)", "O(n log n)", "O(2ⁿ)"],
+    "answer": 1,
+    "why": "Two calls per level and log n levels → 2^(log n) = n calls. Compute half once and square it for O(log n)."
+  },
+  {
+    "id": "memo",
+    "kind": "pattern",
+    "q": "A recursive solution recomputes the same sub-problems many times. What's the standard fix?",
+    "options": ["Increase the recursion limit", "Memoization: cache each sub-problem's result", "Use a while loop with the same logic", "Sort the input first"],
+    "answer": 1,
+    "why": "Caching turns repeated work into lookups. This is top-down dynamic programming."
+  }
+]

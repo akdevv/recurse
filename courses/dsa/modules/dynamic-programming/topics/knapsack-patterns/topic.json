@@ -1,0 +1,34 @@
+{
+  "id": "knapsack-patterns",
+  "title": "Knapsack patterns",
+  "status": "ready",
+  "learn": "0/1 knapsack (each item once) vs unbounded (reuse), subset-sum framing",
+  "hook": "Partition Equal Subset Sum, Coin Change II and Target Sum all hide the same knapsack table. Recognising \"this is subset sum\" (and which loop direction to use) turns three scary mediums into one pattern.",
+  "patterns": [
+    "dynamic-programming"
+  ],
+  "problems": [
+    {
+      "id": "partition-equal-subset-sum",
+      "role": "guided"
+    },
+    {
+      "id": "coin-change-ii",
+      "role": "core"
+    },
+    {
+      "id": "target-sum",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how Partition Equal Subset Sum reduces to 0/1 knapsack, and why the capacity loop runs backwards.",
+    "keyPoints": [
+      "equal partition exists iff some subset sums to total / 2 (total must be even)",
+      "can[s] = some subset of the items seen so far sums to s; can[0] = True",
+      "for each item x, update can[s] |= can[s − x] for s from target down to x",
+      "looping downward uses each item at most once (0/1); looping upward would reuse it (unbounded)",
+      "O(n × target) time, O(target) space"
+    ]
+  }
+}

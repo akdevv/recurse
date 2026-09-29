@@ -1,0 +1,39 @@
+{
+  "id": "dp-fundamentals",
+  "title": "DP fundamentals",
+  "status": "ready",
+  "learn": "overlapping subproblems + optimal substructure, memoization (top-down, `@cache`) vs tabulation (bottom-up), state + transition + base case, space optimization",
+  "hook": "DP scares people more than any other topic, but it's just recursion that remembers its answers. Climbing Stairs is the question interviewers use to see whether you can go from a brute-force recursion to O(n).",
+  "patterns": [
+    "dynamic-programming",
+    "memoization"
+  ],
+  "problems": [
+    {
+      "id": "climbing-stairs",
+      "role": "guided"
+    },
+    {
+      "id": "n-th-tribonacci-number",
+      "role": "core"
+    },
+    {
+      "id": "min-cost-climbing-stairs",
+      "role": "core"
+    },
+    {
+      "id": "pascals-triangle",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain dynamic programming using Climbing Stairs: the recurrence, why plain recursion is slow, and how memoization and tabulation fix it.",
+    "keyPoints": [
+      "define the state: dp[i] = number of ways to reach step i",
+      "recurrence from the last choice: dp[i] = dp[i − 1] + dp[i − 2], with base cases dp[0] = dp[1] = 1",
+      "plain recursion recomputes the same subproblems: O(2ⁿ)",
+      "memoization caches each answer (top-down); tabulation fills a table from the base cases (bottom-up): O(n)",
+      "only the last two values are needed, so O(1) space is possible"
+    ]
+  }
+}

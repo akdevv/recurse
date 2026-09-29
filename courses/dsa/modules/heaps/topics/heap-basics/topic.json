@@ -1,0 +1,34 @@
+{
+  "id": "heap-basics",
+  "title": "Heap basics",
+  "status": "ready",
+  "learn": "complete binary tree in an array, sift up/down, heapify O(n), `heapq` (min-heap; negate for max), heap sort",
+  "hook": "Whenever a problem says \"repeatedly take the largest\" or \"always process the most urgent next\", the answer is a heap. It's also the engine behind Dijkstra, schedulers and every top-k question that follows.",
+  "patterns": [
+    "top-k-heap"
+  ],
+  "problems": [
+    {
+      "id": "last-stone-weight",
+      "role": "guided"
+    },
+    {
+      "id": "kth-largest-element-in-a-stream",
+      "role": "core"
+    },
+    {
+      "id": "take-gifts-from-the-richest-pile",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain what a binary heap is, how push and pop keep it valid, and their time complexity.",
+    "keyPoints": [
+      "a complete binary tree where every parent ≤ its children (min-heap), stored in an array",
+      "children of index i are 2i + 1 and 2i + 2, parent is (i − 1) // 2",
+      "push: append at the end, sift up while smaller than the parent: O(log n)",
+      "pop: take the root, move the last element to the root, sift down with the smaller child: O(log n)",
+      "peek is O(1); heapify builds a heap in O(n); Python's heapq is a min-heap (negate for max)"
+    ]
+  }
+}

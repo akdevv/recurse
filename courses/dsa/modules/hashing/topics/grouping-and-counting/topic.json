@@ -1,0 +1,37 @@
+{
+  "id": "grouping-and-counting",
+  "title": "Grouping & counting",
+  "status": "ready",
+  "learn": "keys that describe a group (sorted string, count tuple), frequency maps, set-based sequence tricks",
+  "hook": "Group Anagrams, Top K Frequent and Longest Consecutive Sequence are all on the NeetCode 150 and Grind 75 lists. They look different, but each one is \"choose the right key for a dict or set\".",
+  "patterns": [
+    "hash-map"
+  ],
+  "problems": [
+    {
+      "id": "group-anagrams",
+      "role": "guided"
+    },
+    {
+      "id": "top-k-frequent-elements",
+      "role": "core"
+    },
+    {
+      "id": "longest-consecutive-sequence",
+      "role": "core"
+    },
+    {
+      "id": "valid-sudoku",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd group anagrams and why your approach is faster than comparing every pair of words.",
+    "keyPoints": [
+      "anagrams share a canonical key: the sorted word or a tuple of 26 letter counts",
+      "a dict from key to list collects each group in one pass",
+      "O(n · k log k) with sorted keys, O(n · k) with count keys, vs O(n² · k) comparing pairs",
+      "keys must be hashable, so counts go in a tuple, not a list"
+    ]
+  }
+}

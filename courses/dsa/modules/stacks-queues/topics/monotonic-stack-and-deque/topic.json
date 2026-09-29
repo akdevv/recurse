@@ -1,0 +1,46 @@
+{
+  "id": "monotonic-stack-and-deque",
+  "title": "Monotonic stack & deque",
+  "status": "ready",
+  "learn": "keep stack increasing/decreasing to answer 'next greater/smaller' in O(n); monotonic deque for window max",
+  "hook": "Daily Temperatures, Next Greater Element and Largest Rectangle in Histogram all use the same trick. Once you see it, a whole class of O(n²) \"look for the next bigger thing\" problems becomes O(n).",
+  "patterns": [
+    "monotonic-stack"
+  ],
+  "problems": [
+    {
+      "id": "next-greater-element-i",
+      "role": "guided"
+    },
+    {
+      "id": "daily-temperatures",
+      "role": "core"
+    },
+    {
+      "id": "online-stock-span",
+      "role": "optional"
+    },
+    {
+      "id": "car-fleet",
+      "role": "core"
+    },
+    {
+      "id": "largest-rectangle-in-histogram",
+      "role": "optional"
+    },
+    {
+      "id": "sliding-window-maximum",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the monotonic stack using Daily Temperatures: what's on the stack, when you pop, and why it's O(n).",
+    "keyPoints": [
+      "the stack holds indexes of days still waiting for a warmer day, temperatures decreasing from bottom to top",
+      "a warmer day pops every colder day on top; for each popped day the answer is the distance to today",
+      "a colder element behind a warmer, closer one can never be anyone's answer, so popping loses nothing",
+      "each index is pushed once and popped at most once → O(n)",
+      "window maximum uses the same idea with a deque, also dropping indexes that leave the window"
+    ]
+  }
+}

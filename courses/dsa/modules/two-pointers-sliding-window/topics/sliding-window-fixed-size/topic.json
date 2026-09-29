@@ -1,0 +1,33 @@
+{
+  "id": "sliding-window-fixed-size",
+  "title": "Sliding window: fixed size",
+  "status": "ready",
+  "learn": "add right, drop left, keep running state (sum/count/set)",
+  "hook": "\"Every subarray of length k\" questions are where most people first write an O(n·k) double loop. Sliding the window turns them into one O(n) pass, and the same idea powers the harder variable windows next.",
+  "patterns": [
+    "sliding-window"
+  ],
+  "problems": [
+    {
+      "id": "maximum-average-subarray-i",
+      "role": "guided"
+    },
+    {
+      "id": "contains-duplicate-ii",
+      "role": "core"
+    },
+    {
+      "id": "maximum-number-of-vowels-in-a-substring-of-given-length",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the fixed-size sliding window: how do you get the maximum sum of k consecutive elements in O(n)?",
+    "keyPoints": [
+      "compute the first window's sum once",
+      "each slide adds the element entering on the right and subtracts the one leaving on the left",
+      "each update is O(1), so all n − k + 1 windows cost O(n) instead of O(n·k)",
+      "the window state can be a sum, a count, a set or letter counts"
+    ]
+  }
+}

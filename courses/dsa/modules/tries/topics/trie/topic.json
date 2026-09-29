@@ -1,0 +1,38 @@
+{
+  "id": "trie",
+  "title": "Trie",
+  "status": "ready",
+  "learn": "node = dict of children + end flag, insert/search/startsWith O(L), when trie beats hash set",
+  "hook": "Implement Trie is a classic design question, and tries are what make Word Search II and autocomplete feasible. Any time the word \"prefix\" appears in a problem, a trie should come to mind.",
+  "patterns": [
+    "trie"
+  ],
+  "problems": [
+    {
+      "id": "implement-trie-prefix-tree",
+      "role": "guided"
+    },
+    {
+      "id": "design-add-and-search-words-data-structure",
+      "role": "core"
+    },
+    {
+      "id": "replace-words",
+      "role": "optional"
+    },
+    {
+      "id": "word-search-ii",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain what a trie is, how insert, search and startsWith work, and when you'd use one instead of a hash set.",
+    "keyPoints": [
+      "each node holds children keyed by character plus an end-of-word flag",
+      "insert walks/creates one node per character and marks the last node as a word end",
+      "search walks the path and requires the end flag; startsWith only requires the path to exist",
+      "all operations are O(L) for a word of length L, independent of how many words are stored",
+      "a hash set answers exact lookups but can't answer prefix queries without scanning every word"
+    ]
+  }
+}

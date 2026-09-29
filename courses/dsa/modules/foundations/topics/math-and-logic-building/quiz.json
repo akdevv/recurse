@@ -1,0 +1,58 @@
+[
+  {
+    "id": "mod-div",
+    "kind": "predict-output",
+    "q": "What does this print?",
+    "code": "x = 4096\nprint(x % 10, x // 10)",
+    "options": ["6 409", "409 6", "6 409.6", "4 096"],
+    "answer": 0,
+    "why": "% 10 gives the last digit (6); // 10 drops it (409)."
+  },
+  {
+    "id": "neg-mod",
+    "kind": "predict-output",
+    "q": "In Python, what does this print?",
+    "code": "print(-123 % 10, -123 // 10)",
+    "options": ["-3 -12", "3 -12", "7 -13", "-3 -13"],
+    "answer": 2,
+    "why": "Python floors division toward −∞: -123 // 10 = -13, and -123 % 10 = 7 so that (-13)·10 + 7 = -123. Work with abs(x)."
+  },
+  {
+    "id": "digits-complexity",
+    "kind": "complexity",
+    "q": "Time complexity of summing the digits of n?",
+    "options": ["O(n)", "O(log n)", "O(√n)", "O(1)"],
+    "answer": 1,
+    "why": "One iteration per digit, and n has about log₁₀ n digits."
+  },
+  {
+    "id": "euclid-trace",
+    "kind": "predict-output",
+    "q": "Euclid: what is gcd(48, 18)?",
+    "code": "a, b = 48, 18\nwhile b:\n    a, b = b, a % b\nprint(a)",
+    "options": ["2", "6", "18", "3"],
+    "answer": 1,
+    "why": "(48,18) → (18,12) → (12,6) → (6,0) → 6."
+  },
+  {
+    "id": "sqrt-bound",
+    "kind": "concept",
+    "q": "Why does a primality test only need to try divisors up to √n?",
+    "options": [
+      "Primes are always smaller than √n",
+      "If n = a × b with both a and b > √n, then a × b > n, so one factor must be ≤ √n",
+      "It's a heuristic that usually works",
+      "Because even numbers are skipped"
+    ],
+    "answer": 1,
+    "why": "Factors come in pairs around √n. If none is found up to √n, there's none above it either."
+  },
+  {
+    "id": "sieve-pattern",
+    "kind": "pattern",
+    "q": "You must answer 'is k prime?' for 100,000 different k values, all ≤ 10⁶. Best approach?",
+    "options": ["Trial division for each query", "Build a sieve up to 10⁶ once, then O(1) lookups", "Check k % 2 only", "Sort the queries"],
+    "answer": 1,
+    "why": "One O(n log log n) sieve + O(1) per query beats 10⁵ × O(√k) trial divisions: a precompute-then-lookup trade-off."
+  }
+]

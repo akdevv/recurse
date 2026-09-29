@@ -1,0 +1,30 @@
+{
+  "id": "merge-sort-and-quick-sort",
+  "title": "Merge sort & quick sort",
+  "status": "ready",
+  "learn": "divide & conquer, merge step, partition (Lomuto/Hoare), O(n log n), quick sort worst case, stability, Python's Timsort",
+  "hook": "\"Sort an array without the built-in sort\" is a real LeetCode problem and a common screen. Merge sort and quick sort are also the cleanest examples of divide and conquer you'll ever explain.",
+  "patterns": [
+    "divide-and-conquer"
+  ],
+  "problems": [
+    {
+      "id": "sort-an-array",
+      "role": "guided"
+    },
+    {
+      "id": "kth-largest-element-in-an-array",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Compare merge sort and quick sort: how each one works, their time and space complexity, and when quick sort degrades.",
+    "keyPoints": [
+      "merge sort: split in half, sort both halves recursively, merge two sorted lists in linear time",
+      "log n levels × O(n) work per level = O(n log n) always; O(n) extra space; stable",
+      "quick sort: partition around a pivot (pivot lands in its final spot), recurse on both sides",
+      "O(n log n) average, O(n²) with consistently bad pivots (e.g. sorted input + last-element pivot); random pivot fixes it",
+      "quick sort is in place (O(log n) stack) but not stable"
+    ]
+  }
+}

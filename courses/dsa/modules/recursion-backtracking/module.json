@@ -1,0 +1,17 @@
+{
+  "id": "recursion-backtracking",
+  "number": 7,
+  "title": "Recursion & Backtracking",
+  "summary": "Generate all choices, prune bad ones. Base for trees, graphs and DP.",
+  "prereqs": [
+    "foundations",
+    "arrays-strings"
+  ],
+  "topics": [
+    "subsets-combinations-permutations",
+    "constraint-and-grid-backtracking"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

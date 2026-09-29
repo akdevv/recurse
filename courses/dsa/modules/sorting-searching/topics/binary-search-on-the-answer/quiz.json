@@ -1,0 +1,81 @@
+[
+ {
+  "id": "mono",
+  "kind": "concept",
+  "q": "What property makes binary search on the answer valid?",
+  "options": [
+   "The input is sorted",
+   "Feasibility is monotonic: once an answer works, all bigger ones work",
+   "The answer is unique",
+   "n is small"
+  ],
+  "answer": 1,
+  "why": "The yes/no answers form no…no yes…yes, so there is one boundary to find."
+ },
+ {
+  "id": "koko-hi",
+  "kind": "concept",
+  "q": "For Koko Eating Bananas, why is hi = max(piles)?",
+  "options": [
+   "It's the average",
+   "At that speed every pile takes one hour; faster never helps",
+   "Because h ≥ n",
+   "It's arbitrary"
+  ],
+  "answer": 1,
+  "why": "Eating faster than the largest pile can't reduce any pile below one hour."
+ },
+ {
+  "id": "ship-lo",
+  "kind": "concept",
+  "q": "For Ship Packages Within D Days, why is lo = max(weights) and not 1?",
+  "options": [
+   "Faster convergence only",
+   "A capacity smaller than the heaviest package can never ship it",
+   "Packages must be sorted",
+   "It's required by bisect"
+  ],
+  "answer": 1,
+  "why": "Packages can't be split, so any capacity below the heaviest one is infeasible."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Checking feasibility is O(n) and the answer range is up to 10⁹. Total cost?",
+  "options": [
+   "O(n · 10⁹)",
+   "O(n log 10⁹) ≈ 30 · n",
+   "O(n²)",
+   "O(log n)"
+  ],
+  "answer": 1,
+  "why": "Binary search over 10⁹ values needs about 30 steps."
+ },
+ {
+  "id": "ceil",
+  "kind": "output",
+  "q": "Hours for a pile of 7 bananas at speed 3, using (p + k − 1) // k?",
+  "code": "p, k = 7, 3\nprint((p + k - 1) // k)",
+  "options": [
+   "2",
+   "3",
+   "4",
+   "7"
+  ],
+  "answer": 1,
+  "why": "(7 + 2) // 3 = 3. She eats 3, 3, then 1."
+ },
+ {
+  "id": "signal",
+  "kind": "pattern",
+  "q": "Which phrase most strongly suggests binary search on the answer?",
+  "options": [
+   "\"Return all permutations\"",
+   "\"Minimize the maximum load\"",
+   "\"Find the shortest path\"",
+   "\"Count distinct values\""
+  ],
+  "answer": 1,
+  "why": "Minimize-the-maximum / maximize-the-minimum with an easy check is the classic signal."
+ }
+]

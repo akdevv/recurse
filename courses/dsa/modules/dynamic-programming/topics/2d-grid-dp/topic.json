@@ -1,0 +1,42 @@
+{
+  "id": "2d-grid-dp",
+  "title": "2D / grid DP",
+  "status": "ready",
+  "learn": "dp[i][j] on grids and two strings",
+  "hook": "Unique Paths, Minimum Path Sum, Longest Common Subsequence and Edit Distance are the classic 2D DP problems. Edit Distance in particular is a favourite at companies that care about fundamentals.",
+  "patterns": [
+    "dynamic-programming"
+  ],
+  "problems": [
+    {
+      "id": "unique-paths",
+      "role": "guided"
+    },
+    {
+      "id": "unique-paths-ii",
+      "role": "optional"
+    },
+    {
+      "id": "minimum-path-sum",
+      "role": "core"
+    },
+    {
+      "id": "longest-common-subsequence",
+      "role": "core"
+    },
+    {
+      "id": "edit-distance",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the DP for Longest Common Subsequence: what dp[i][j] means, the recurrence, and the complexity.",
+    "keyPoints": [
+      "dp[i][j] = LCS length of the first i characters of a and the first j characters of b",
+      "if a[i−1] == b[j−1]: dp[i][j] = dp[i−1][j−1] + 1 (extend the diagonal)",
+      "otherwise dp[i][j] = max(dp[i−1][j], dp[i][j−1]) (drop a character from one string)",
+      "row and column 0 represent empty strings and are 0",
+      "O(m·n) time, O(min(m, n)) space with rolling rows"
+    ]
+  }
+}

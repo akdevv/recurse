@@ -1,0 +1,80 @@
+[
+ {
+  "id": "pre",
+  "kind": "output",
+  "q": "Preorder of the tree 1 (left 2, right 3), where 2 has left child 4?",
+  "options": [
+   "1, 2, 4, 3",
+   "4, 2, 1, 3",
+   "4, 2, 3, 1",
+   "1, 2, 3, 4"
+  ],
+  "answer": 0,
+  "why": "Node, then the whole left subtree (2, 4), then the right subtree (3)."
+ },
+ {
+  "id": "in",
+  "kind": "output",
+  "q": "Inorder of the same tree (1 → 2, 3; 2 → 4)?",
+  "options": [
+   "1, 2, 4, 3",
+   "4, 2, 1, 3",
+   "4, 2, 3, 1",
+   "2, 4, 1, 3"
+  ],
+  "answer": 1,
+  "why": "Left subtree (4, 2), then 1, then right (3)."
+ },
+ {
+  "id": "post",
+  "kind": "concept",
+  "q": "Which traversal processes both children before the parent?",
+  "options": [
+   "Preorder",
+   "Inorder",
+   "Postorder",
+   "Level order"
+  ],
+  "answer": 2,
+  "why": "Postorder is the natural order for \"compute from children, then combine\"."
+ },
+ {
+  "id": "space",
+  "kind": "complexity",
+  "q": "Recursive DFS on a completely skewed tree of n nodes uses how much stack space?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n²)"
+  ],
+  "answer": 2,
+  "why": "The recursion goes n levels deep. For a balanced tree it's O(log n)."
+ },
+ {
+  "id": "leaf",
+  "kind": "concept",
+  "q": "Path Sum: why check `not node.left and not node.right` before comparing the sum?",
+  "options": [
+   "Speed",
+   "Only leaves may end a root-to-leaf path",
+   "To skip negative values",
+   "It's not needed"
+  ],
+  "answer": 1,
+  "why": "A node with one child isn't a leaf; stopping there would count a path that doesn't reach a leaf."
+ },
+ {
+  "id": "sym",
+  "kind": "concept",
+  "q": "Symmetric Tree compares which pairs?",
+  "options": [
+   "left with left, right with right",
+   "a.left with b.right and a.right with b.left",
+   "only values of siblings",
+   "inorder lists"
+  ],
+  "answer": 1,
+  "why": "A mirror flips sides: outer pair and inner pair."
+ }
+]

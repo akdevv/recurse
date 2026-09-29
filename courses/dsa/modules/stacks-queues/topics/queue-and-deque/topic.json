@@ -1,0 +1,34 @@
+{
+  "id": "queue-and-deque",
+  "title": "Queue & deque",
+  "status": "ready",
+  "learn": "FIFO, `collections.deque`, circular queue, why `list.pop(0)` is O(n)",
+  "hook": "Queues are the engine of breadth-first search, which you'll use in trees and graphs. Knowing why `list.pop(0)` is secretly O(n), and reaching for `deque`, is a small thing interviewers notice.",
+  "patterns": [
+    "simulation",
+    "sliding-window"
+  ],
+  "problems": [
+    {
+      "id": "implement-stack-using-queues",
+      "role": "guided"
+    },
+    {
+      "id": "number-of-recent-calls",
+      "role": "core"
+    },
+    {
+      "id": "design-circular-queue",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the difference between a stack, a queue and a deque, and why you'd use collections.deque instead of a list for a queue in Python.",
+    "keyPoints": [
+      "queue is FIFO (add at the back, remove from the front); stack is LIFO; deque allows both ends",
+      "list.pop(0) shifts every remaining element: O(n)",
+      "deque.append / popleft / appendleft / pop are all O(1)",
+      "queues power BFS and time windows; a circular array gives a fixed-size O(1) queue"
+    ]
+  }
+}

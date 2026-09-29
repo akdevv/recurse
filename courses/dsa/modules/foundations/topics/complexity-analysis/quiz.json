@@ -1,0 +1,85 @@
+[
+  {
+    "id": "drop-constants",
+    "kind": "complexity",
+    "q": "Simplify: 3n² + 100n + 5000",
+    "options": ["O(3n²)", "O(n²)", "O(n² + n)", "O(5000)"],
+    "answer": 1,
+    "why": "Keep the fastest-growing term and drop constants: O(n²)."
+  },
+  {
+    "id": "two-loops",
+    "kind": "complexity",
+    "q": "Time complexity?",
+    "code": "def f(a, b):\n    for x in a:\n        print(x)\n    for y in b:\n        print(y)",
+    "options": ["O(n²)", "O(a · b)", "O(a + b)", "O(1)"],
+    "answer": 2,
+    "why": "Sequential loops add, and they run over different inputs, so O(len(a) + len(b))."
+  },
+  {
+    "id": "halving",
+    "kind": "complexity",
+    "q": "Time complexity?",
+    "code": "def f(n):\n    count = 0\n    while n > 1:\n        n //= 2\n        count += 1\n    return count",
+    "options": ["O(n)", "O(log n)", "O(√n)", "O(n / 2)"],
+    "answer": 1,
+    "why": "n halves every iteration, so it takes about log₂ n steps."
+  },
+  {
+    "id": "triangle",
+    "kind": "complexity",
+    "q": "Time complexity?",
+    "code": "for i in range(n):\n    for j in range(i):\n        work()",
+    "options": ["O(n)", "O(n log n)", "O(n²)", "O(2ⁿ)"],
+    "answer": 2,
+    "why": "The inner loop runs 0 + 1 + … + (n-1) = n(n-1)/2 times, still O(n²)."
+  },
+  {
+    "id": "sqrt",
+    "kind": "complexity",
+    "q": "Time complexity?",
+    "code": "i = 1\nwhile i * i <= n:\n    i += 1",
+    "options": ["O(n)", "O(log n)", "O(√n)", "O(1)"],
+    "answer": 2,
+    "why": "The loop stops when i reaches √n."
+  },
+  {
+    "id": "recursion-space",
+    "kind": "complexity",
+    "q": "Space complexity (extra memory)?",
+    "code": "def count_down(n):\n    if n == 0:\n        return\n    count_down(n - 1)",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+    "answer": 2,
+    "why": "No data structures, but n nested calls sit on the call stack at once: O(n) space."
+  },
+  {
+    "id": "constraints",
+    "kind": "concept",
+    "q": "Constraints say n ≤ 10⁵. Which complexity is the safest target in Python?",
+    "options": ["O(n²)", "O(n log n) or better", "O(2ⁿ)", "O(n³)"],
+    "answer": 1,
+    "why": "n² = 10¹⁰ operations, far too slow. n log n ≈ 1.7·10⁶: fine."
+  },
+  {
+    "id": "amortized",
+    "kind": "concept",
+    "q": "Why is list.append() called O(1) *amortized*?",
+    "options": [
+      "It never needs to copy anything",
+      "Occasional resizes copy everything, but capacity doubles so they're rare; the average cost per append is O(1)",
+      "Python lists are linked lists",
+      "Because append is written in C"
+    ],
+    "answer": 1,
+    "why": "Doubling makes the total copying across n appends about 2n, which is O(1) per append on average."
+  },
+  {
+    "id": "hidden-loop",
+    "kind": "complexity",
+    "q": "Time complexity?",
+    "code": "def f(nums):\n    out = []\n    for x in nums:\n        if x not in out:\n            out.append(x)\n    return out",
+    "options": ["O(n)", "O(n²)", "O(n log n)", "O(1)"],
+    "answer": 1,
+    "why": "`x not in out` scans the list: a hidden inner loop. O(n²). A set makes it O(n)."
+  }
+]

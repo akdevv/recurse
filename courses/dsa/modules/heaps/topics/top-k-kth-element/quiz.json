@@ -1,0 +1,80 @@
+[
+ {
+  "id": "which",
+  "kind": "concept",
+  "q": "To keep the k LARGEST values seen so far, use a…",
+  "options": [
+   "Max-heap of size k",
+   "Min-heap of size k",
+   "Sorted list of size n",
+   "Stack"
+  ],
+  "answer": 1,
+  "why": "The root of a min-heap is the weakest of the top k: the one a newcomer must beat."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Size-k heap over n values costs…",
+  "options": [
+   "O(n log n)",
+   "O(n log k)",
+   "O(k log n)",
+   "O(n + k)"
+  ],
+  "answer": 1,
+  "why": "n pushes/pops on a heap that never exceeds k + 1 items."
+ },
+ {
+  "id": "qs",
+  "kind": "complexity",
+  "q": "Quickselect's average time?",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(log n)",
+   "O(k n)"
+  ],
+  "answer": 0,
+  "why": "n + n/2 + n/4 + … ≈ 2n on average."
+ },
+ {
+  "id": "dist",
+  "kind": "concept",
+  "q": "K Closest Points: why compare x² + y² instead of the real distance?",
+  "options": [
+   "It's more accurate",
+   "sqrt is monotonic, so the order is the same without floats or extra work",
+   "Negative coordinates",
+   "Required by heapq"
+  ],
+  "answer": 1,
+  "why": "Squared distances sort the points identically."
+ },
+ {
+  "id": "tie",
+  "kind": "output",
+  "q": "Top K Frequent Words with counts {\"b\": 2, \"a\": 2, \"c\": 1} and k = 2 returns…",
+  "options": [
+   "[\"b\", \"a\"]",
+   "[\"a\", \"b\"]",
+   "[\"a\", \"c\"]",
+   "[\"b\", \"c\"]"
+  ],
+  "answer": 1,
+  "why": "Same frequency → alphabetical order, so the sort key is (−count, word)."
+ },
+ {
+  "id": "stream",
+  "kind": "pattern",
+  "q": "Numbers arrive one at a time and you must report the k-th largest after each. Best fit?",
+  "options": [
+   "Sort after each arrival",
+   "Quickselect after each arrival",
+   "A min-heap of size k",
+   "A hash map"
+  ],
+  "answer": 2,
+  "why": "Each arrival costs O(log k); quickselect would redo O(n) work every time."
+ }
+]

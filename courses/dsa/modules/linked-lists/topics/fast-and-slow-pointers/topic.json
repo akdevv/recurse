@@ -1,0 +1,50 @@
+{
+  "id": "fast-and-slow-pointers",
+  "title": "Fast & slow pointers",
+  "status": "ready",
+  "learn": "tortoise/hare: middle, cycle detection (Floyd), cycle start, nth from end, gap pointers",
+  "hook": "Linked List Cycle and Middle of the Linked List are interview staples, and the follow-up \"now find where the cycle starts, in O(1) space\" is a classic test of whether you understand Floyd's algorithm or just memorized it.",
+  "patterns": [
+    "fast-slow-pointers"
+  ],
+  "problems": [
+    {
+      "id": "middle-of-the-linked-list",
+      "role": "guided"
+    },
+    {
+      "id": "linked-list-cycle",
+      "role": "core"
+    },
+    {
+      "id": "happy-number",
+      "role": "optional"
+    },
+    {
+      "id": "palindrome-linked-list",
+      "role": "core"
+    },
+    {
+      "id": "linked-list-cycle-ii",
+      "role": "core"
+    },
+    {
+      "id": "remove-nth-node-from-end-of-list",
+      "role": "core"
+    },
+    {
+      "id": "find-the-duplicate-number",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain Floyd's cycle detection: why the fast and slow pointers must meet if there's a cycle, and how you then find the node where the cycle starts.",
+    "keyPoints": [
+      "slow moves 1 step, fast moves 2; without a cycle fast reaches None",
+      "inside a cycle fast gains one step per move, so it must land on slow",
+      "to find the start: reset one pointer to the head, move both 1 step at a time; they meet at the cycle start",
+      "because head→start distance a equals meeting point→start distance (a = kL − b)",
+      "O(n) time, O(1) space vs O(n) space for a visited set"
+    ]
+  }
+}

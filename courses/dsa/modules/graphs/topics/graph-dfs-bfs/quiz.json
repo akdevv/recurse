@@ -1,0 +1,80 @@
+[
+ {
+  "id": "visited",
+  "kind": "concept",
+  "q": "Why do graph traversals need a visited set when tree traversals don't?",
+  "options": [
+   "Graphs are bigger",
+   "Graphs can contain cycles and multiple paths to the same node",
+   "Trees are sorted",
+   "They don't"
+  ],
+  "answer": 1,
+  "why": "In a tree every node has one path from the root; graphs don't."
+ },
+ {
+  "id": "shortest",
+  "kind": "pattern",
+  "q": "Fewest transformations from one word to another (Word Ladder). Which traversal?",
+  "options": [
+   "DFS",
+   "BFS",
+   "Inorder",
+   "Topological sort"
+  ],
+  "answer": 1,
+  "why": "BFS reaches every node first along a shortest path when all steps cost the same."
+ },
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "BFS on a graph with V nodes and E edges (adjacency list) costs…",
+  "options": [
+   "O(V)",
+   "O(E log V)",
+   "O(V + E)",
+   "O(V²)"
+  ],
+  "answer": 2,
+  "why": "Each node is dequeued once and each edge is looked at once (twice if undirected)."
+ },
+ {
+  "id": "components",
+  "kind": "concept",
+  "q": "How do you count connected components with DFS?",
+  "options": [
+   "Run DFS once from node 0",
+   "Loop over all nodes; start a new DFS from each unvisited one and count the starts",
+   "Count edges",
+   "Count leaves"
+  ],
+  "answer": 1,
+  "why": "Each fresh start discovers a new component."
+ },
+ {
+  "id": "bipartite",
+  "kind": "concept",
+  "q": "A graph is bipartite exactly when…",
+  "options": [
+   "It has no edges",
+   "You can colour it with 2 colours so no edge joins same colours (no odd cycle)",
+   "It's a tree",
+   "It's connected"
+  ],
+  "answer": 1,
+  "why": "BFS/DFS colouring finds a conflict precisely when there's an odd cycle."
+ },
+ {
+  "id": "clone",
+  "kind": "concept",
+  "q": "Clone Graph: what does the old → new map do besides storing copies?",
+  "options": [
+   "Nothing",
+   "It's also the visited set, so cycles don't cause infinite recursion",
+   "Sorts the nodes",
+   "Counts edges"
+  ],
+  "answer": 1,
+  "why": "If a node is already in the map, return its copy instead of recursing again."
+ }
+]

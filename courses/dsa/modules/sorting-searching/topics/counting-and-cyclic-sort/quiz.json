@@ -1,0 +1,81 @@
+[
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Counting sort on n values in the range 0..K costs…",
+  "options": [
+   "O(n log n)",
+   "O(n + K)",
+   "O(n·K)",
+   "O(K log K)"
+  ],
+  "answer": 1,
+  "why": "One pass to count (n), one pass over the counts (K)."
+ },
+ {
+  "id": "beat",
+  "kind": "concept",
+  "q": "How can counting sort beat the O(n log n) limit for sorting?",
+  "options": [
+   "It uses a faster CPU trick",
+   "It never compares elements; values are used as array indexes",
+   "It only works on sorted input",
+   "It can't"
+  ],
+  "answer": 1,
+  "why": "The n log n lower bound applies to comparison sorts only."
+ },
+ {
+  "id": "home",
+  "kind": "concept",
+  "q": "In cyclic sort for values 1..n, where does value 7 go?",
+  "options": [
+   "Index 7",
+   "Index 6",
+   "Index 0",
+   "The end"
+  ],
+  "answer": 1,
+  "why": "Value v belongs at index v − 1."
+ },
+ {
+  "id": "advance",
+  "kind": "concept",
+  "q": "After swapping nums[i] to its home, why not advance i immediately?",
+  "options": [
+   "It's slower",
+   "The value just swapped into index i may also need to move",
+   "i must stay at 0",
+   "To keep the sort stable"
+  ],
+  "answer": 1,
+  "why": "Keep placing whatever lands at i until it's home or is a duplicate."
+ },
+ {
+  "id": "missing",
+  "kind": "output",
+  "q": "What does this return for nums = [3, 0, 1]?",
+  "code": "n = len(nums)\nreturn n * (n + 1) // 2 - sum(nums)",
+  "options": [
+   "0",
+   "1",
+   "2",
+   "3"
+  ],
+  "answer": 2,
+  "why": "Expected sum of 0..3 is 6, actual sum is 4."
+ },
+ {
+  "id": "range",
+  "kind": "pattern",
+  "q": "Values are up to 10⁹ and n = 10⁵. Is counting sort a good idea?",
+  "options": [
+   "Yes, always O(n)",
+   "No: the count array would need 10⁹ slots",
+   "Yes if values are unique",
+   "Only for negative numbers"
+  ],
+  "answer": 1,
+  "why": "Counting sort only pays off when the value range is small compared to memory."
+ }
+]

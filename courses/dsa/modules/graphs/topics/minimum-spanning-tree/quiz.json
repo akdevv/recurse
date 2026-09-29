@@ -1,0 +1,80 @@
+[
+ {
+  "id": "edges",
+  "kind": "concept",
+  "q": "How many edges does a spanning tree of V nodes have?",
+  "options": [
+   "V",
+   "V − 1",
+   "2V",
+   "V²"
+  ],
+  "answer": 1,
+  "why": "Any tree on V nodes has V − 1 edges."
+ },
+ {
+  "id": "kruskal",
+  "kind": "concept",
+  "q": "In Kruskal, when is an edge skipped?",
+  "options": [
+   "When it's expensive",
+   "When its endpoints are already in the same component",
+   "When it touches a leaf",
+   "Never"
+  ],
+  "answer": 1,
+  "why": "Adding it would create a cycle."
+ },
+ {
+  "id": "prim",
+  "kind": "concept",
+  "q": "Prim's algorithm grows the tree by adding…",
+  "options": [
+   "The globally cheapest edge",
+   "The cheapest edge with exactly one end in the tree",
+   "A random edge",
+   "The longest edge"
+  ],
+  "answer": 1,
+  "why": "It always extends the single tree it's building."
+ },
+ {
+  "id": "dense",
+  "kind": "pattern",
+  "q": "1000 points, every pair is a possible edge. Which version is simplest and fast?",
+  "options": [
+   "Kruskal with all edges sorted",
+   "O(V²) Prim with a distance array",
+   "Dijkstra",
+   "BFS"
+  ],
+  "answer": 1,
+  "why": "Avoids building and sorting ~500,000 edges."
+ },
+ {
+  "id": "diff",
+  "kind": "concept",
+  "q": "MST vs shortest paths: which statement is true?",
+  "options": [
+   "They're the same thing",
+   "An MST minimises total edge weight; it doesn't guarantee the shortest path between two nodes",
+   "Shortest paths always form an MST",
+   "MSTs work on directed graphs"
+  ],
+  "answer": 1,
+  "why": "Different objectives: the cheapest network vs the cheapest route."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "Edges (A–B 1), (B–C 2), (A–C 3), (C–D 4). MST weight?",
+  "options": [
+   "6",
+   "7",
+   "10",
+   "3"
+  ],
+  "answer": 1,
+  "why": "Take 1, 2, skip A–C (cycle), take 4: 1 + 2 + 4 = 7."
+ }
+]

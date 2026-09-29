@@ -1,0 +1,35 @@
+{
+  "id": "constraint-and-grid-backtracking",
+  "title": "Constraint & grid backtracking",
+  "status": "ready",
+  "learn": "backtracking on a grid (mark/unmark visited), partitioning, pruning",
+  "hook": "Word Search and Palindrome Partitioning are among the most common backtracking mediums, and N-Queens is the classic hard. They add constraints and pruning to the basic template, plus the mark/unmark trick for grids.",
+  "patterns": [
+    "backtracking",
+    "island-traversal"
+  ],
+  "problems": [
+    {
+      "id": "word-search",
+      "role": "guided"
+    },
+    {
+      "id": "palindrome-partitioning",
+      "role": "core"
+    },
+    {
+      "id": "n-queens",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd solve Word Search with backtracking, including how you avoid reusing a cell and what the complexity is.",
+    "keyPoints": [
+      "DFS from every cell that matches the first letter",
+      "at each step the next letter must be in one of the 4 neighbours",
+      "mark the cell while it's on the current path, unmark it when backtracking so other paths can use it",
+      "prune immediately on out-of-bounds, mismatch or a visited cell",
+      "O(m·n·3^L) worst case, O(L) recursion depth"
+    ]
+  }
+}

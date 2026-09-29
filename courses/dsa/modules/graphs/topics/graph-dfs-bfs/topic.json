@@ -1,0 +1,43 @@
+{
+  "id": "graph-dfs-bfs",
+  "title": "Graph DFS / BFS",
+  "status": "ready",
+  "learn": "visited set, connected components, BFS for shortest path in unweighted graphs, bipartite check",
+  "hook": "Number of Provinces, Clone Graph, Keys and Rooms and Word Ladder are all \"just\" DFS or BFS with a visited set. Knowing which one to reach for (BFS for fewest steps) is what interviewers check.",
+  "patterns": [
+    "bfs",
+    "tree-dfs"
+  ],
+  "problems": [
+    {
+      "id": "number-of-provinces",
+      "role": "guided"
+    },
+    {
+      "id": "keys-and-rooms",
+      "role": "core"
+    },
+    {
+      "id": "clone-graph",
+      "role": "core"
+    },
+    {
+      "id": "is-graph-bipartite",
+      "role": "optional"
+    },
+    {
+      "id": "word-ladder",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Compare DFS and BFS on a graph: how each works, why you need a visited set, and when BFS gives shortest paths.",
+    "keyPoints": [
+      "both visit every reachable node once with a visited set, O(V + E)",
+      "graphs can have cycles, so without a visited set the search never ends",
+      "DFS goes deep first (stack/recursion): components, cycles, backtracking",
+      "BFS explores by distance (queue): the first time it reaches a node is via the fewest edges",
+      "run the search from every unvisited node to count connected components"
+    ]
+  }
+}

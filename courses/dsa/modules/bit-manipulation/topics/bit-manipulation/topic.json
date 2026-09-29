@@ -1,0 +1,46 @@
+{
+  "id": "bit-manipulation",
+  "title": "Bit manipulation",
+  "status": "ready",
+  "learn": "binary representation, &, |, ^, ~, <<, >>, XOR tricks (a^a=0), n & (n-1), masks",
+  "hook": "Single Number, Number of 1 Bits, Counting Bits and Missing Number have one-line bitwise answers that interviewers love. They're quick wins, and they show you understand how numbers are stored.",
+  "patterns": [
+    "bit-manipulation"
+  ],
+  "problems": [
+    {
+      "id": "number-of-1-bits",
+      "role": "guided"
+    },
+    {
+      "id": "single-number",
+      "role": "core"
+    },
+    {
+      "id": "counting-bits",
+      "role": "core"
+    },
+    {
+      "id": "reverse-bits",
+      "role": "optional"
+    },
+    {
+      "id": "add-binary",
+      "role": "core"
+    },
+    {
+      "id": "sum-of-two-integers",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how XOR finds the single number in an array where every other number appears twice, and what n & (n − 1) does.",
+    "keyPoints": [
+      "x ^ x = 0 and x ^ 0 = x, and XOR is order-independent",
+      "XOR all numbers: every pair cancels, leaving the single one; O(n) time, O(1) space",
+      "n & (n − 1) clears the lowest set bit, so looping it counts set bits in O(number of 1-bits)",
+      "n > 0 and n & (n − 1) == 0 means n is a power of two",
+      "Python ints are unbounded: mask with 0xFFFFFFFF to imitate 32-bit behaviour"
+    ]
+  }
+}

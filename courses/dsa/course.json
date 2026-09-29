@@ -1,0 +1,23 @@
+{
+  "id": "dsa",
+  "title": "Data Structures & Algorithms",
+  "language": "python",
+  "modules": [
+    "foundations",
+    "arrays-strings",
+    "hashing",
+    "two-pointers-sliding-window",
+    "sorting-searching",
+    "linked-lists",
+    "stacks-queues",
+    "recursion-backtracking",
+    "trees",
+    "heaps",
+    "graphs",
+    "greedy-intervals",
+    "dynamic-programming",
+    "tries",
+    "bit-manipulation",
+    "advanced-structures"
+  ]
+}

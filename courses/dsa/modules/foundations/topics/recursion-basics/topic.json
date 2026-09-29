@@ -1,0 +1,24 @@
+{
+  "id": "recursion-basics",
+  "title": "Recursion basics",
+  "status": "ready",
+  "learn": "base case + recursive case, call stack, recursion tree, recursion vs iteration, cost of recursion (depth = space)",
+  "hook": "Trees, graphs, backtracking and DP are all recursion underneath. If recursion clicks now, half of the later modules get easier.",
+  "patterns": ["recursion", "memoization", "divide-and-conquer"],
+  "problems": [
+    { "id": "fibonacci-number", "role": "guided" },
+    { "id": "reverse-string", "role": "core" },
+    { "id": "power-of-two", "role": "core" },
+    { "id": "powx-n", "role": "core" }
+  ],
+  "explain": {
+    "prompt": "Explain recursion to an interviewer using Fibonacci: how it works, what the call stack does, and why the naive version is slow.",
+    "keyPoints": [
+      "a recursive function solves a problem by calling itself on a smaller input",
+      "base case stops the recursion; without it → infinite recursion / stack overflow",
+      "each call waits on the call stack until its sub-calls return; stack depth = extra space",
+      "naive Fibonacci branches twice per call → O(2ⁿ) time because subproblems repeat",
+      "fix by memoization (cache results) or iterating bottom-up → O(n)"
+    ]
+  }
+}

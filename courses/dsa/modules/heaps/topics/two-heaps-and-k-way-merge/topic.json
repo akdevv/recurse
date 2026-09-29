@@ -1,0 +1,31 @@
+{
+  "id": "two-heaps-and-k-way-merge",
+  "title": "Two heaps & K-way merge",
+  "status": "ready",
+  "learn": "max-heap + min-heap for running median; merging k sorted lists with a heap",
+  "hook": "Find Median from Data Stream and Merge k Sorted Lists are two famous hards that become manageable once you see the heap trick behind each: split the data into two halves, or keep one candidate per source.",
+  "patterns": [
+    "two-heaps",
+    "k-way-merge"
+  ],
+  "problems": [
+    {
+      "id": "find-median-from-data-stream",
+      "role": "optional"
+    },
+    {
+      "id": "merge-k-sorted-lists",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how two heaps give you the running median of a stream, and how a heap merges k sorted lists.",
+    "keyPoints": [
+      "median: max-heap for the lower half, min-heap for the upper half; every lower value ≤ every upper value",
+      "keep sizes equal (or the lower heap one larger); median = lower top, or the average of both tops",
+      "each insert is O(log n), the median is O(1)",
+      "k-way merge: a min-heap holds the current head of each list; pop the smallest, push that list's next element",
+      "merge costs O(N log k) for N total elements"
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+[
+ {
+  "id": "space",
+  "kind": "complexity",
+  "q": "An adjacency list for V nodes and E edges uses…",
+  "options": [
+   "O(V²)",
+   "O(V + E)",
+   "O(E²)",
+   "O(V · E)"
+  ],
+  "answer": 1,
+  "why": "Each node has a list; each edge appears once (twice if undirected)."
+ },
+ {
+  "id": "matrix",
+  "kind": "concept",
+  "q": "What does an adjacency matrix do faster than a list?",
+  "options": [
+   "List all neighbours",
+   "Check if a specific edge (u, v) exists",
+   "Use less memory",
+   "Nothing"
+  ],
+  "answer": 1,
+  "why": "matrix[u][v] is one lookup."
+ },
+ {
+  "id": "undirected",
+  "kind": "concept",
+  "q": "Building an adjacency list from an UNDIRECTED edge [a, b]…",
+  "options": [
+   "add b to adj[a] only",
+   "add a to adj[b] only",
+   "add both directions",
+   "skip it"
+  ],
+  "answer": 2,
+  "why": "Undirected means you can travel either way."
+ },
+ {
+  "id": "sumdeg",
+  "kind": "output",
+  "q": "An undirected graph has 7 edges. What's the sum of all node degrees?",
+  "options": [
+   "7",
+   "14",
+   "49",
+   "It depends"
+  ],
+  "answer": 1,
+  "why": "Every edge contributes 1 to each of its two endpoints: 2E."
+ },
+ {
+  "id": "judge",
+  "kind": "concept",
+  "q": "The town judge in a directed trust graph has…",
+  "options": [
+   "in-degree 0, out-degree n − 1",
+   "in-degree n − 1, out-degree 0",
+   "in-degree = out-degree",
+   "no edges"
+  ],
+  "answer": 1,
+  "why": "Trusted by everyone else, trusts nobody."
+ },
+ {
+  "id": "grid",
+  "kind": "pattern",
+  "q": "A 2D grid of land and water. How do you treat it as a graph?",
+  "options": [
+   "You can't",
+   "Each cell is a node; its up/down/left/right cells are its neighbours",
+   "Each row is a node",
+   "Build a matrix of all pairs"
+  ],
+  "answer": 1,
+  "why": "An implicit graph: no need to build the adjacency list at all."
+ }
+]

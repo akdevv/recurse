@@ -1,0 +1,23 @@
+{
+  "id": "python-for-dsa",
+  "title": "Python for DSA",
+  "status": "ready",
+  "learn": "list/dict/set/str ops and their costs, slicing, comprehensions, sorted(key=), collections (deque, Counter, defaultdict), heapq, bisect, float('inf'), tuple unpacking",
+  "hook": "Interviewers don't care that you know Python. They care that you know what each line costs. `x in my_list` vs `x in my_set` is the difference between O(n²) and O(n).",
+  "patterns": ["simulation", "prefix-sum"],
+  "problems": [
+    { "id": "fizz-buzz", "role": "guided" },
+    { "id": "running-sum-of-1d-array", "role": "core" },
+    { "id": "richest-customer-wealth", "role": "core" },
+    { "id": "kids-with-the-greatest-number-of-candies", "role": "optional" }
+  ],
+  "explain": {
+    "prompt": "An interviewer asks: why would you use a set instead of a list to check whether you've seen a value before? Explain with costs.",
+    "keyPoints": [
+      "list membership (`in`) scans every element: O(n)",
+      "set/dict membership hashes the value: O(1) average",
+      "inside a loop: list gives O(n²) total, set gives O(n)",
+      "trade-off: the set uses O(n) extra memory"
+    ]
+  }
+}

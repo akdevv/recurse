@@ -1,0 +1,81 @@
+[
+ {
+  "id": "overlap",
+  "kind": "concept",
+  "q": "What makes a problem a good fit for DP?",
+  "options": [
+   "It's sorted",
+   "Overlapping subproblems with an optimal/combinable substructure",
+   "It uses a graph",
+   "It needs O(1) space"
+  ],
+  "answer": 1,
+  "why": "The same smaller problems come up repeatedly and their answers combine into the bigger answer."
+ },
+ {
+  "id": "naive",
+  "kind": "complexity",
+  "q": "Plain recursive Fibonacci / Climbing Stairs runs in…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(2ⁿ)",
+   "O(n²)"
+  ],
+  "answer": 2,
+  "why": "Each call branches into two, and the same values are recomputed over and over."
+ },
+ {
+  "id": "memo",
+  "kind": "complexity",
+  "q": "With memoization, Climbing Stairs for n steps takes…",
+  "options": [
+   "O(1)",
+   "O(n)",
+   "O(n²)",
+   "O(2ⁿ)"
+  ],
+  "answer": 1,
+  "why": "Each of the n states is computed once in O(1)."
+ },
+ {
+  "id": "topdown",
+  "kind": "concept",
+  "q": "Memoization is…",
+  "options": [
+   "Bottom-up",
+   "Top-down: recursion plus a cache",
+   "A greedy method",
+   "Only for graphs"
+  ],
+  "answer": 1,
+  "why": "Tabulation is the bottom-up counterpart."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "What does this return for n = 5?",
+  "code": "a, b = 1, 1\nfor _ in range(n - 1):\n    a, b = b, a + b\nreturn b",
+  "options": [
+   "5",
+   "8",
+   "13",
+   "10"
+  ],
+  "answer": 1,
+  "why": "1, 1, 2, 3, 5, 8: ways(5) = 8."
+ },
+ {
+  "id": "state",
+  "kind": "concept",
+  "q": "Min Cost Climbing Stairs: which definition makes the recurrence simplest?",
+  "options": [
+   "dp[i] = total cost of the array",
+   "dp[i] = cheapest cost to stand on step i",
+   "dp[i] = number of steps",
+   "dp[i] = cost[i]"
+  ],
+  "answer": 1,
+  "why": "Then dp[i] = min(dp[i − 1] + cost[i − 1], dp[i − 2] + cost[i − 2])."
+ }
+]

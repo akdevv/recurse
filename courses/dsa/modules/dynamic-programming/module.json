@@ -1,0 +1,19 @@
+{
+  "id": "dynamic-programming",
+  "number": 12,
+  "title": "Dynamic Programming",
+  "summary": "Recursion + memory. Scariest topic, most learnable with the right framework.",
+  "prereqs": [
+    "recursion-backtracking",
+    "greedy-intervals"
+  ],
+  "topics": [
+    "dp-fundamentals",
+    "1d-dp",
+    "2d-grid-dp",
+    "knapsack-patterns"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

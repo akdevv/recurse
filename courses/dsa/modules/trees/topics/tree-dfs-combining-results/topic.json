@@ -1,0 +1,49 @@
+{
+  "id": "tree-dfs-combining-results",
+  "title": "Tree DFS: combining results",
+  "status": "ready",
+  "learn": "return values up the tree, global answer vs return value (diameter pattern), passing state down",
+  "hook": "Diameter of Binary Tree, Balanced Binary Tree and Lowest Common Ancestor all test one idea: the value a recursive call returns isn't always the answer. Separating \"what my parent needs\" from \"the best seen so far\" is the key to most tree mediums.",
+  "patterns": [
+    "tree-dfs"
+  ],
+  "problems": [
+    {
+      "id": "diameter-of-binary-tree",
+      "role": "guided"
+    },
+    {
+      "id": "balanced-binary-tree",
+      "role": "core"
+    },
+    {
+      "id": "subtree-of-another-tree",
+      "role": "core"
+    },
+    {
+      "id": "count-good-nodes-in-binary-tree",
+      "role": "core"
+    },
+    {
+      "id": "lowest-common-ancestor-of-a-binary-tree",
+      "role": "core"
+    },
+    {
+      "id": "construct-binary-tree-from-preorder-and-inorder-traversal",
+      "role": "optional"
+    },
+    {
+      "id": "binary-tree-maximum-path-sum",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how to find the diameter of a binary tree in O(n): what the recursive function returns and how the answer is tracked.",
+    "keyPoints": [
+      "every path has one highest node where it turns; its length there is left height + right height",
+      "the recursive function returns height (1 + max(left, right)) because a parent can only extend one side",
+      "a separate variable tracks the best left + right seen at any node",
+      "one postorder pass → O(n) time, O(h) space; computing heights separately per node would be O(n²)"
+    ]
+  }
+}

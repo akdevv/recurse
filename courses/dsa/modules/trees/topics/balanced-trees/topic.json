@@ -1,0 +1,19 @@
+{
+  "id": "balanced-trees",
+  "title": "Balanced trees (concept only)",
+  "status": "ready",
+  "learn": "why BSTs degrade to O(n), AVL rotations, red-black trees idea, B-trees/2-3 trees for disks. Explain-level only, no problems",
+  "hook": "\"What happens if the BST becomes skewed?\" is a standard follow-up to any BST answer. You won't code an AVL tree in an interview, but explaining rotations and why databases use B-trees shows real depth.",
+  "patterns": [],
+  "problems": [],
+  "explain": {
+    "prompt": "Explain why a plain BST can degrade to O(n), and how self-balancing trees like AVL or red-black trees prevent it.",
+    "keyPoints": [
+      "inserting sorted data into a plain BST makes a chain (height n), so operations become O(n)",
+      "self-balancing trees keep height O(log n) by rotating after inserts and deletes",
+      "a rotation is an O(1) local change of a few pointers that keeps the BST ordering",
+      "AVL: subtree heights differ by at most 1 (stricter, faster lookups); red-black: looser rules, fewer rotations (used in TreeMap / std::map)",
+      "B-trees / B+ trees keep many keys per node to minimise disk reads (database indexes)"
+    ]
+  }
+}

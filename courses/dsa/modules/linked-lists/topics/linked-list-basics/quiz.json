@@ -1,0 +1,81 @@
+[
+ {
+  "id": "access",
+  "kind": "complexity",
+  "q": "Accessing the k-th node of a singly linked list costs…",
+  "options": [
+   "O(1)",
+   "O(log k)",
+   "O(k)",
+   "O(n²)"
+  ],
+  "answer": 2,
+  "why": "No indexing: you follow k next-pointers from the head."
+ },
+ {
+  "id": "insert",
+  "kind": "complexity",
+  "q": "Inserting a new node right after a node you already have a reference to costs…",
+  "options": [
+   "O(1)",
+   "O(n)",
+   "O(log n)",
+   "O(k)"
+  ],
+  "answer": 0,
+  "why": "Two pointer assignments, nothing shifts."
+ },
+ {
+  "id": "save",
+  "kind": "concept",
+  "q": "When reversing, why save `nxt = cur.next` before `cur.next = prev`?",
+  "options": [
+   "For speed",
+   "After rewiring, cur.next no longer leads to the rest of the list",
+   "To handle cycles",
+   "It's optional"
+  ],
+  "answer": 1,
+  "why": "Overwriting cur.next first would lose the only reference to the remaining nodes."
+ },
+ {
+  "id": "dummy",
+  "kind": "concept",
+  "q": "What problem does a dummy node solve?",
+  "options": [
+   "It makes traversal faster",
+   "Removing or inserting at the head works like anywhere else",
+   "It prevents cycles",
+   "It stores the length"
+  ],
+  "answer": 1,
+  "why": "The head always has a predecessor (the dummy), so no special case. Return dummy.next."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "The list is 1 → 2 → 3. After this runs, what does prev point to?",
+  "code": "prev, cur = None, head\nwhile cur:\n    nxt = cur.next\n    cur.next = prev\n    prev, cur = cur, nxt",
+  "options": [
+   "Node 1, list 1 → None",
+   "Node 3, list 3 → 2 → 1",
+   "None",
+   "Node 2"
+  ],
+  "answer": 1,
+  "why": "Standard reversal: prev ends at the old tail."
+ },
+ {
+  "id": "doubly",
+  "kind": "pattern",
+  "q": "You must delete a node given only a reference to it, in O(1). Which structure makes this natural?",
+  "options": [
+   "Singly linked list",
+   "Doubly linked list",
+   "Array",
+   "Stack"
+  ],
+  "answer": 1,
+  "why": "A doubly linked node knows its previous node, so it can unlink itself."
+ }
+]

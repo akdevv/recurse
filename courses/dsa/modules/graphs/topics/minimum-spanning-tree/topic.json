@@ -1,0 +1,27 @@
+{
+  "id": "minimum-spanning-tree",
+  "title": "Minimum spanning tree",
+  "status": "ready",
+  "learn": "Prim's (heap) vs Kruskal's (sort + DSU), what an MST is used for",
+  "hook": "Min Cost to Connect All Points is the standard MST interview question. Kruskal and Prim are also the cleanest examples of greedy algorithms that are provably correct.",
+  "patterns": [
+    "union-find",
+    "greedy"
+  ],
+  "problems": [
+    {
+      "id": "min-cost-to-connect-all-points",
+      "role": "optional"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain what a minimum spanning tree is and how Kruskal's and Prim's algorithms build one.",
+    "keyPoints": [
+      "an MST connects all V nodes with V − 1 edges of minimum total weight and no cycles",
+      "Kruskal: sort edges by weight, add each edge unless its endpoints are already connected (union-find)",
+      "Prim: grow one tree, always adding the cheapest edge that leaves it (min-heap)",
+      "Kruskal O(E log E); Prim O(E log V), or O(V²) with an array for dense graphs like all pairs of points",
+      "an MST minimises the total, not the path between two specific nodes"
+    ]
+  }
+}

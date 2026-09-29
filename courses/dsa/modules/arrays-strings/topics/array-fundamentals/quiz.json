@@ -1,0 +1,82 @@
+[
+ {
+  "id": "insert-front",
+  "kind": "complexity",
+  "q": "What does `nums.insert(0, x)` cost on a Python list of length n?",
+  "options": [
+   "O(1)",
+   "O(log n)",
+   "O(n)",
+   "O(n²)"
+  ],
+  "answer": 2,
+  "why": "Every existing element shifts one slot right to make room at index 0."
+ },
+ {
+  "id": "remove-loop",
+  "kind": "complexity",
+  "q": "What is the time complexity of this function?",
+  "code": "def strip(nums, val):\n    while val in nums:\n        nums.remove(val)\n    return len(nums)",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²)",
+   "O(1)"
+  ],
+  "answer": 2,
+  "why": "Each `in` and each `remove` scans or shifts O(n), and it can repeat up to n times. A write pointer does it in one O(n) pass."
+ },
+ {
+  "id": "rebind",
+  "kind": "output",
+  "q": "What does `a` hold after this runs?",
+  "code": "def reset(nums):\n    nums = [0, 0, 0]\n\na = [1, 2, 3]\nreset(a)",
+  "options": [
+   "[0, 0, 0]",
+   "[1, 2, 3]",
+   "[]",
+   "An error"
+  ],
+  "answer": 1,
+  "why": "`nums = ...` only rebinds the local name. To change the caller's list you'd write `nums[:] = [0, 0, 0]`."
+ },
+ {
+  "id": "rotate-k",
+  "kind": "concept",
+  "q": "Rotating an array of length 5 right by k = 12 is the same as rotating it by…",
+  "options": [
+   "12",
+   "7",
+   "2",
+   "0"
+  ],
+  "answer": 2,
+  "why": "Every n rotations bring the array back to the start, so only k % n = 12 % 5 = 2 matters."
+ },
+ {
+  "id": "merge-back",
+  "kind": "pattern",
+  "q": "Merge Sorted Array: why fill nums1 from the back?",
+  "options": [
+   "Because sorting is faster backwards",
+   "The free space is at the end, so nothing unread gets overwritten",
+   "It uses fewer comparisons",
+   "Python lists can only grow at the end"
+  ],
+  "answer": 1,
+  "why": "Writing from the front would overwrite values of nums1 you still need. The empty tail is safe to write into."
+ },
+ {
+  "id": "boyer",
+  "kind": "concept",
+  "q": "Boyer-Moore voting finds the majority element in…",
+  "options": [
+   "O(n) time, O(n) space",
+   "O(n log n) time, O(1) space",
+   "O(n) time, O(1) space",
+   "O(n²) time, O(1) space"
+  ],
+  "answer": 2,
+  "why": "One pass with just a candidate and a count. It relies on the majority appearing more than n/2 times."
+ }
+]

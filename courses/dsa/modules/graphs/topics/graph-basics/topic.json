@@ -1,0 +1,33 @@
+{
+  "id": "graph-basics",
+  "title": "Graph basics",
+  "status": "ready",
+  "learn": "vertices/edges, directed/undirected, weighted, adjacency list vs matrix, degree, building a graph from edges",
+  "hook": "Graphs model maps, networks, dependencies and social connections, and they're a big part of medium/hard interviews. It all starts with one habit: turn the edge list into an adjacency list.",
+  "patterns": [
+    "simulation"
+  ],
+  "problems": [
+    {
+      "id": "find-center-of-star-graph",
+      "role": "guided"
+    },
+    {
+      "id": "find-the-town-judge",
+      "role": "core"
+    },
+    {
+      "id": "find-if-path-exists-in-graph",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain the ways to represent a graph, and when you'd pick an adjacency list over an adjacency matrix.",
+    "keyPoints": [
+      "a graph is nodes plus edges; edges can be directed or undirected, weighted or not",
+      "adjacency list: node → neighbours, O(V + E) space, neighbours listed in O(degree)",
+      "adjacency matrix: O(V²) space, O(1) edge check; only worth it for dense graphs",
+      "undirected edges are stored in both directions; in-degree/out-degree count arrows in and out"
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+[
+ {
+  "id": "slow",
+  "kind": "concept",
+  "q": "In read/write compaction, what does the slow pointer k mean?",
+  "options": [
+   "The index being read",
+   "The number of kept elements so far = where the next kept one goes",
+   "The last duplicate",
+   "The array's length"
+  ],
+  "answer": 1,
+  "why": "nums[0..k-1] is the finished part. The next value you keep is written at index k."
+ },
+ {
+  "id": "dedupe-out",
+  "kind": "output",
+  "q": "After this runs on nums = [1, 1, 2, 3, 3], what is k?",
+  "code": "k = 1\nfor i in range(1, len(nums)):\n    if nums[i] != nums[k - 1]:\n        nums[k] = nums[i]\n        k += 1",
+  "options": [
+   "2",
+   "3",
+   "4",
+   "5"
+  ],
+  "answer": 1,
+  "why": "The unique values 1, 2, 3 end up in nums[0..2]."
+ },
+ {
+  "id": "remove-cx",
+  "kind": "complexity",
+  "q": "Removing all zeros by calling `nums.remove(0)` in a loop costs…",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²) in the worst case",
+   "O(1)"
+  ],
+  "answer": 2,
+  "why": "Each remove shifts everything after it: O(n) per call. Read/write pointers do it in one O(n) pass."
+ },
+ {
+  "id": "dutch",
+  "kind": "concept",
+  "q": "Sort Colors: after swapping nums[mid] with nums[hi], why doesn't mid move?",
+  "options": [
+   "It's a bug",
+   "The value swapped in from hi hasn't been examined yet",
+   "mid always equals lo",
+   "To keep the sort stable"
+  ],
+  "answer": 1,
+  "why": "The region [mid, hi] is unknown. The swapped-in value came from that region, so it still needs checking."
+ },
+ {
+  "id": "subseq",
+  "kind": "pattern",
+  "q": "\"Is s a subsequence of t?\" Best approach?",
+  "options": [
+   "Sliding window of len(s)",
+   "One pointer in each string, advance in s only on a match",
+   "Sort both",
+   "Hash set of t's characters"
+  ],
+  "answer": 1,
+  "why": "Greedy matching: take each character of s at its earliest spot in t. O(len(t)) time, O(1) space."
+ },
+ {
+  "id": "move-zero",
+  "kind": "output",
+  "q": "What is nums after this, starting from [0, 1, 0, 3, 12]?",
+  "code": "k = 0\nfor i in range(len(nums)):\n    if nums[i] != 0:\n        nums[k], nums[i] = nums[i], nums[k]\n        k += 1",
+  "options": [
+   "[1, 3, 12, 0, 0]",
+   "[0, 0, 1, 3, 12]",
+   "[1, 0, 3, 0, 12]",
+   "[12, 3, 1, 0, 0]"
+  ],
+  "answer": 0,
+  "why": "Each non-zero is swapped to the next write slot, so non-zeros keep their order and zeros drift to the end."
+ }
+]

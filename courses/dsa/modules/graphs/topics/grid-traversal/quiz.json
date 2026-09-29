@@ -1,0 +1,80 @@
+[
+ {
+  "id": "cx",
+  "kind": "complexity",
+  "q": "Counting islands in an m×n grid takes…",
+  "options": [
+   "O(m + n)",
+   "O(m·n)",
+   "O((m·n)²)",
+   "O(m·n·log(m·n))"
+  ],
+  "answer": 1,
+  "why": "Every cell is visited a constant number of times."
+ },
+ {
+  "id": "mark",
+  "kind": "concept",
+  "q": "Why mark a cell visited as soon as it's added to the BFS queue?",
+  "options": [
+   "Style",
+   "Otherwise several neighbours may add the same cell, duplicating work",
+   "To count islands",
+   "It's required by deque"
+  ],
+  "answer": 1,
+  "why": "Marking on push guarantees each cell enters the queue once."
+ },
+ {
+  "id": "multi",
+  "kind": "pattern",
+  "q": "Rotting Oranges: several rotten oranges spread at once. Approach?",
+  "options": [
+   "BFS from each rotten orange separately",
+   "One BFS with all rotten oranges in the queue from the start",
+   "DFS",
+   "Sort the grid"
+  ],
+  "answer": 1,
+  "why": "Multi-source BFS: each level is one minute for all fires together."
+ },
+ {
+  "id": "border",
+  "kind": "pattern",
+  "q": "Surrounded Regions: which 'O' cells survive?",
+  "options": [
+   "All of them",
+   "Those connected to the border; start the search from the border",
+   "Those in the center",
+   "None"
+  ],
+  "answer": 1,
+  "why": "It's easier to find the safe cells from the edges than to test every region."
+ },
+ {
+  "id": "flood",
+  "kind": "concept",
+  "q": "Flood Fill where the new colour equals the starting colour. Danger?",
+  "options": [
+   "None",
+   "Without an early return the recolouring never marks cells as done: infinite loop",
+   "Wrong answer only",
+   "Index error"
+  ],
+  "answer": 1,
+  "why": "The visited mark IS the colour change, so return immediately if nothing changes."
+ },
+ {
+  "id": "out",
+  "kind": "output",
+  "q": "How many islands in [[1,1,0],[0,0,1],[1,0,1]] (4-directional)?",
+  "options": [
+   "2",
+   "3",
+   "4",
+   "5"
+  ],
+  "answer": 1,
+  "why": "Top-left pair, the right column pair, and the bottom-left single cell."
+ }
+]

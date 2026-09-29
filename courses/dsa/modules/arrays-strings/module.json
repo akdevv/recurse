@@ -1,0 +1,17 @@
+{
+  "id": "arrays-strings",
+  "number": 1,
+  "title": "Arrays & Strings",
+  "summary": "Most asked category. Everything else builds on array fluency.",
+  "prereqs": [
+    "foundations"
+  ],
+  "topics": [
+    "array-fundamentals",
+    "strings",
+    "matrices"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

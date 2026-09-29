@@ -1,0 +1,20 @@
+{
+  "id": "trees",
+  "number": 8,
+  "title": "Trees",
+  "summary": "Most asked after arrays. Recursion made visual.",
+  "prereqs": [
+    "stacks-queues",
+    "recursion-backtracking"
+  ],
+  "topics": [
+    "binary-tree-basics-and-dfs-traversals",
+    "tree-dfs-combining-results",
+    "tree-bfs",
+    "binary-search-trees",
+    "balanced-trees"
+  ],
+  "boss": {
+    "timeLimitMin": 30
+  }
+}

@@ -1,0 +1,81 @@
+[
+ {
+  "id": "concat",
+  "kind": "complexity",
+  "q": "What is the time complexity of building a string of n characters like this?",
+  "code": "s = \"\"\nfor c in chars:\n    s += c",
+  "options": [
+   "O(n)",
+   "O(n log n)",
+   "O(n²) in the worst case",
+   "O(1)"
+  ],
+  "answer": 2,
+  "why": "Strings are immutable, so each `+=` can copy the whole string so far. Collect in a list and `\"\".join` once for O(n)."
+ },
+ {
+  "id": "split-diff",
+  "kind": "output",
+  "q": "What is `\"a  b\".split(\" \")`?",
+  "options": [
+   "['a', 'b']",
+   "['a', '', 'b']",
+   "['a  b']",
+   "['a', ' ', 'b']"
+  ],
+  "answer": 1,
+  "why": "Splitting on a single space keeps the empty string between the two spaces. `split()` with no argument would give ['a', 'b']."
+ },
+ {
+  "id": "ord",
+  "kind": "output",
+  "q": "What is `ord('7') - ord('0')`?",
+  "options": [
+   "'7'",
+   "7",
+   "55",
+   "An error"
+  ],
+  "answer": 1,
+  "why": "Digit characters have consecutive codes, so subtracting the code of '0' gives the digit's value."
+ },
+ {
+  "id": "count26",
+  "kind": "concept",
+  "q": "Counting letters of a lowercase string with a 26-slot array uses how much extra space?",
+  "options": [
+   "O(n)",
+   "O(1)",
+   "O(log n)",
+   "O(26n)"
+  ],
+  "answer": 1,
+  "why": "26 slots no matter how long the string is: constant space."
+ },
+ {
+  "id": "roman",
+  "kind": "pattern",
+  "q": "In a Roman numeral, when is a symbol subtracted?",
+  "options": [
+   "When it's the first symbol",
+   "When it's smaller than the symbol right after it",
+   "When it appears twice",
+   "When it's I, X or C anywhere"
+  ],
+  "answer": 1,
+  "why": "Symbols normally go largest to smallest. A smaller one before a bigger one (IV, XC, CM) counts negatively."
+ },
+ {
+  "id": "atoi-stop",
+  "kind": "output",
+  "q": "What does atoi return for \"   -12a34\"?",
+  "options": [
+   "-1234",
+   "-12",
+   "0",
+   "12"
+  ],
+  "answer": 1,
+  "why": "Skip spaces, read '-', read digits 1 and 2, then stop at 'a'. Everything after is ignored."
+ }
+]

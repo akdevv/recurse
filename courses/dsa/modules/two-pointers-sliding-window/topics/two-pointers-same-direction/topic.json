@@ -1,0 +1,41 @@
+{
+  "id": "two-pointers-same-direction",
+  "title": "Two pointers: same direction",
+  "status": "ready",
+  "learn": "read/write pointers for in-place filtering, subsequence matching, merging",
+  "hook": "\"Do it in place with O(1) extra memory\" is one of the most common interview follow-ups. A slow write pointer and a fast read pointer is usually the answer: Remove Duplicates, Move Zeroes, Sort Colors.",
+  "patterns": [
+    "two-pointers"
+  ],
+  "problems": [
+    {
+      "id": "remove-duplicates-from-sorted-array",
+      "role": "guided"
+    },
+    {
+      "id": "move-zeroes",
+      "role": "core"
+    },
+    {
+      "id": "is-subsequence",
+      "role": "core"
+    },
+    {
+      "id": "backspace-string-compare",
+      "role": "optional"
+    },
+    {
+      "id": "sort-colors",
+      "role": "core"
+    }
+  ],
+  "explain": {
+    "prompt": "Explain how you'd remove duplicates from a sorted array in place, and why it's O(n) time and O(1) space.",
+    "keyPoints": [
+      "a fast pointer reads every element, a slow pointer marks where the next kept element goes",
+      "sorted input: an element is new when it differs from the last kept value",
+      "write it at the slow pointer and advance; everything before the slow pointer is the answer",
+      "one pass, O(n) time, O(1) extra space, no deletions (which would be O(n) each)"
+    ]
+  }
+}
