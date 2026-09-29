@@ -109,7 +109,9 @@ struct RootView: View {
             switch parts[0] {
             case "review": nav.go(.review)
             case "course": nav.go(.course)
-            case "chests": nav.go(.chests)
+            case "rewards":
+                UserDefaults.standard.set(parts.count > 1 ? parts[1] : "path", forKey: "rewardsTab")
+                nav.go(.rewards)
             case "boss": nav.go(.boss(parts[1]))
             case "topic": nav.go(.topic(parts[1]))
             case "problem": nav.go(.problem(parts[1]))
@@ -130,7 +132,7 @@ struct RootView: View {
         case .today: HomeView()
         case .review: ReviewView()
         case .course: CourseView()
-        case .chests: ChestsView()
+        case .rewards: RewardsView()
         case .boss(let id): BossView(moduleId: id).id(id)
         case .topic(let id): TopicView(topicId: id).id(id)
         case .problem(let id): ProblemView(pid: id).id(id)
@@ -154,9 +156,9 @@ struct Sidebar: View {
                     .badge(me.reviewsDue)
                     .tag(Route.review)
                 Label("Course map", systemImage: "map").tag(Route.course)
-                Label("Chests", systemImage: "shippingbox")
-                    .badge(store.chestsWaiting)
-                    .tag(Route.chests)
+                Label("Rewards", systemImage: "gift")
+                    .badge(store.rewardsWaiting)
+                    .tag(Route.rewards)
             }
 
             Section("Modules") {

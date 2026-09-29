@@ -272,7 +272,6 @@ struct ChestsView: View {
             .frame(maxWidth: 860)
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle("Chests")
         .sheet(item: Binding(get: { opening.map(SheetID.init) }, set: { opening = $0?.id })) { ChestSheet(id: $0.id) }
     }
 

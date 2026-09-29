@@ -214,3 +214,44 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     #expect(store.me().streak.freezes <= Streak.maxFreezes)
     #expect(store.chestsWaiting == 0 && store.chestQueue.count == 40)
 }
+
+/// Marks a topic complete the way the app records it: lesson read, quiz passed, explained, required problems solved.
+@MainActor private func complete(_ store: Store, _ tid: String) throws {
+    let t = try #require(Content.topic(tid))
+    store.markLessonDone(tid)
+    _ = store.submitQuiz(tid, answers: Content.quiz(tid).map(\.answer))
+    store.submitTopicExplain(tid, text: String(repeating: "explained ", count: 5))
+    for p in t.problems where p.role != .optional {
+        store._db.run("INSERT INTO attempts (problem_id, started_at, finished_at, outcome) VALUES (?, ?, ?, 'solved')", p.id, Dates.iso(), Dates.iso())
+    }
+    store.changed()
+}
+
+@MainActor @Test func rewardPath() throws {
+    let store = try tempStore()
+    let coffee = { store.rewardPath().first { $0.id == "coffee-1" }! }
+    #expect(coffee().status == .locked && coffee().total == 2)
+
+    store.setAvailed("coffee-1", true) // locked: refused
+    #expect(coffee().status == .locked && store.error != nil)
+
+    try complete(store, "python-for-dsa")
+    #expect(coffee().done == 1 && coffee().status == .locked)
+    try complete(store, "complexity-analysis")
+    #expect(coffee().status == .unlocked)
+    #expect(store.rewardsWaiting == 1)
+
+    store.setAvailed("coffee-1", true)
+    #expect(coffee().status == .availed && coffee().availedAt != nil && store.rewardsWaiting == 0)
+    store.setAvailed("coffee-1", false)
+    #expect(coffee().status == .unlocked)
+
+    // the finale needs every module and the DP boss
+    let grand = try #require(store.rewardPath().first { $0.id == "grand" })
+    #expect(grand.total == store.moduleViews().flatMap(\.topics).count && grand.requires.last == "Dynamic Programming boss fight")
+
+    let b = Dictionary(uniqueKeysWithValues: store.badges().map { ($0.id, $0) })
+    #expect(b["topics"]?.value == 2 && b["topics"]?.tier == 1)
+    #expect(b["first-solve"]?.tier == 1 && b["quiz-ace"]!.value == 2)
+    #expect(b["boss"]?.tier == 0 && b["solver"]?.next == 25)
+}

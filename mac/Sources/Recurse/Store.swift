@@ -43,7 +43,7 @@ struct ModuleView: Identifiable {
 }
 
 enum Route: Hashable {
-    case today, review, course, chests
+    case today, review, course, rewards
     case topic(String)
     case boss(String)
     case problem(String)
