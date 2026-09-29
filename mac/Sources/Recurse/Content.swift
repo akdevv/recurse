@@ -33,6 +33,7 @@ struct ProblemRef: Decodable, Hashable {
 struct Topic: Decodable, Identifiable, Hashable {
     let id, title, status, learn: String
     let hook: String?
+    let patterns: [String]
     let problems: [ProblemRef]
     struct Explain: Decodable, Hashable { let prompt: String; let keyPoints: [String] }
     let explain: Explain
@@ -101,6 +102,7 @@ struct Problem {
     let lc: Int?
     let title: String
     let difficulty: Difficulty
+    let patterns: [String]
     let params: [String]
     let starter: String
     let statement: String // markdown
@@ -232,6 +234,7 @@ enum Content {
         return Problem(
             id: id, lc: meta["lc"]?.int, title: meta["title"]?.string ?? id,
             difficulty: Difficulty(rawValue: meta["difficulty"]?.string ?? "") ?? .medium,
+            patterns: meta["patterns"]?.array.compactMap(\.string) ?? [],
             params: meta["entry"]?["params"]?.array.compactMap { $0["name"]?.string } ?? [],
             starter: starter, statement: secs[0].text, hints: hints, keyPoints: keyPoints, solutions: solutions)
     }

@@ -6,14 +6,20 @@ struct RecurseApp: App {
     @NSApplicationDelegateAdaptor private var delegate: AppDelegate
     @State private var store: Store
     @State private var activity: Activity
-    @State private var nav = Nav()
+    @State private var nav: Nav
+    @State private var reminders: Reminders
+    @State private var palette = false
 
     init() {
         let db: DB
         do { db = try DB() } catch { fatalError("Can't open the database: \(error)") }
-        let store = Store(db: db)
+        let store = Store(db: db), activity = Activity(store: store), nav = Nav()
         _store = State(initialValue: store)
-        _activity = State(initialValue: Activity(store: store))
+        _activity = State(initialValue: activity)
+        _nav = State(initialValue: nav)
+        let reminders = Reminders(store: store, activity: activity, nav: nav)
+        _reminders = State(initialValue: reminders)
+        reminders.schedule()
     }
 
     var body: some Scene {
@@ -22,16 +28,28 @@ struct RecurseApp: App {
                 .environment(store)
                 .environment(activity)
                 .environment(nav)
+                .environment(reminders)
                 .frame(minWidth: 980, minHeight: 640)
+                .sheet(isPresented: $palette) { CommandPalette().environment(store).environment(nav) }
         }
         .commands {
             CommandMenu("Go") {
+                Button("Search…") { palette = true }.keyboardShortcut("k")
+                Divider()
                 Button("Today") { nav.go(.today) }.keyboardShortcut("t", modifiers: [.command, .shift])
                 Button("Review") { nav.go(.review) }.keyboardShortcut("r", modifiers: [.command, .shift])
                 Button("Course map") { nav.go(.course) }.keyboardShortcut("m", modifiers: [.command, .shift])
+                Button("Problems") { nav.go(.problems) }.keyboardShortcut("p", modifiers: [.command, .shift])
+                Button("Stats") { nav.go(.stats) }
+                Button("Patterns") { nav.go(.patterns) }
+                Button("Rewards") { nav.go(.rewards) }
                 Divider()
                 Button("Back") { nav.back() }.keyboardShortcut("[").disabled(nav.path.isEmpty)
             }
+        }
+
+        SwiftUI.Settings {
+            SettingsView().environment(store).environment(reminders)
         }
     }
 }
@@ -43,7 +61,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate()
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool { true }
+    // keep running with the window closed so reminders still fire; the Dock icon brings the window back
+    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool { false }
 }
 
 @MainActor @Observable
@@ -109,6 +128,9 @@ struct RootView: View {
             switch parts[0] {
             case "review": nav.go(.review)
             case "course": nav.go(.course)
+            case "problems": nav.go(.problems)
+            case "patterns": nav.go(.patterns)
+            case "stats": nav.go(.stats)
             case "rewards":
                 UserDefaults.standard.set(parts.count > 1 ? parts[1] : "path", forKey: "rewardsTab")
                 nav.go(.rewards)
@@ -133,6 +155,9 @@ struct RootView: View {
         case .review: ReviewView()
         case .course: CourseView()
         case .rewards: RewardsView()
+        case .problems: ProblemsView()
+        case .patterns: PatternsView()
+        case .stats: StatsView()
         case .boss(let id): BossView(moduleId: id).id(id)
         case .topic(let id): TopicView(topicId: id).id(id)
         case .problem(let id): ProblemView(pid: id).id(id)
@@ -156,6 +181,9 @@ struct Sidebar: View {
                     .badge(me.reviewsDue)
                     .tag(Route.review)
                 Label("Course map", systemImage: "map").tag(Route.course)
+                Label("Problems", systemImage: "list.bullet").tag(Route.problems)
+                Label("Patterns", systemImage: "square.grid.3x3").tag(Route.patterns)
+                Label("Stats", systemImage: "chart.bar").tag(Route.stats)
                 Label("Rewards", systemImage: "gift")
                     .badge(store.rewardsWaiting)
                     .tag(Route.rewards)

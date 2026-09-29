@@ -47,84 +47,97 @@ private struct TopicPage: View {
         return s
     }
 
+    private var headings: [String] {
+        (lesson?.markdown ?? "").split(separator: "\n").filter { $0.hasPrefix("## ") }.map { String($0.dropFirst(3)).trimmingCharacters(in: .whitespaces) }
+    }
+
     var body: some View {
         let steps = steps
         let n = { (id: String) in (steps.firstIndex { $0.id == id } ?? 0) + 1 }
         let done = { (id: String) in steps.first { $0.id == id }?.done ?? false }
 
         ScrollViewReader { proxy in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 44) {
-                    VStack(alignment: .leading, spacing: 18) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Module \(m.number) · \(m.title)  /  Topic \((m.topics.firstIndex(of: t.id) ?? 0) + 1) of \(m.topics.count)")
-                                .font(.callout).foregroundStyle(.secondary)
-                            Text(t.title).font(.largeTitle.weight(.semibold))
-                        }
-                        HStack(spacing: 12) {
-                            ForEach(steps) { s in
-                                Button { withAnimation { proxy.scrollTo(s.id, anchor: .top) } } label: {
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        Capsule().fill(s.done ? Color.green : s.started ? Color.accentColor : Color.primary.opacity(0.1)).frame(height: 4)
-                                        Label(s.label, systemImage: s.icon).font(.callout.weight(.medium))
-                                            .foregroundStyle(s.done || s.started ? .primary : .secondary)
-                                        Text(s.detail).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                                    }
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .contentShape(.rect)
+            GeometryReader { geo in
+                HStack(alignment: .top, spacing: 0) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 44) {
+                            VStack(alignment: .leading, spacing: 18) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text("Module \(m.number) · \(m.title)  /  Topic \((m.topics.firstIndex(of: t.id) ?? 0) + 1) of \(m.topics.count)")
+                                        .font(.callout).foregroundStyle(.secondary)
+                                    Text(t.title).font(.largeTitle.weight(.semibold))
                                 }
-                                .buttonStyle(.plain)
+                                if status.complete {
+                                    WrappedCard(title: t.title, w: store.topicWrapped(t))
+                                } else {
+                                    HStack(spacing: 12) {
+                                        ForEach(steps) { s in
+                                            Button { withAnimation { proxy.scrollTo(s.id, anchor: .top) } } label: {
+                                                VStack(alignment: .leading, spacing: 6) {
+                                                    Capsule().fill(s.done ? Color.green : s.started ? Color.accentColor : Color.primary.opacity(0.1)).frame(height: 4)
+                                                    Label(s.label, systemImage: s.icon).font(.callout.weight(.medium))
+                                                        .foregroundStyle(s.done || s.started ? .primary : .secondary)
+                                                    Text(s.detail).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                                                }
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                                .contentShape(.rect)
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                }
+                                }
+                                if let hook = t.hook {
+                                    (Text("Why this matters. ").fontWeight(.semibold).foregroundStyle(.orange) + Text(MD.inline(hook)))
+                                        .font(.callout).lineSpacing(3)
+                                        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color.orange.opacity(0.07), in: .rect(cornerRadius: 10))
+                                        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.orange.opacity(0.2)))
+                                }
                             }
-                        }
-                        if let hook = t.hook {
-                            (Text("Why this matters. ").fontWeight(.semibold).foregroundStyle(.orange) + Text(hook))
-                                .font(.callout).lineSpacing(3)
-                                .padding(14).frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.orange.opacity(0.07), in: .rect(cornerRadius: 10))
-                                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Color.orange.opacity(0.2)))
-                        }
-                    }
 
-                    VStack(alignment: .leading, spacing: 18) {
-                        SectionHeader(n: n("lesson"), title: "Lesson", done: status.lessonDone)
-                        if !t.ready {
-                            Label("The lesson for this topic hasn't been written yet. Its problems are listed below.", systemImage: "book")
-                                .foregroundStyle(.secondary).card()
-                        } else if let lesson {
-                            MarkdownView(text: lesson.markdown, viz: lesson.viz)
-                            LessonDone(t: t, done: status.lessonDone, hasQuiz: !quiz.isEmpty) { proxy.scrollTo("quiz", anchor: .top) }
-                        }
-                    }
-                    .id("lesson")
+                            VStack(alignment: .leading, spacing: 18) {
+                                SectionHeader(n: n("lesson"), title: "Lesson", done: status.lessonDone)
+                                if !t.ready {
+                                    Label("The lesson for this topic hasn't been written yet. Its problems are listed below.", systemImage: "book")
+                                        .foregroundStyle(.secondary).card()
+                                } else if let lesson {
+                                    MarkdownView(text: lesson.markdown, viz: lesson.viz)
+                                    LessonDone(t: t, done: status.lessonDone, hasQuiz: !quiz.isEmpty) { proxy.scrollTo("quiz", anchor: .top) }
+                                }
+                            }
+                            .id("lesson")
 
-                    if !quiz.isEmpty {
-                        VStack(alignment: .leading, spacing: 18) {
-                            SectionHeader(n: n("quiz"), title: "Quiz", done: done("quiz"),
-                                          subtitle: "\(quiz.count) quick questions. Score 70% or more to pass. Retakes only earn XP for beating your best.")
-                            QuizView(topicId: t.id, quiz: quiz, best: status.quizBest)
-                        }
-                        .id("quiz")
-                    }
+                            if !quiz.isEmpty {
+                                VStack(alignment: .leading, spacing: 18) {
+                                    SectionHeader(n: n("quiz"), title: "Quiz", done: done("quiz"),
+                                                  subtitle: "\(quiz.count) quick questions. Score 70% or more to pass. Retakes only earn XP for beating your best.")
+                                    QuizView(topicId: t.id, quiz: quiz, best: status.quizBest)
+                                }
+                                .id("quiz")
+                            }
 
-                    if !problems.isEmpty {
-                        VStack(alignment: .leading, spacing: 18) {
-                            SectionHeader(n: n("problems"), title: "Problems", done: done("problems"),
-                                          subtitle: "Start with the guided one. Optional problems are extra practice for bonus XP.")
-                            VStack(spacing: 10) { ForEach(problems) { ProblemRow(p: $0) } }.card()
-                        }
-                        .id("problems")
-                    }
+                            if !problems.isEmpty {
+                                VStack(alignment: .leading, spacing: 18) {
+                                    SectionHeader(n: n("problems"), title: "Problems", done: done("problems"),
+                                                  subtitle: "Start with the guided one. Optional problems are extra practice for bonus XP.")
+                                    VStack(spacing: 10) { ForEach(problems) { ProblemRow(p: $0) } }.card()
+                                }
+                                .id("problems")
+                            }
 
-                    VStack(alignment: .leading, spacing: 18) {
-                        SectionHeader(n: n("explain"), title: "Explain it back", done: status.explained,
-                                      subtitle: "The interview skill: explain the idea clearly, without notes.")
-                        TopicExplain(t: t)
+                            VStack(alignment: .leading, spacing: 18) {
+                                SectionHeader(n: n("explain"), title: "Explain it back", done: status.explained,
+                                              subtitle: "The interview skill: explain the idea clearly, without notes.")
+                                TopicExplain(t: t)
+                            }
+                            .id("explain")
+                        }
+                        .padding(.horizontal, 36).padding(.vertical, 32)
+                        .frame(maxWidth: 780)
+                        .frame(maxWidth: .infinity)
                     }
-                    .id("explain")
+                    if geo.size.width > 1100 { OnThisPage(headings: headings, hasQuiz: !quiz.isEmpty, hasProblems: !problems.isEmpty, proxy: proxy) }
                 }
-                .padding(.horizontal, 36).padding(.vertical, 32)
-                .frame(maxWidth: 780)
-                .frame(maxWidth: .infinity)
             }
         }
         .navigationTitle(t.title)
@@ -329,5 +342,76 @@ private struct TopicExplain: View {
         }
         .card(padding: 20)
         .onAppear { if !loaded { text = saved; loaded = true } }
+    }
+}
+
+private struct OnThisPage: View {
+    let headings: [String]
+    let hasQuiz, hasProblems: Bool
+    let proxy: ScrollViewProxy
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Text("On this page").font(.caption.weight(.semibold)).foregroundStyle(.secondary).padding(.bottom, 4)
+            link("Lesson", "lesson")
+            ForEach(headings, id: \.self) { link($0, "h:" + $0, sub: true) }
+            if hasQuiz { link("Quiz", "quiz") }
+            if hasProblems { link("Problems", "problems") }
+            link("Explain it back", "explain")
+        }
+        .frame(width: 200, alignment: .leading)
+        .padding(.top, 40).padding(.trailing, 20)
+    }
+
+    private func link(_ title: String, _ id: String, sub: Bool = false) -> some View {
+        Button { withAnimation { proxy.scrollTo(id, anchor: .top) } } label: {
+            Text(MD.inline(title)).font(sub ? .caption : .callout).foregroundStyle(sub ? .secondary : .primary)
+                .lineLimit(1).padding(.leading, sub ? 12 : 0).contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Shown once a topic is mastered: what it took, in numbers.
+private struct WrappedCard: View {
+    let title: String
+    let w: TopicWrapped
+
+    var body: some View {
+        let pct = { (x: Double) in "\(Int((x * 100).rounded()))%" }
+        let time = w.seconds >= 3600 ? "\(w.seconds / 3600)h \(w.seconds % 3600 / 60)m" : "\(w.seconds / 60)m"
+        let line = w.hintFree >= 0.999 ? "Every problem solved without a single hint."
+            : w.hintFree >= 0.6 ? "\(pct(w.hintFree)) of it without hints." : "You pushed through the hard parts."
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 14) {
+                Image(systemName: "rosette").font(.title2).foregroundStyle(.green)
+                    .frame(width: 44, height: 44).background(Color.green.opacity(0.14), in: .rect(cornerRadius: 11))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Topic mastered" + (w.masteredAt.flatMap(Dates.fromIso).map { " · \($0.formatted(date: .abbreviated, time: .omitted))" } ?? ""))
+                        .font(.caption.weight(.medium)).foregroundStyle(.green)
+                    Text("\(title), wrapped").font(.title3.weight(.semibold))
+                    Text(line).font(.callout).foregroundStyle(.secondary)
+                }
+            }
+            .padding(18)
+            Divider()
+            HStack(spacing: 0) {
+                stat("Focused time", time)
+                stat("Problems solved", "\(w.solved)/\(w.total)" + (w.optional > 0 ? " +\(w.optional)" : ""))
+                stat("Hint-free", w.solved > 0 ? pct(w.hintFree) : "–")
+                stat("Quiz best", w.quizBest.map(pct) ?? "–")
+                stat("Best explanation", w.bestExplain < 0 ? "–" : "\(w.bestExplain)/5")
+            }
+        }
+        .background(LinearGradient(colors: [Color.green.opacity(0.1), .clear], startPoint: .topLeading, endPoint: .bottomTrailing), in: .rect(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.green.opacity(0.25)))
+    }
+
+    private func stat(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label).font(.caption).foregroundStyle(.secondary)
+            Text(value).font(.title3.weight(.semibold)).monospacedDigit()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 18).padding(.vertical, 12)
     }
 }

@@ -10,6 +10,8 @@ final class Activity {
 
     private let store: Store
     private(set) var pending = 0
+    /// Last second that counted as active; reminders stay quiet for a while after it.
+    private(set) var lastActiveAt = Date.distantPast
     private var context: String?
     private var tracked = false
     private var holds = 0 // a playing viz keeps the session active without input
@@ -36,6 +38,7 @@ final class Activity {
 
     private func tick() {
         guard isActive else { return }
+        lastActiveAt = .now
         pending += 1
         if pending >= Self.flushEvery { flush() }
     }

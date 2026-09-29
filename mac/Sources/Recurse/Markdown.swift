@@ -135,6 +135,7 @@ struct MarkdownView: View {
             Text(MD.inline(s))
                 .font(level <= 2 ? .title3.weight(.semibold) : .headline)
                 .padding(.top, level <= 2 && !compact ? 18 : 6)
+                .id(level == 2 ? "h:" + s : "")
         case .paragraph(let s):
             Text(MD.inline(s)).lineSpacing(4).foregroundStyle(.primary.opacity(0.88))
         case .list(let ordered, let items):

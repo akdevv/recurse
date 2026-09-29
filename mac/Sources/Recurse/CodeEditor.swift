@@ -36,6 +36,10 @@ struct CodeEditor: NSViewRepresentable {
         tv.typingAttributes = [.font: Self.font, .foregroundColor: NSColor.labelColor, .paragraphStyle: para]
         tv.string = text
         context.coordinator.highlight(tv)
+        let ruler = LineNumbers(textView: tv)
+        scroll.verticalRulerView = ruler
+        scroll.hasVerticalRuler = true
+        scroll.rulersVisible = true
         return scroll
     }
 
@@ -57,6 +61,7 @@ struct CodeEditor: NSViewRepresentable {
             let tv = n.object as! NSTextView
             parent.text = tv.string
             highlight(tv)
+            tv.enclosingScrollView?.verticalRulerView?.needsDisplay = true
         }
 
         func highlight(_ tv: NSTextView) {
@@ -100,6 +105,54 @@ struct CodeEditor: NSViewRepresentable {
                 }
             }
             return false
+        }
+    }
+}
+
+/// Gutter with line numbers (tracebacks point at them).
+final class LineNumbers: NSRulerView {
+    private let font = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
+
+    init(textView: NSTextView) {
+        super.init(scrollView: textView.enclosingScrollView, orientation: .verticalRuler)
+        clientView = textView
+        ruleThickness = 36
+        // repaint while scrolling
+        textView.enclosingScrollView?.contentView.postsBoundsChangedNotifications = true
+        NotificationCenter.default.addObserver(forName: NSView.boundsDidChangeNotification, object: textView.enclosingScrollView?.contentView,
+                                               queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.needsDisplay = true } }
+    }
+
+    required init(coder: NSCoder) { fatalError() }
+
+    override func draw(_ dirtyRect: NSRect) { drawHashMarksAndLabels(in: dirtyRect) } // no ruler chrome, just numbers
+
+    override func drawHashMarksAndLabels(in _: NSRect) {
+        guard let tv = clientView as? NSTextView, let lm = tv.layoutManager, let tc = tv.textContainer else { return }
+        let ns = tv.string as NSString
+        let visible = lm.characterRange(forGlyphRange: lm.glyphRange(forBoundingRect: tv.visibleRect, in: tc), actualGlyphRange: nil)
+        var line = ns.substring(to: visible.location).reduce(1) { $1 == "\n" ? $0 + 1 : $0 }
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: NSColor.tertiaryLabelColor]
+        let draw = { (n: Int, fragmentY: CGFloat, height: CGFloat) in
+            let y = self.convert(NSPoint(x: 0, y: fragmentY + tv.textContainerOrigin.y), from: tv).y
+            let s = NSAttributedString(string: "\(n)", attributes: attrs)
+            s.draw(at: NSPoint(x: self.ruleThickness - s.size().width - 8, y: y + (height - s.size().height) / 2 - 1.5))
+        }
+        var i = visible.location
+        while i < NSMaxRange(visible) || (i == visible.location && ns.length == 0) {
+            let lr = ns.lineRange(for: NSRange(location: i, length: 0))
+            if ns.length > 0 {
+                let r = lm.lineFragmentRect(forGlyphAt: lm.glyphIndexForCharacter(at: lr.location), effectiveRange: nil)
+                draw(line, r.minY, r.height)
+            }
+            line += 1
+            if NSMaxRange(lr) <= i { break }
+            i = NSMaxRange(lr)
+        }
+        // the empty line after a trailing newline (where the cursor sits after Enter)
+        if ns.length == 0 || (ns.hasSuffix("\n") && NSMaxRange(visible) == ns.length) {
+            let r = lm.extraLineFragmentRect
+            draw(line, r.minY, max(r.height, 17))
         }
     }
 }

@@ -255,3 +255,55 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     #expect(b["first-solve"]?.tier == 1 && b["quiz-ace"]!.value == 2)
     #expect(b["boss"]?.tier == 0 && b["solver"]?.next == 25)
 }
+
+@Test func reminderTiming() {
+    let cal = Calendar.current
+    let d = { (h: Int, m: Int) in cal.date(from: DateComponents(year: 2026, month: 9, day: 28, hour: h, minute: m))! }
+    let next = { (now: Date, planned: Bool, catchUp: Bool, done: Bool, sent: Int, last: Date?) in
+        ReminderTiming.next(now: now, window: ("10:00", "23:00"), plannedDay: planned, catchUp: catchUp, todayDone: done, sentToday: sent, lastSentAt: last)
+    }
+    // first one late morning, reproducible
+    let first = next(d(9, 0), true, false, false, 0, nil)!
+    #expect(cal.component(.hour, from: first) == 11 && cal.component(.minute, from: first) <= 30)
+    #expect(next(d(9, 0), true, false, false, 0, nil) == first)
+    // gaps shrink as the window runs out
+    let g1 = next(d(12, 0), true, false, false, 1, d(12, 0))!.timeIntervalSince(d(12, 0))
+    let g2 = next(d(21, 0), true, false, false, 1, d(21, 0))!.timeIntervalSince(d(21, 0))
+    #expect(g2 < g1)
+    #expect(next(d(12, 0), true, false, true, 0, nil) == nil)
+    #expect(next(d(23, 30), true, false, false, 0, nil) == nil)
+    #expect(next(d(12, 0), true, false, false, ReminderTiming.capPlanned, d(12, 0)) == nil)
+    #expect(next(d(12, 0), false, false, false, 0, nil) == nil)
+    #expect(next(d(12, 0), false, true, false, 0, nil) != nil)
+    // same PRNG as the web (mulberry32): value for seed 0 computed in node
+    #expect(abs(ReminderTiming.rand(0) - 0.26642920868471265) < 1e-12)
+}
+
+@MainActor @Test func settingsRoundTrip() throws {
+    let store = try tempStore()
+    #expect(store.settings() == Settings())
+    // written by the web app: JSON per key
+    store._db.run("INSERT INTO settings (key, value) VALUES ('window', ?)", #"{"start":"09:30","end":"22:00"}"#)
+    #expect(store.settings().window == .init(start: "09:30", end: "22:00"))
+    var s = store.settings()
+    s.username = "ak"; s.plannedDays = [4, 0]; s.reminders = false
+    store.saveSettings(s)
+    #expect(store.settings().plannedDays == [0, 4] && store.username == "ak" && !store.settings().reminders)
+    #expect(store._db.one("SELECT value FROM settings WHERE key = 'plannedDays'")?.str("value") == "[0,4]")
+}
+
+@MainActor @Test func browseStatsPatternsWrapped() throws {
+    let store = try tempStore()
+    let rows = store.allProblems()
+    #expect(Set(rows.map(\.id)).count == rows.count && rows.count > 200)
+    try complete(store, "python-for-dsa")
+    let s = store.stats()
+    #expect(s.days.count == 30 && s.weeks.count == 12 && s.solved > 0)
+    #expect(s.days.last?.xp ?? 0 > 0) // today's quiz + explain XP lands in today's bucket
+    let pats = store.patterns()
+    #expect(pats.count > 20 && pats.contains { !$0.topics.isEmpty && !$0.problems.isEmpty })
+    let t = try #require(Content.topic("python-for-dsa"))
+    let w = store.topicWrapped(t)
+    #expect(w.solved == t.problems.filter { $0.role != .optional }.count && w.hintFree == 1 && w.quizBest == 1 && w.masteredAt != nil)
+    for r in [Route.today, .review, .course, .topic("x"), .problem("two-sum")] { #expect(Reminders.decode(Reminders.encode(r)) == r) }
+}

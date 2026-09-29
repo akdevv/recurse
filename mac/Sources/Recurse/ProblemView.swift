@@ -14,13 +14,14 @@ struct ProblemView: View {
     @State private var tab = "statement"
     @State private var consoleTab = "result"
     @State private var saveTask: Task<Void, Never>?
+    @FocusState private var tutorFocused: Bool // ⌘↵ sends to the tutor instead of running
 
     var body: some View {
         Group {
             if let p {
                 let a = store.latestAttempt(pid)
                 HSplitView {
-                    DescriptionPane(p: p, a: a, tab: $tab, code: { code })
+                    DescriptionPane(p: p, a: a, tab: $tab, tutorFocused: $tutorFocused, code: { code })
                         .frame(minWidth: 340, idealWidth: 480)
                     VSplitView {
                         CodeEditor(text: $code)
@@ -73,7 +74,7 @@ struct ProblemView: View {
             Button { judge("run") } label: {
                 if busy == "run" { ProgressView().controlSize(.small) } else { Label("Run", systemImage: "play.fill") }
             }
-            .keyboardShortcut(.return, modifiers: .command)
+            .keyboardShortcut(tutorFocused ? nil : KeyboardShortcut(.return, modifiers: .command))
             .help("Run against the examples (⌘↵)")
             .disabled(busy != nil)
             Button { judge("submit") } label: {
@@ -132,6 +133,7 @@ private struct DescriptionPane: View {
     let p: Problem
     let a: Attempt?
     @Binding var tab: String
+    var tutorFocused: FocusState<Bool>.Binding
     let code: () -> String
 
     var body: some View {
@@ -156,7 +158,7 @@ private struct DescriptionPane: View {
                 Group {
                     switch tab {
                     case "hints": HintsTab(p: p, a: a, boss: boss)
-                    case "tutor": TutorTab(p: p, a: a, boss: boss, code: code)
+                    case "tutor": TutorTab(p: p, a: a, boss: boss, focused: tutorFocused, code: code)
                     case "solutions": SolutionsTab(p: p, a: a, show: solutions)
                     case "submissions": SubmissionsTab(a: a)
                     default: statement
@@ -335,6 +337,7 @@ private struct TutorTab: View {
     let p: Problem
     let a: Attempt?
     let boss: Bool
+    var focused: FocusState<Bool>.Binding
     let code: () -> String
 
     @State private var draft = ""
@@ -361,10 +364,12 @@ private struct TutorTab: View {
                 }
                 if a?.finished == false {
                     TextArea(text: $draft, placeholder: "Where are you stuck? Describe your idea, not just “help”.", minHeight: 70)
+                        .focused(focused)
                     HStack {
-                        Text(err.isEmpty ? "Sees your current code" : err).font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : .red)
+                        Text(err.isEmpty ? "⌘↵ to send · sees your current code" : err).font(.caption).foregroundStyle(err.isEmpty ? Color.secondary : .red)
                         Spacer()
                         Button { send() } label: { Label("Ask", systemImage: "paperplane") }
+                            .keyboardShortcut(focused.wrappedValue ? KeyboardShortcut(.return, modifiers: .command) : nil)
                             .disabled(busy || draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     }
                 } else {

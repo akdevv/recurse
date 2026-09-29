@@ -2,6 +2,14 @@
 import Foundation
 import Observation
 
+struct Settings: Equatable {
+    struct Window: Codable, Equatable { var start = "10:00", end = "23:00" }
+    var username = "akdevv"
+    var plannedDays = [0, 1, 2, 3, 4] // 0 = Monday
+    var window = Window()
+    var reminders = true
+}
+
 struct Me {
     var username: String
     var xp: Int
@@ -27,6 +35,14 @@ struct TopicProblem: Identifiable, Hashable {
     let status: String // new | in-progress | solved | hinted | assisted
 }
 
+struct TopicWrapped {
+    let seconds, solved, optional, total: Int
+    let hintFree: Double
+    let quizBest: Double?
+    let bestExplain: Int // -1 = none
+    let masteredAt: String?
+}
+
 struct TopicState: Identifiable {
     let topic: Topic
     let status: TopicStatus
@@ -43,7 +59,7 @@ struct ModuleView: Identifiable {
 }
 
 enum Route: Hashable {
-    case today, review, course, rewards
+    case today, review, course, rewards, problems, patterns, stats
     case topic(String)
     case boss(String)
     case problem(String)
@@ -119,11 +135,31 @@ final class Store {
 
     // MARK: progress
 
-    var username: String {
-        // settings values are JSON; username is a JSON string
-        guard let raw = db.one("SELECT value FROM settings WHERE key = 'username'")?.str("value"),
-              let s = try? JSONDecoder().decode(String.self, from: Data(raw.utf8)) else { return "akdevv" }
+    var username: String { settings().username }
+
+    /// Same keys and JSON values as web/server/settings.ts.
+    func settings() -> Settings {
+        var s = Settings()
+        func value<T: Decodable>(_ key: String, _: T.Type) -> T? {
+            db.one("SELECT value FROM settings WHERE key = ?", key)?.str("value").flatMap { try? JSONDecoder().decode(T.self, from: Data($0.utf8)) }
+        }
+        if let v = value("username", String.self) { s.username = v }
+        if let v = value("plannedDays", [Int].self) { s.plannedDays = v }
+        if let v = value("window", Settings.Window.self) { s.window = v }
+        if let v = value("reminders", Bool.self) { s.reminders = v }
         return s
+    }
+
+    func saveSettings(_ s: Settings) {
+        func put(_ k: String, _ v: some Encodable) {
+            _db.run("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    k, String(decoding: try! JSONEncoder().encode(v), as: UTF8.self))
+        }
+        put("username", s.username)
+        put("plannedDays", s.plannedDays.sorted())
+        put("window", s.window)
+        put("reminders", s.reminders)
+        changed()
     }
 
     func activityMap() -> [String: Int] {
@@ -148,7 +184,7 @@ final class Store {
                   reviewsDue: reviewsDue)
     }
 
-    static func isSolved(_ s: String?) -> Bool { s.flatMap(Outcome.init) != nil }
+    nonisolated static func isSolved(_ s: String?) -> Bool { s.flatMap(Outcome.init) != nil }
 
     func problemStatuses() -> [String: String] {
         var out: [String: String] = [:]
@@ -177,6 +213,25 @@ final class Store {
             && (!hasQuiz || (quizBest ?? 0) >= Store.quizPass)
         return TopicStatus(lessonDone: lessonDone, quizBest: quizBest, hasQuiz: hasQuiz, explained: explained,
                            solved: solved, required: required.count, complete: complete)
+    }
+
+    /// What mastering a topic took, for its Wrapped card. Port of topicWrapped in progress.ts.
+    func topicWrapped(_ t: Topic) -> TopicWrapped {
+        let ids = Set(t.problems.map(\.id))
+        let attempts = db.all("SELECT problem_id, outcome, active_seconds, finished_at FROM attempts").filter { ids.contains($0.str("problem_id")!) }
+        let solved = Set(attempts.filter { $0.str("outcome") != nil }.map { $0.str("problem_id")! })
+        let clean = Set(attempts.filter { $0.str("outcome") == "solved" }.map { $0.str("problem_id")! })
+        let row = db.one("SELECT lesson_done_at, quiz_best, explain_at FROM topic_progress WHERE topic_id = ?", t.id)
+        let best = { (kind: String, refs: Set<String>) in
+            self.db.all("SELECT ref, score FROM grades WHERE kind = ?", kind).filter { refs.contains($0.str("ref")!) }.compactMap { $0.int("score") }.max()
+        }
+        let stamps = ([row?.str("lesson_done_at"), row?.str("explain_at")] + attempts.filter { $0.str("outcome") != nil }.map { $0.str("finished_at") })
+            .compactMap { $0 }
+        return TopicWrapped(
+            seconds: attempts.reduce(0) { $0 + ($1.int("active_seconds") ?? 0) }, solved: solved.count,
+            optional: t.problems.filter { $0.role == .optional && solved.contains($0.id) }.count, total: ids.count,
+            hintFree: solved.isEmpty ? 0 : Double(clean.count) / Double(solved.count), quizBest: row?.real("quiz_best"),
+            bestExplain: max(best("topic", [t.id]) ?? -1, best("problem", ids) ?? -1), masteredAt: stamps.max())
     }
 
     func topicProblems(_ t: Topic, _ statuses: [String: String]) -> [TopicProblem] {

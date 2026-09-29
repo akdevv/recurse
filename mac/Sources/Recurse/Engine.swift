@@ -188,3 +188,47 @@ enum Hints {
             solutionAvailable: active >= solutionAt, solutionAt: solutionAt)
     }
 }
+
+// MARK: reminders: when to nudge next (pure, no DB/clock; Reminders.swift feeds it)
+
+enum ReminderTiming {
+    static let minGap: TimeInterval = 20 * 60
+    static let maxGap: TimeInterval = 150 * 60
+    static let capPlanned = 8
+    static let capCatchUp = 2 // unplanned day that can still save the weekly streak
+
+    /// Deterministic 0..1 from a seed (mulberry32, same as the web), so a given day's schedule is reproducible.
+    static func rand(_ seed: Int) -> Double {
+        var t = UInt32(truncatingIfNeeded: seed &+ 0x6d2b79f5)
+        t = (t ^ (t >> 15)) &* (t | 1)
+        t ^= t &+ ((t ^ (t >> 7)) &* (t | 61))
+        return Double(t ^ (t >> 14)) / 4294967296
+    }
+
+    static func at(_ day: Date, _ hhmm: String) -> Date {
+        let p = hhmm.split(separator: ":").map { Int($0) ?? 0 }
+        return Calendar.current.date(bySettingHour: p[0], minute: p[1], second: 0, of: day)!
+    }
+
+    static func next(now: Date, window: (start: String, end: String), plannedDay: Bool, catchUp: Bool,
+                     todayDone: Bool, sentToday: Int, lastSentAt: Date?) -> Date? {
+        let cap = plannedDay ? capPlanned : catchUp ? capCatchUp : 0
+        if todayDone || sentToday >= cap { return nil }
+        let start = at(now, window.start), end = at(now, window.end)
+        if now >= end { return nil }
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: now)
+        let seed = c.year! * 10000 + c.month! * 100 + c.day! + sentToday * 7919
+        let soonest = now.addingTimeInterval(60)
+        let t: Date
+        if sentToday == 0 || lastSentAt == nil {
+            let first = max(start, at(now, "11:00")).addingTimeInterval(rand(seed) * 30 * 60)
+            t = max(first, soonest)
+        } else {
+            // gaps shrink as the window runs out
+            let left = end.timeIntervalSince(lastSentAt!)
+            let gap = min(maxGap, max(minGap, left / 4)) * (0.7 + 0.6 * rand(seed))
+            t = max(lastSentAt!.addingTimeInterval(gap), soonest)
+        }
+        return t < end ? t : nil
+    }
+}
