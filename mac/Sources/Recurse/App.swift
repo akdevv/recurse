@@ -101,8 +101,8 @@ struct RootView: View {
                 .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 340)
         } detail: {
             NavigationStack(path: $nav.path) {
-                page(nav.selection ?? .today)
-                    .navigationDestination(for: Route.self) { page($0) }
+                page(nav.selection ?? .today).pageChrome()
+                    .navigationDestination(for: Route.self) { page($0).pageChrome() }
             }
         }
         .onChange(of: nav.current, initial: true) { old, r in
@@ -117,7 +117,7 @@ struct RootView: View {
                 ZStack(alignment: .top) {
                     // click anywhere outside to close
                     Color.black.opacity(0.12).ignoresSafeArea().onTapGesture { withAnimation { nav.searching = false } }
-                    CommandPalette().padding(.top, 90)
+                    CommandPalette().padding(.top, 8) // opens where the header's search bar sits
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.97, anchor: .top)))
             }

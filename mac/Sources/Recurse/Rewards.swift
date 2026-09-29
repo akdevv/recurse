@@ -160,18 +160,15 @@ struct RewardsView: View {
             default: PathTab(path: path)
             }
         }
-        .navigationTitle("Rewards")
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Picker("", selection: $tab) {
-                    Text("Path \(path.filter { $0.status != .locked }.count)/\(path.count)").tag("path")
-                    Text("Trophies \(badges.reduce(0) { $0 + $1.tier })/\(badges.reduce(0) { $0 + $1.tiers.count })").tag("trophies")
-                    Text(store.chestsWaiting > 0 ? "Chests · \(store.chestsWaiting) new" : "Chests").tag("chests")
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-            }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            GlassTabs(selection: $tab, tabs: [
+                .init(id: "path", title: "Path \(path.filter { $0.status != .locked }.count)/\(path.count)", icon: "flag.pattern.checkered"),
+                .init(id: "trophies", title: "Trophies \(badges.reduce(0) { $0 + $1.tier })/\(badges.reduce(0) { $0 + $1.tiers.count })", icon: "trophy"),
+                .init(id: "chests", title: store.chestsWaiting > 0 ? "Chests · \(store.chestsWaiting) new" : "Chests", icon: "shippingbox"),
+            ])
+            .padding(.vertical, 8)
         }
+        .navigationTitle("Rewards")
     }
 }
 

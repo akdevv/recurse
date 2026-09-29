@@ -49,6 +49,7 @@ struct ProblemsView: View {
 
         return VStack(spacing: 0) {
             HStack(spacing: 10) {
+                FilterField(text: $query, prompt: "Title, topic or LeetCode #").frame(maxWidth: 260)
                 Picker("Difficulty", selection: $difficulty) {
                     Text("Any difficulty").tag("all")
                     ForEach(["Easy", "Medium", "Hard"], id: \.self) { Text($0).tag($0) }
@@ -95,7 +96,6 @@ struct ProblemsView: View {
             }
             .overlay { if shown.isEmpty { ContentUnavailableView.search(text: query) } }
         }
-        .searchable(text: $query, placement: .toolbar, prompt: "Title, topic or LeetCode #")
         .navigationTitle("Problems")
     }
 }

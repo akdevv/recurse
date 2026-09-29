@@ -263,3 +263,22 @@ func fmtClock(_ s: Int) -> String {
 }
 
 func days(_ n: Int) -> String { n == 1 ? "1 day" : "\(n) days" }
+
+/// In-page search/filter box.
+struct FilterField: View {
+    @Binding var text: String
+    let prompt: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "line.3.horizontal.decrease").foregroundStyle(.muted)
+            TextField(prompt, text: $text).textFieldStyle(.plain)
+            if !text.isEmpty {
+                Button { text = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.muted) }.buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 10).frame(height: 28)
+        .background(.surface, in: .rect(cornerRadius: 8, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(.hairline))
+    }
+}

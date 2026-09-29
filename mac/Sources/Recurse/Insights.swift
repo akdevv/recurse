@@ -266,7 +266,11 @@ struct PatternsView: View {
                 }
             }
         }
-        .searchable(text: $query, placement: .toolbar, prompt: "Search patterns or signals")
+        .safeAreaInset(edge: .top, spacing: 0) {
+            FilterField(text: $query, prompt: "Search patterns or signals")
+                .frame(maxWidth: 360).frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20).padding(.vertical, 10)
+        }
         .navigationTitle("Patterns")
     }
 }
