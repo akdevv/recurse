@@ -3,6 +3,7 @@ import SwiftUI
 struct ProblemView: View {
     @Environment(Store.self) private var store
     @Environment(Activity.self) private var activity
+    @Environment(Nav.self) private var nav
     let pid: String
 
     @State private var p: Problem?
@@ -50,8 +51,16 @@ struct ProblemView: View {
 
     @ToolbarContentBuilder
     private func toolbar(_ p: Problem, _ a: Attempt?) -> some ToolbarContent {
+        let boss = a.flatMap { store.activeBossRun(attemptId: $0.id) }
         ToolbarItemGroup(placement: .primaryAction) {
-            if let a, a.finished {
+            if let boss {
+                if a?.finished == true {
+                    Button { nav.go(.boss(boss.moduleId)) } label: { Label("Finish the boss fight", systemImage: "figure.fencing") }
+                        .buttonStyle(.borderedProminent)
+                } else {
+                    BossCountdown(deadline: boss.deadline)
+                }
+            } else if let a, a.finished {
                 Label(a.outcome?.label ?? "Solved", systemImage: "checkmark.circle.fill").foregroundStyle(.green).labelStyle(.titleAndIcon)
                 Button {
                     store.startProblem(pid, fresh: true)

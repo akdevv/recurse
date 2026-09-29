@@ -162,3 +162,55 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     }
     #expect(traces > 50)
 }
+
+@MainActor private func tempStore() throws -> Store {
+    Store(db: try DB(path: FileManager.default.temporaryDirectory.appending(path: "recurse-test-\(UUID()).db")))
+}
+
+@MainActor @Test func bossFlow() async throws {
+    let store = try tempStore()
+    let mid = "hashing"
+    let pid = try #require(store.startBoss(mid))
+    #expect(store.bossCandidates(mid).contains(pid))
+    let a = try #require(store.latestAttempt(pid))
+    let run = try #require(store.activeBossRun(attemptId: a.id))
+    #expect(run.limitS == Content.module(mid).boss.timeLimitMin * 60)
+    // a mock interview: nothing unlocks, however long you work
+    store.addActivity(seconds: 120, problemId: pid)
+    #expect(store.unlocks(store.latestAttempt(pid), hintCount: 2) == .none)
+    #expect(!store.showSolutions(pid, store.latestAttempt(pid)))
+
+    let ref = try #require(Content.problem(pid)?.solutions.first { $0.reference })
+    let (r, o) = await store.submit(pid, code: ref.code)
+    #expect(r.verdict == "Accepted" && o == .solved)
+    #expect(store.activeBossRun(attemptId: a.id)?.solvedIn != nil) // solved, still waiting for the explanation
+    #expect(store.chests().isEmpty) // boss solves never drop a solve chest
+
+    // starting again abandons the open run
+    _ = store.startBoss(mid)
+    #expect(store.bossRuns(mid).filter { !$0.finished }.count == 1)
+    #expect(store.bossRuns(mid).last?.passed == false)
+}
+
+@MainActor @Test func chests() throws {
+    // same JSON as the web app
+    #expect(String(decoding: try JSONEncoder().encode(ChestReward.freeze), as: UTF8.self) == #"{"kind":"freeze"}"#)
+    let web = #"{"kind":"collectible","id":"xor-coin","name":"XOR Coin","desc":"Flip it twice, it cancels out."}"#
+    #expect(try JSONDecoder().decode(ChestReward.self, from: Data(web.utf8)) == .collectible(id: "xor-coin", name: "XOR Coin", desc: "Flip it twice, it cancels out."))
+
+    let store = try tempStore()
+    var xp = 0, ids: [String] = []
+    for _ in 0..<40 {
+        let id = store.earnChest("boss", "hashing")
+        switch try #require(store.openChest(id)) {
+        case .xp(let n): xp += n; #expect((50...120).contains(n))
+        case .collectible(let cid, _, _): ids.append(cid)
+        case .freeze: break
+        }
+        #expect(store.openChest(id) != nil) // re-opening returns the same reward, no second roll
+    }
+    #expect(Set(ids).count == ids.count) // never a duplicate collectible
+    #expect(store.me().xp == xp)
+    #expect(store.me().streak.freezes <= Streak.maxFreezes)
+    #expect(store.chestsWaiting == 0 && store.chestQueue.count == 40)
+}

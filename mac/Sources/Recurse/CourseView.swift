@@ -92,6 +92,24 @@ private struct ModuleCard: View {
                 }
                 .padding(.vertical, 2)
             }
+            Divider()
+            Button { nav.go(.boss(m.id)) } label: {
+                HStack {
+                    Image(systemName: "figure.fencing").foregroundStyle(m.complete ? Color.orange : .secondary)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Boss fight").fontWeight(.medium)
+                        Text("Mock interview · \(m.module.boss.timeLimitMin) min · one problem, explained out loud")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    let left = m.topics.filter { !$0.status.complete }.count
+                    Text(left == 0 ? "Ready" : "\(left) \(left == 1 ? "topic" : "topics") to go")
+                        .font(.caption).foregroundStyle(left == 0 ? Color.orange : .secondary)
+                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+                }
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
         }
         .card()
     }

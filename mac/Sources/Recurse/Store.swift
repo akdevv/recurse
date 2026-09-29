@@ -43,8 +43,9 @@ struct ModuleView: Identifiable {
 }
 
 enum Route: Hashable {
-    case today, review, course
+    case today, review, course, chests
     case topic(String)
+    case boss(String)
     case problem(String)
 }
 
@@ -97,19 +98,21 @@ final class Store {
 
     /// Bumped by every write; reads go through `db`, which touches it, so views re-render after changes.
     private(set) var tick = 0
-    private let _db: DB
-    private var db: DB { _ = tick; return _db }
+    let _db: DB
+    var db: DB { _ = tick; return _db }
     var toast: String?
     var error: String?
+    /// Chests just earned; the root view shows the opening sheet for the first one.
+    var chestQueue: [Int] = []
 
     init(db: DB) { _db = db }
 
-    private func changed() { tick += 1 }
+    func changed() { tick += 1 }
 
     func flashXP(_ xp: Int) { if xp > 0 { toast = "+\(xp) XP" } }
 
     @discardableResult
-    private func addXp(_ amount: Int, _ reason: String, _ ref: String? = nil) -> Int {
+    func addXp(_ amount: Int, _ reason: String, _ ref: String? = nil) -> Int {
         if amount > 0 { _db.run("INSERT INTO xp_events (ts, amount, reason, ref) VALUES (?, ?, ?, ?)", Dates.iso(), amount, reason, ref) }
         return amount
     }
@@ -127,7 +130,7 @@ final class Store {
         Dictionary(uniqueKeysWithValues: db.all("SELECT date, seconds FROM activity").map { ($0.str("date")!, $0.int("seconds")!) })
     }
 
-    /// Streak freezes from opened mystery chests (chests themselves aren't in the Mac app yet).
+    /// Streak freezes from opened mystery chests, by local date.
     func bonusFreezes() -> [String: Int] {
         var out: [String: Int] = [:]
         for r in db.all("SELECT opened_at FROM chests WHERE reward LIKE '%\"freeze\"%' AND opened_at IS NOT NULL") {
@@ -270,7 +273,7 @@ final class Store {
         changed()
     }
 
-    private func addReview(_ type: String, _ id: String, _ o: Outcome) {
+    func addReview(_ type: String, _ id: String, _ o: Outcome) {
         let r = SRS.first(o, today: Dates.local())
         _db.run("INSERT OR IGNORE INTO reviews (item_type, item_id, interval_idx, due) VALUES (?, ?, ?, ?)", type, id, r.idx, r.due)
     }
@@ -316,9 +319,7 @@ final class Store {
     }
 
     /// A boss fight (started in the web app) is a mock interview: no hints, solutions or tutor until explained.
-    func inBoss(_ attemptId: Int) -> Bool {
-        db.one("SELECT 1 AS x FROM boss_runs WHERE attempt_id = ? AND finished_at IS NULL", attemptId) != nil
-    }
+    func inBoss(_ attemptId: Int) -> Bool { activeBossRun(attemptId: attemptId) != nil }
 
     /// Continue the latest attempt; `fresh` starts a new one after a finished attempt.
     func startProblem(_ pid: String, fresh: Bool = false) {
@@ -397,6 +398,7 @@ final class Store {
         logSubmission(a.id, "submit", r, code)
         var outcome: Outcome?
         if r.verdict == "Accepted" && !a.finished {
+            let boss = inBoss(a.id) // boss wins drop their own chest
             _db.run("UPDATE boss_runs SET solved_at = ? WHERE attempt_id = ? AND solved_at IS NULL AND finished_at IS NULL", Dates.iso(), a.id)
             let o = XP.outcome(hints: a.hintsUsed, solutionViewed: a.solutionViewed)
             let firstSolve = !everSolved(pid)
@@ -405,7 +407,7 @@ final class Store {
                 flashXP(addXp(XP.solve(p.difficulty, hints: a.hintsUsed, solutionViewed: a.solutionViewed,
                                        optional: Content.problemHome(pid)?.role == .optional), "solve", pid))
                 addReview("problem", pid, o)
-                // ponytail: no mystery chest drop yet, add with the rewards pass
+                if !boss { maybeSolveChest(pid, o) }
             }
             outcome = o
         }

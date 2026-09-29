@@ -91,6 +91,9 @@ struct RootView: View {
         }
         .overlay(alignment: .top) { Toast() }
         .task { await snapshots() }
+        .sheet(item: Binding(get: { store.chestQueue.first.map(SheetID.init) }, set: { if $0 == nil, !store.chestQueue.isEmpty { store.chestQueue.removeFirst() } })) {
+            ChestSheet(id: $0.id)
+        }
         .alert("Hold on", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             Button("OK") {}
         } message: { Text(store.error ?? "") }
@@ -106,6 +109,8 @@ struct RootView: View {
             switch parts[0] {
             case "review": nav.go(.review)
             case "course": nav.go(.course)
+            case "chests": nav.go(.chests)
+            case "boss": nav.go(.boss(parts[1]))
             case "topic": nav.go(.topic(parts[1]))
             case "problem": nav.go(.problem(parts[1]))
             default: nav.go(.today)
@@ -125,6 +130,8 @@ struct RootView: View {
         case .today: HomeView()
         case .review: ReviewView()
         case .course: CourseView()
+        case .chests: ChestsView()
+        case .boss(let id): BossView(moduleId: id).id(id)
         case .topic(let id): TopicView(topicId: id).id(id)
         case .problem(let id): ProblemView(pid: id).id(id)
         }
@@ -147,6 +154,9 @@ struct Sidebar: View {
                     .badge(me.reviewsDue)
                     .tag(Route.review)
                 Label("Course map", systemImage: "map").tag(Route.course)
+                Label("Chests", systemImage: "shippingbox")
+                    .badge(store.chestsWaiting)
+                    .tag(Route.chests)
             }
 
             Section("Modules") {
@@ -166,6 +176,9 @@ struct Sidebar: View {
                             .foregroundStyle(t.topic.ready ? .primary : .secondary)
                             .tag(Route.topic(t.id))
                         }
+                        Label("Boss fight", systemImage: "figure.fencing")
+                            .foregroundStyle(m.complete ? Color.orange : .secondary)
+                            .tag(Route.boss(m.id))
                     } label: {
                         HStack(spacing: 8) {
                             Text(String(format: "%02d", m.module.number))
@@ -187,6 +200,7 @@ struct Sidebar: View {
         }
         .onChange(of: nav.selection) { _, r in
             if case .topic(let tid) = r, let m = modules.first(where: { $0.module.topics.contains(tid) }) { expanded.insert(m.id) }
+            if case .boss(let mid) = r { expanded.insert(mid) }
         }
     }
 }

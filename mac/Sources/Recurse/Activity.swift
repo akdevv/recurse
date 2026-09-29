@@ -50,7 +50,7 @@ final class Activity {
     func route(_ r: Route?) {
         let problem: String? = if case .problem(let id) = r { id } else { nil }
         let learning = switch r {
-        case .topic, .problem, .review: true
+        case .topic, .problem, .review, .boss: true
         default: false
         }
         if problem != context || learning != tracked { flush() }
