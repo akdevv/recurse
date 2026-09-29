@@ -1,22 +1,14 @@
-// Sidebar in the web app's layout (brand, today panel, grouped nav, profile row), on the system glass sidebar.
+// Sidebar in the web app's layout (today panel, grouped nav, profile row), on the system glass sidebar.
 import SwiftUI
 
 struct Sidebar: View {
     @Environment(Store.self) private var store
     @Environment(Nav.self) private var nav
-    @State private var expanded: Set<String> = []
 
     var body: some View {
         let me = store.me()
-        let modules = store.moduleViews()
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                HStack(spacing: 10) {
-                    Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 28, height: 28)
-                    Text("Recurse").font(.headline)
-                }
-                .padding(.horizontal, 10)
-
                 TodayPanel(me: me)
 
                 group("Learn") {
@@ -32,22 +24,11 @@ struct Sidebar: View {
                     row(.stats, "Stats", "chart.bar")
                     row(.rewards, "Rewards", "gift", count: store.rewardsWaiting)
                 }
-                group("Modules") {
-                    ForEach(modules) { m in moduleRows(m) }
-                }
             }
             .padding(.horizontal, 10).padding(.top, 4).padding(.bottom, 12)
         }
         .scrollIndicators(.never)
         .safeAreaInset(edge: .bottom, spacing: 0) { ProfileRow(me: me) }
-        .onAppear {
-            // open the module you're working in
-            if expanded.isEmpty, let cur = modules.first(where: { $0.unlocked && !$0.complete }) { expanded = [cur.id] }
-        }
-        .onChange(of: nav.selection) { _, r in
-            if case .topic(let tid) = r, let m = modules.first(where: { $0.module.topics.contains(tid) }) { expanded.insert(m.id) }
-            if case .boss(let mid) = r { expanded.insert(mid) }
-        }
     }
 
     private func group(_ title: String, @ViewBuilder _ rows: () -> some View) -> some View {
@@ -59,52 +40,9 @@ struct Sidebar: View {
     }
 
     private func row(_ r: Route, _ title: String, _ icon: String, count: Int = 0) -> some View {
-        SidebarRow(title: title, icon: icon, active: nav.selection == r, count: count) { nav.go(r) }
-    }
-
-    @ViewBuilder
-    private func moduleRows(_ m: ModuleView) -> some View {
-        let open = expanded.contains(m.id)
-        let done = m.topics.filter(\.status.complete).count
-        Button {
-            withAnimation(.snappy(duration: 0.2)) { if open { expanded.remove(m.id) } else { expanded.insert(m.id) } }
-        } label: {
-            HStack(spacing: 8) {
-                Text(String(format: "%02d", m.module.number))
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(m.complete ? Color.success : m.unlocked ? Color.brand : Color.muted)
-                    .frame(width: 18, alignment: .leading)
-                Text(m.module.title).lineLimit(1).foregroundStyle(m.unlocked ? .primary : Color.muted)
-                Spacer(minLength: 4)
-                if m.unlocked {
-                    Text("\(done)/\(m.topics.count)").font(.caption2.monospacedDigit()).foregroundStyle(.muted)
-                } else {
-                    Image(systemName: "lock.fill").font(.system(size: 9)).foregroundStyle(.muted.opacity(0.7))
-                }
-                Image(systemName: "chevron.right").font(.system(size: 9, weight: .semibold)).foregroundStyle(.muted)
-                    .rotationEffect(.degrees(open ? 90 : 0))
-            }
-            .font(.callout)
-            .padding(.horizontal, 10).frame(height: 28)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-
-        if open {
-            VStack(alignment: .leading, spacing: 1) {
-                ForEach(m.topics) { t in
-                    SidebarRow(title: t.topic.title, icon: t.status.complete ? "checkmark.circle.fill"
-                               : t.status.lessonDone || t.status.solved > 0 ? "circle.dashed" : "circle",
-                               iconTint: t.status.complete ? .success : nil, active: nav.selection == .topic(t.id),
-                               dim: !t.topic.ready, small: true) { nav.go(.topic(t.id)) }
-                }
-                SidebarRow(title: "Boss fight", icon: "figure.fencing", iconTint: m.complete ? .warning : nil,
-                           active: nav.selection == .boss(m.id), dim: !m.complete, small: true) { nav.go(.boss(m.id)) }
-            }
-            .padding(.leading, 14)
-            .overlay(alignment: .leading) { Rectangle().fill(.hairline).frame(width: 1).padding(.leading, 18).padding(.vertical, 4) }
-            .transition(.opacity.combined(with: .move(edge: .top)))
-        }
+        // topics and boss fights live under Course
+        let inCourse = switch nav.selection { case .topic, .boss: true; default: false }
+        return SidebarRow(title: title, icon: icon, active: nav.selection == r || (r == .course && inCourse), count: count) { nav.go(r) }
     }
 }
 
@@ -192,7 +130,7 @@ private struct TodayPanel: View {
     }
 }
 
-/// Avatar, name and level; opens Settings.
+/// Avatar, name and level; opens Settings. A solid card so it doesn't float on the glass.
 private struct ProfileRow: View {
     @Environment(\.openSettings) private var openSettings
     let me: Me
@@ -201,26 +139,63 @@ private struct ProfileRow: View {
     var body: some View {
         Button { openSettings() } label: {
             HStack(spacing: 10) {
-                Text(String(me.username.prefix(1)).uppercased())
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(.brandInk)
-                    .frame(width: 32, height: 32)
-                    .background(LinearGradient(colors: [.warning, .brand], startPoint: .topLeading, endPoint: .bottomTrailing), in: .circle)
+                Avatar(size: 34)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(me.username).font(.callout.weight(.medium)).lineLimit(1)
+                    Text(me.username).font(.callout.weight(.semibold)).lineLimit(1)
                     Text("Lv \(me.level.level) · \(me.level.title)").font(.caption).foregroundStyle(.muted).lineLimit(1)
                 }
-                Spacer()
-                Image(systemName: "gearshape").foregroundStyle(hover ? .primary : Color.muted)
+                Spacer(minLength: 4)
+                Image(systemName: "gearshape.fill").font(.system(size: 13)).foregroundStyle(hover ? .primary : Color.muted)
             }
-            .padding(.horizontal, 10).padding(.vertical, 8)
-            .background(hover ? Color.raised.opacity(0.6) : .clear, in: .rect(cornerRadius: 10, style: .continuous))
+            .padding(10)
+            .background(hover ? Color.hover : Color.surface, in: .rect(cornerRadius: 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(.hairline))
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .onHover { hover = $0 }
         .help("Settings (⌘,)")
-        .padding(10)
-        .overlay(alignment: .top) { Rectangle().fill(.hairline).frame(height: 1) }
+        .padding(.horizontal, 10).padding(.bottom, 10).padding(.top, 6)
+    }
+}
+
+/// The web app's avatar.svg (gold face with glasses on dark teal), drawn natively on its 36×36 grid.
+struct Avatar: View {
+    var size: CGFloat = 32
+
+    var body: some View {
+        Canvas { ctx, sz in
+            ctx.scaleBy(x: sz.width / 36, y: sz.height / 36)
+            let ink = Color(hex: 0x0b0f11), blue = Color(hex: 0x7aa2f7)
+            func about(_ deg: Double) -> CGAffineTransform {
+                CGAffineTransform(translationX: -18, y: -18).concatenating(.init(rotationAngle: deg * .pi / 180)).concatenating(.init(translationX: 18, y: 18))
+            }
+            ctx.fill(Path(CGRect(x: 0, y: 0, width: 36, height: 36)), with: .color(Color(hex: 0x0f2a27)))
+            ctx.fill(Path(ellipseIn: CGRect(x: 21, y: -3, width: 18, height: 18)), with: .color(blue.opacity(0.18)))
+            // face: scale, tilt 18° about the centre, shift down-right
+            let face = CGAffineTransform(scaleX: 0.9, y: 0.9).concatenating(about(18)).concatenating(.init(translationX: 5, y: 8))
+            ctx.fill(Path(roundedRect: CGRect(x: 0, y: 0, width: 36, height: 36), cornerRadius: 9).applying(face), with: .color(.warning))
+            // features: tilt 9°, shift down 1
+            let f = about(9).concatenating(.init(translationX: 0, y: 1))
+            for x in [12.3, 23.7] {
+                ctx.fill(Path(ellipseIn: CGRect(x: x - 1.3, y: 18.7, width: 2.6, height: 2.6)).applying(f), with: .color(blue.opacity(0.45)))
+            }
+            for x in [13.5, 20.5] {
+                ctx.fill(Path(roundedRect: CGRect(x: x, y: 15, width: 2, height: 3), cornerRadius: 1).applying(f), with: .color(ink))
+            }
+            var glasses = Path()
+            glasses.addEllipse(in: CGRect(x: 11.6, y: 13.6, width: 5.8, height: 5.8))
+            glasses.addEllipse(in: CGRect(x: 18.6, y: 13.6, width: 5.8, height: 5.8))
+            glasses.move(to: CGPoint(x: 17.4, y: 16.5))
+            glasses.addLine(to: CGPoint(x: 18.6, y: 16.5))
+            ctx.stroke(glasses.applying(f), with: .color(ink), lineWidth: 1)
+            var smile = Path()
+            smile.move(to: CGPoint(x: 14.5, y: 21.5))
+            smile.addCurve(to: CGPoint(x: 21.5, y: 21.5), control1: CGPoint(x: 16.1, y: 23.5), control2: CGPoint(x: 19.9, y: 23.5))
+            ctx.stroke(smile.applying(f), with: .color(ink), style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+        }
+        .frame(width: size, height: size)
+        .clipShape(.circle)
+        .overlay(Circle().strokeBorder(.hairline))
     }
 }
