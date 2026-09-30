@@ -46,7 +46,7 @@
 2. Open it. macOS says it can't verify the developer, because the app isn't notarized. Open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**. You only do this once.
 3. Running code needs `python3`. If macOS offers to install the Command Line Tools, accept.
 
-Requires macOS 26 or later. AI feedback on your explanations and the tutor use the [`claude` CLI](https://claude.com/claude-code), logged in. Everything else works without it.
+Requires macOS 26 or later. AI feedback on your explanations and the tutor use your Claude subscription (through the [`claude` CLI](https://claude.com/claude-code)) or your own Anthropic, OpenAI or Gemini API key: pick one in **Settings › AI**. Everything else works without it.
 
 ### Updates and your data
 

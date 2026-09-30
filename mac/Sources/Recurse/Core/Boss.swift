@@ -89,10 +89,10 @@ extension Store {
         do {
             grade = try await Proc.gradeExplain(
                 question: "You just solved \"\(p.title)\" in a timed interview. Walk me through it: the approach, why it's correct, and the time and space complexity.",
-                keyPoints: p.keyPoints, answer: text)
+                keyPoints: p.keyPoints, answer: text, ai: aiConfig())
         } catch {
             print("boss grading failed:", error)
-            throw Proc.AIError(errorDescription: "AI grading is unavailable right now. Try again in a minute.")
+            throw Proc.AIError(errorDescription: "AI grading failed: \(error.localizedDescription)")
         }
         let inTime = solvedIn <= r.limitS
         let passed = inTime && grade.score >= Store.bossPassScore

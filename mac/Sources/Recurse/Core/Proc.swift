@@ -92,24 +92,10 @@ enum Proc {
             results: [])
     }
 
-    static let gradeModel = ProcessInfo.processInfo.environment["AI_MODEL"] ?? "opus"
-    static let tutorModel = ProcessInfo.processInfo.environment["AI_TUTOR_MODEL"] ?? "sonnet"
-
     struct AIError: LocalizedError { let errorDescription: String? }
 
-    static func ask(_ prompt: String, model: String) async throws -> String {
-        // tmp cwd so the CLI doesn't load this repo's CLAUDE.md into every call
-        let o = await run(["claude", "-p", prompt, "--model", model, "--output-format", "json"],
-                          timeout: 120, cwd: FileManager.default.temporaryDirectory)
-        guard o.status == 0,
-              let obj = try? JSONSerialization.jsonObject(with: Data(o.out.utf8)) as? [String: Any],
-              obj["is_error"] as? Bool != true, let result = obj["result"]
-        else { throw AIError(errorDescription: o.timedOut ? "timed out" : String(o.err.suffix(500))) }
-        return "\(result)"
-    }
-
     static func tutorReply(title: String, statement: String, hints: [String], code: String,
-                           history: [(role: String, text: String)]) async throws -> String {
+                           history: [(role: String, text: String)], ai: AI.Config) async throws -> String {
         let convo = history.map { "\($0.role == "user" ? "Learner" : "Tutor"): \($0.text)" }.joined(separator: "\n\n")
         let seen = hints.enumerated().map { "\($0 + 1). \($1)" }.joined(separator: "\n")
         let prompt = """
@@ -139,10 +125,10 @@ enum Proc {
 
         Write only the tutor's next reply.
         """
-        return try await ask(prompt, model: tutorModel).trimmingCharacters(in: .whitespacesAndNewlines)
+        return try await AI.ask(prompt, ai, .tutor).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    static func gradeExplain(question: String, keyPoints: [String], answer: String) async throws -> Grade {
+    static func gradeExplain(question: String, keyPoints: [String], answer: String, ai: AI.Config) async throws -> Grade {
         let points = keyPoints.enumerated().map { "\($0 + 1). \($1)" }.joined(separator: "\n")
         let prompt = """
         You are a strict but fair technical interviewer grading a candidate's verbal explanation in a DSA interview. Be honest, never flattering: vague or hand-wavy answers score low.
@@ -160,7 +146,7 @@ enum Proc {
         Reply with ONLY a JSON object, no prose, no code fence:
         {"score": <integer 0-5, 5 = interview-ready>, "covered": [<true/false per key point, in order>], "feedback": "<2-3 short sentences: what was good, what was missing or wrong>", "followUp": "<one probing follow-up question an interviewer would ask next>"}
         """
-        let text = try await ask(prompt, model: gradeModel)
+        let text = try await AI.ask(prompt, ai, .grade)
         guard let a = text.firstIndex(of: "{"), let b = text.lastIndex(of: "}"),
               let g = try? JSONSerialization.jsonObject(with: Data(text[a...b].utf8)) as? [String: Any]
         else { throw AIError(errorDescription: "unreadable grade") }

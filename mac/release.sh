@@ -13,7 +13,7 @@ gh release create "v$V" "$ZIP" --target "$(git rev-parse HEAD)" --title "Recurse
 ## Install
 1. Download **Recurse.zip**, unzip it and drag **Recurse.app** into Applications.
 2. Open it. macOS says it can't verify the app: open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**. Only needed once.
-3. Running code needs \`python3\`: if macOS offers to install the Command Line Tools, accept. AI grading and the tutor need the \`claude\` CLI, logged in.
+3. Running code needs \`python3\`: if macOS offers to install the Command Line Tools, accept. AI grading and the tutor use your Claude subscription (the \`claude\` CLI) or an Anthropic, OpenAI or Gemini API key: pick one in **Settings › AI**.
 
 ## Update
 **Recurse › Check for Updates…** downloads and installs it, or replace the app with this one. Your progress lives in \`~/Library/Application Support/Recurse\` and is kept.

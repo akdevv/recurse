@@ -206,6 +206,10 @@ final class Store {
         _db.run("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", key, value.jsonText)
     }
 
+    func aiConfig() -> AI.Config {
+        db.one("SELECT value FROM settings WHERE key = 'ai'")?.json("value") ?? AI.Config()
+    }
+
     func saveSettings(_ s: Settings) {
         putSetting("name", s.name)
         putSetting("username", s.username)
@@ -420,9 +424,9 @@ final class Store {
     func grade(_ kind: String, _ id: String, answer: String) async throws -> Grade {
         guard let r = rubric(kind, id) else { throw Proc.AIError(errorDescription: "Nothing to grade against.") }
         let g: Grade
-        do { g = try await Proc.gradeExplain(question: r.question, keyPoints: r.keyPoints, answer: answer) } catch {
+        do { g = try await Proc.gradeExplain(question: r.question, keyPoints: r.keyPoints, answer: answer, ai: aiConfig()) } catch {
             print("grade failed:", error)
-            throw Proc.AIError(errorDescription: "AI grading is unavailable right now. Use the checklist.")
+            throw Proc.AIError(errorDescription: "AI grading failed: \(error.localizedDescription) Use the checklist.")
         }
         let best = _db.one("SELECT MAX(score) AS s FROM grades WHERE kind = ? AND ref = ?", kind, id)?.int("s") ?? 0
         saveGrade(kind, id, g)
@@ -553,10 +557,10 @@ final class Store {
         do {
             reply = try await Proc.tutorReply(
                 title: p.title, statement: p.statement, hints: Array(p.hints.prefix(a.hintsUsed)), code: code,
-                history: tutorMessages(a.id) + [("user", text)])
+                history: tutorMessages(a.id) + [("user", text)], ai: aiConfig())
         } catch {
             print("tutor failed:", error)
-            throw Proc.AIError(errorDescription: "The tutor is unavailable right now. Try again in a minute.")
+            throw Proc.AIError(errorDescription: "The tutor is unavailable: \(error.localizedDescription)")
         }
         _db.run("INSERT INTO tutor_messages (attempt_id, ts, role, text) VALUES (?, ?, ?, ?)", a.id, Dates.iso(), "user", text)
         _db.run("INSERT INTO tutor_messages (attempt_id, ts, role, text) VALUES (?, ?, ?, ?)", a.id, Dates.iso(), "tutor", reply)

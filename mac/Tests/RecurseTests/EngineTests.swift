@@ -422,3 +422,68 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     #expect(other.rewardPath().first { $0.id == "grand" }!.item.title == "A trip to the mountains")
     #expect(RewardItem.presets.allSatisfy { Art.image($0.icon) != nil } && Art.image("custom") != nil)
 }
+
+@Test func aiRequestsAndReplies() throws {
+    func body(_ r: URLRequest) throws -> [String: Any] { try JSONSerialization.jsonObject(with: r.httpBody!) as! [String: Any] }
+    let a = AI.request(.anthropic, model: "m", key: "k", prompt: "hi")
+    #expect(a.url?.absoluteString == "https://api.anthropic.com/v1/messages" && a.value(forHTTPHeaderField: "x-api-key") == "k")
+    #expect(try a.value(forHTTPHeaderField: "anthropic-version") != nil && body(a)["max_tokens"] != nil)
+    let o = AI.request(.openai, model: "m", key: "k", prompt: "hi")
+    #expect(o.url?.absoluteString == "https://api.openai.com/v1/chat/completions" && o.value(forHTTPHeaderField: "Authorization") == "Bearer k")
+    let g = AI.request(.gemini, model: "gemini-x", key: "k", prompt: "hi")
+    #expect(g.url?.absoluteString.hasSuffix("/models/gemini-x:generateContent") == true && g.value(forHTTPHeaderField: "x-goog-api-key") == "k")
+    #expect(g.url?.query == nil) // the key goes in a header, never the URL
+    for r in [a, o, g] { #expect(r.httpMethod == "POST" && String(decoding: r.httpBody!, as: UTF8.self).contains("hi")) }
+
+    let reply = { (p: AIProvider, json: String) in try AI.parse(p, Data(json.utf8), status: 200) }
+    #expect(try reply(.anthropic, #"{"content":[{"type":"thinking","thinking":"hmm"},{"type":"text","text":"OK"}]}"#) == "OK")
+    #expect(try reply(.openai, #"{"choices":[{"message":{"role":"assistant","content":"OK"}}]}"#) == "OK")
+    #expect(try reply(.gemini, #"{"candidates":[{"content":{"parts":[{"text":"hmm","thought":true},{"text":"O"},{"text":"K"}]}}]}"#) == "OK")
+    #expect(throws: Proc.AIError.self) { try reply(.openai, #"{"choices":[]}"#) }
+    #expect {
+        try AI.parse(.openai, Data(#"{"error":{"message":"Incorrect API key provided"}}"#.utf8), status: 401)
+    } throws: { $0.localizedDescription == "OpenAI API: Incorrect API key provided" }
+    #expect { try AI.parse(.gemini, Data("<html>".utf8), status: 503) } throws: { $0.localizedDescription == "Google Gemini API: HTTP 503" }
+
+    #expect(AI.Config().provider == .claudeCode && AI.Config(provider: .gemini).model(.tutor) == "gemini-flash-latest")
+    #expect(AI.Config(provider: .openai, model: " gpt-x ").model(.grade) == "gpt-x")
+}
+
+@Test func keychainRoundTrip() {
+    let account = "test-\(UUID())"
+    defer { Keychain.delete(account) }
+    #expect(Keychain.get(account) == nil)
+    #expect(Keychain.set(account, "one") && Keychain.get(account) == "one")
+    #expect(Keychain.set(account, "two") && Keychain.get(account) == "two")
+    Keychain.delete(account)
+    #expect(Keychain.get(account) == nil)
+}
+
+@MainActor @Test func aiSettingPersists() throws {
+    let store = try tempStore()
+    #expect(store.aiConfig() == AI.Config())
+    store.putSetting("ai", AI.Config(provider: .gemini, model: "gemini-x"))
+    #expect(store.aiConfig() == AI.Config(provider: .gemini, model: "gemini-x"))
+}
+
+/// Live calls, only when asked: `GEMINI_API_KEY=… swift test --filter liveGemini`, `RECURSE_LIVE_CLAUDE=1 swift test --filter liveClaude`.
+@Test(.enabled(if: ProcessInfo.processInfo.environment["GEMINI_API_KEY"] != nil)) func liveGemini() async throws {
+    let account = AIProvider.gemini.rawValue, before = Keychain.get(account)
+    defer { if let before { Keychain.set(account, before) } else { Keychain.delete(account) } }
+    Keychain.set(account, ProcessInfo.processInfo.environment["GEMINI_API_KEY"]!)
+    let config = AI.Config(provider: .gemini)
+    #expect(try await AI.ask("Reply with just the word OK.", config, .tutor).localizedCaseInsensitiveContains("ok"))
+    let g = try await Proc.gradeExplain(question: "What does a hash map give you?", keyPoints: ["average O(1) lookup", "keys map to values"],
+                                        answer: "It stores key-value pairs and looks keys up in O(1) on average by hashing them.", ai: config)
+    #expect(g.score >= 3 && g.covered == [true, true] && !g.feedback.isEmpty)
+    await #expect(throws: Proc.AIError.self) {
+        Keychain.set(account, "not-a-key")
+        _ = try await AI.ask("hi", config, .tutor)
+    }
+}
+
+@Test(.enabled(if: ProcessInfo.processInfo.environment["RECURSE_LIVE_CLAUDE"] != nil)) func liveClaude() async throws {
+    let reply = try await Proc.tutorReply(title: "Two Sum", statement: "Find two numbers that add up to target.", hints: [],
+                                          code: "class Solution: pass", history: [("user", "Where do I start?")], ai: AI.Config())
+    #expect(reply.contains("?"))
+}
