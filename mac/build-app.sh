@@ -48,7 +48,8 @@ IDENTITY=$(security find-identity -v -p codesigning | grep -m1 -o '"Apple Develo
 if [ -n "$IDENTITY" ]; then
   WX="$APP/Contents/PlugIns/RecurseWidget.appex"
   mkdir -p "$WX/Contents/MacOS"
-  xcrun swiftc -O -parse-as-library -application-extension -target arm64-apple-macos26.0 \
+  # entry point _NSExtensionMain (as Xcode links it) sets up the extension before main; without it the widget traps at launch
+  xcrun swiftc -O -parse-as-library -application-extension -target arm64-apple-macos26.0 -Xlinker -e -Xlinker _NSExtensionMain \
     Widget/RecurseWidget.swift Sources/Recurse/Core/WidgetSnapshot.swift Sources/Recurse/App/Theme.swift \
     -o "$WX/Contents/MacOS/RecurseWidget"
   cat > "$WX/Contents/Info.plist" <<PLIST

@@ -328,27 +328,32 @@ private struct AITab: View {
 
 private struct UpdatesTab: View {
     @State private var latest: Updates.Release?
-    @State private var busy = false
-    @State private var status = ""
+    @State private var checking = false
+    @State private var downloading = false
+    @State private var error: String?
 
     var body: some View {
         let current = Updates.current
-        let newer = latest.map { l in current.map { Updates.isNewer(l.version, than: $0) } ?? true } ?? false
+        let newer = latest.flatMap { l in current.map { Updates.isNewer(l.version, than: $0) } ?? false } ?? false
         Form {
             Section {
-                LabeledContent("Installed", value: current ?? "Development build")
-                if let latest { LabeledContent("Latest on GitHub", value: latest.version) }
-                HStack {
-                    Button("Check for Updates") { check() }.disabled(busy)
-                    if newer {
-                        Button("Download and Install") { install() }.buttonStyle(.borderedProminent).disabled(busy || current == nil)
+                HStack(spacing: 12) {
+                    Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 36, height: 36)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(newer ? "Recurse \(latest?.version ?? "") is available" : "Recurse \(current ?? "")")
+                        status(newer: newer).font(.caption).foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if busy { ProgressView().controlSize(.small) }
+                    if downloading || checking { ProgressView().controlSize(.small) }
+                    if newer {
+                        Button("Update Now") { install() }.buttonStyle(.borderedProminent).disabled(downloading)
+                    } else {
+                        Button("Check Now") { check() }.disabled(checking || downloading)
+                    }
                 }
-                if !status.isEmpty { Text(status).font(.callout).foregroundStyle(.secondary) }
+                .padding(.vertical, 2)
             } footer: {
-                Text("Your progress is kept across updates. You can also [download it from GitHub](\(Updates.releasesPage)).")
+                Text(LocalizedStringKey("Your progress is kept across updates. Release notes and downloads are [on GitHub](\(Updates.releasesPage.absoluteString))."))
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -356,26 +361,31 @@ private struct UpdatesTab: View {
         .task { if latest == nil { check() } }
     }
 
+    @ViewBuilder private func status(newer: Bool) -> some View {
+        if downloading, let latest { Text("Downloading \(latest.version)…") }
+        else if checking { Text("Checking for updates…") }
+        else if let error { Text(error) }
+        else if Updates.current == nil { Text("Development build") }
+        else if newer, let current = Updates.current { Text("You have \(current)") }
+        else if latest != nil { Text("Up to date") }
+    }
+
     private func check() {
-        busy = true
-        status = ""
+        checking = true
+        error = nil
         Task {
-            do {
-                let l = try await Updates.latest()
-                latest = l
-                if let c = Updates.current, !Updates.isNewer(l.version, than: c) { status = "You're up to date." }
-            } catch { status = error.localizedDescription }
-            busy = false
+            do { latest = try await Updates.latest() } catch { self.error = error.localizedDescription }
+            checking = false
         }
     }
 
     private func install() {
         guard let latest else { return }
-        busy = true
-        status = "Downloading \(latest.version)…"
+        downloading = true
+        error = nil
         Task {
-            do { try await Updates.install(latest) } catch { status = error.localizedDescription }
-            busy = false
+            do { try await Updates.install(latest) } catch { self.error = error.localizedDescription }
+            downloading = false
         }
     }
 }
