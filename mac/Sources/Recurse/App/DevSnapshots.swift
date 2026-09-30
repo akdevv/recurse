@@ -27,10 +27,16 @@ enum DevSnapshots {
                 NSApp.sendAction(#selector(NSSplitViewController.toggleSidebar(_:)), to: nil, from: nil)
             }
         }
+        // RECURSE_AI_KEY: the configured provider's key for this run only; whatever was saved comes back before quitting
+        let aiKey = env["RECURSE_AI_KEY"].map { k in
+            let account = store.aiConfig().provider.rawValue, before = Keychain.get(account)
+            Keychain.set(account, k)
+            return (account, before)
+        }
         for (i, spec) in (env["RECURSE_ROUTES"] ?? "today").split(separator: ",").enumerated() {
             let offset = spec.firstMatch(of: /@y(\d+)/).flatMap { Double($0.output.1) } ?? (spec.contains("@scroll") ? 360 : nil)
             let scroll = offset != nil, reveal = spec.contains("@reveal")
-            let parts = spec.replacing(/@y\d+/, with: "").replacingOccurrences(of: "@scroll", with: "").replacingOccurrences(of: "@reveal", with: "").replacingOccurrences(of: "@open", with: "")
+            let parts = spec.replacing(/@y\d+/, with: "").replacingOccurrences(of: "@scroll", with: "").replacingOccurrences(of: "@reveal", with: "").replacingOccurrences(of: "@open", with: "").replacingOccurrences(of: "@test", with: "")
                 .split(separator: ":", maxSplits: 1).map(String.init)
             switch parts[0] {
             case "welcome": break
@@ -96,13 +102,18 @@ enum DevSnapshots {
                 sheet.performKeyEquivalent(with: e)
                 try? await Task.sleep(for: .seconds(1.5))
             }
+            if settings { window.makeFirstResponder(nil) }
+            if spec.contains("@test") {
+                NotificationCenter.default.post(name: .testAI, object: nil)
+                try? await Task.sleep(for: .seconds(20))
+            }
             if scroll, let sv = largestScrollView(in: window.contentView) {
                 let end = max(0, (sv.documentView?.frame.height ?? 0) - sv.contentView.bounds.height)
                 sv.contentView.scroll(to: NSPoint(x: 0, y: min(offset ?? 360, end)))
                 sv.reflectScrolledClipView(sv.contentView)
                 try? await Task.sleep(for: .seconds(1))
             }
-            let name = "\(i)-\(parts[0])\(reveal ? "-revealed" : "")\(spec.contains("@open") ? "-opened" : "")\(offset.map { "-y\(Int($0))" } ?? "")"
+            let name = "\(i)-\(parts[0])\(reveal ? "-revealed" : "")\(spec.contains("@open") ? "-opened" : "")\(spec.contains("@test") ? "-tested" : "")\(offset.map { "-y\(Int($0))" } ?? "")"
             dumpToolbar(window, to: "\(dir)/\(name)-toolbar.txt")
             await capture(window, to: URL(fileURLWithPath: dir).appending(path: "\(name).png"))
             if parts[0] == "chest" { store.chestQueue = [] }
@@ -110,6 +121,9 @@ enum DevSnapshots {
         }
         // what the widget reads (its container is off-limits to other processes)
         if let w = WidgetSnapshot.load(), let data = try? JSONEncoder().encode(w) { try? data.write(to: URL(fileURLWithPath: "\(dir)/widget.json")) }
+        if let (account, before) = aiKey {
+            if let before { Keychain.set(account, before) } else { Keychain.delete(account) }
+        }
         NSApp.terminate(nil)
     }
 

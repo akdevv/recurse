@@ -18,6 +18,7 @@ struct SettingsView: View {
             Tab("General", systemImage: "gearshape", value: "general") { general }
             Tab("Reminders", systemImage: "bell.badge", value: "reminders") { remindersTab }
             Tab("Rewards", systemImage: "gift", value: "rewards") { RewardsTab() }
+            Tab("AI", systemImage: "sparkles", value: "ai") { AITab() }
             Tab("Data", systemImage: "externaldrive", value: "data") { DataTab { s = store.settings() } }
             Tab("Updates", systemImage: "arrow.down.circle", value: "updates") { UpdatesTab() }
         }
@@ -219,6 +220,112 @@ private struct DataTab: View {
     }
 }
 
+private struct AITab: View {
+    @Environment(Store.self) private var store
+    @State private var config = AI.Config()
+    @State private var loaded = false
+    @State private var key = ""
+    @State private var saved: String? // the stored key, shown only as its last 4 characters
+    @State private var cli: String?? // nil until checked; .some(nil) = not found
+    @State private var test: (ok: Bool, text: String)?
+    @State private var testing = false
+
+    var body: some View {
+        let p = config.provider
+        Form {
+            Section {
+                Picker("Provider", selection: $config.provider) {
+                    ForEach(AIProvider.allCases) { Text($0.title).tag($0) }
+                }
+                if p.usesKey {
+                    LabeledContent("API key") {
+                        if let saved {
+                            HStack(spacing: 8) {
+                                Label("•••• \(saved.suffix(4))", systemImage: "lock.fill").foregroundStyle(.secondary)
+                                Button("Remove") { Keychain.delete(p.rawValue); load() }
+                            }
+                        } else {
+                            HStack(spacing: 8) {
+                                SecureField("", text: $key, prompt: Text("Paste your key")).frame(width: 190)
+                                Button("Save") { saveKey() }.disabled(key.trimmingCharacters(in: .whitespaces).isEmpty)
+                            }
+                        }
+                    }
+                } else {
+                    LabeledContent("Claude Code") {
+                        switch cli {
+                        case .none: ProgressView().controlSize(.small)
+                        case .some(.some): Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.success)
+                        case .some(.none): Link("Install Claude Code", destination: URL(string: "https://claude.com/claude-code")!)
+                        }
+                    }
+                }
+                TextField("Model", text: $config.model, prompt: Text(p.defaultModel(.grade)))
+            } footer: {
+                let (grade, tutor) = (p.defaultModel(.grade), p.defaultModel(.tutor))
+                Text(LocalizedStringKey((p.usesKey
+                    ? "Your key is kept in the macOS Keychain, never in Recurse's database or backups. [Get a key](\(p.keyPage!))."
+                    : "Uses your Claude Pro or Max plan through Claude Code. Run `claude` in Terminal once to log in.")
+                    + (grade == tutor ? " Leave Model empty to use \(grade)." : " Leave Model empty to use \(grade) for grading and \(tutor) for the tutor.")))
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+
+            Section {
+                HStack(spacing: 10) {
+                    Button("Test Connection") { runTest() }.disabled(testing || (p.usesKey && saved == nil))
+                    if testing { ProgressView().controlSize(.small) }
+                    if let test {
+                        Label(test.text, systemImage: test.ok ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(test.ok ? Color.success : Color.danger).lineLimit(2)
+                    }
+                    Spacer()
+                }
+            } footer: {
+                Text("AI grades your explanations and runs the Socratic tutor. Everything else works without it.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .settingsPane()
+        .onAppear {
+            if !loaded { config = store.aiConfig(); loaded = true }
+            load()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .testAI)) { _ in runTest() }
+        .onChange(of: config) { old, new in
+            guard loaded else { return }
+            store.putSetting("ai", new)
+            if old.provider != new.provider { load() }
+        }
+    }
+
+    private func load() {
+        DispatchQueue.main.async { NSApp.keyWindow?.makeFirstResponder(nil) } // no key field focused, and no Passwords popup
+        key = ""
+        test = nil
+        saved = config.provider.usesKey ? Keychain.get(config.provider.rawValue) : nil
+        if !config.provider.usesKey { Task { cli = .some(await AI.claudePath()) } }
+    }
+
+    private func saveKey() {
+        let k = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard Keychain.set(config.provider.rawValue, k) else { test = (false, "Couldn't save to the Keychain."); return }
+        load()
+        runTest()
+    }
+
+    private func runTest() {
+        testing = true
+        test = nil
+        Task {
+            do {
+                _ = try await AI.ask("Reply with just the word OK.", config, .tutor)
+                test = (true, "Connected to \(config.model(.tutor))")
+            } catch { test = (false, error.localizedDescription) }
+            testing = false
+        }
+    }
+}
+
 private struct UpdatesTab: View {
     @State private var latest: Updates.Release?
     @State private var busy = false
@@ -368,4 +475,9 @@ private extension View {
     func settingsPane() -> some View {
         formStyle(.grouped).scrollDisabled(true).fixedSize(horizontal: false, vertical: true)
     }
+}
+
+extension Notification.Name {
+    /// Posted by DevSnapshots to press Test Connection.
+    static let testAI = Notification.Name("RecurseTestAI")
 }
