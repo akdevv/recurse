@@ -12,24 +12,16 @@ struct ProblemListRow: Identifiable {
 extension Store {
     /// Every problem once, under its first topic in course order.
     func allProblems() -> [ProblemListRow] {
-        var seen = Set<String>()
-        return moduleViews().flatMap { m in
-            m.topics.flatMap { t in t.problems.filter { seen.insert($0.id).inserted }.map { ProblemListRow(p: $0, topic: t.topic, module: m.module) } }
+        moduleViews().flatMap { m in
+            m.topics.flatMap { t in t.problems.map { ProblemListRow(p: $0, topic: t.topic, module: m.module) } }
         }
+        .uniqued(by: \.id)
     }
 }
 
 extension Store {
     func searchItems() -> [SearchItem] {
-        let pages = [
-            SearchItem(id: "p:today", title: "Today", detail: "Page", icon: "house", route: .today),
-            SearchItem(id: "p:course", title: "Course", detail: "Page", icon: "map", route: .course),
-            SearchItem(id: "p:review", title: "Review", detail: "Page", icon: "arrow.counterclockwise", route: .review),
-            SearchItem(id: "p:problems", title: "Problems", detail: "Page", icon: "checklist", route: .problems),
-            SearchItem(id: "p:patterns", title: "Patterns", detail: "Page", icon: "square.on.circle", route: .patterns),
-            SearchItem(id: "p:stats", title: "Stats", detail: "Page", icon: "chart.bar", route: .stats),
-            SearchItem(id: "p:rewards", title: "Rewards", detail: "Page", icon: "gift", route: .rewards),
-        ]
+        let pages = Route.pages.map { SearchItem(id: "p:\($0.title)", title: $0.title, detail: "Page", icon: $0.icon, route: $0) }
         let modules = Content.modules()
         let topics = modules.flatMap { m in m.topics.compactMap(Content.topic).map {
             SearchItem(id: "t:\($0.id)", title: $0.title, detail: "Topic · \(m.title)", icon: "book", route: .topic($0.id))
@@ -37,7 +29,7 @@ extension Store {
         let bosses = modules.map { SearchItem(id: "b:\($0.id)", title: "\($0.title) boss fight", detail: "Boss", icon: "figure.fencing", route: .boss($0.id)) }
         let problems = allProblems().filter(\.p.available).map {
             SearchItem(id: "q:\($0.id)", title: $0.title, detail: ($0.p.lc.map { "#\($0) · " } ?? "") + $0.topic.title,
-                       icon: "chevron.left.forwardslash.chevron.right", route: .problem($0.id))
+                       icon: Route.problem($0.id).icon, route: .problem($0.id))
         }
         return pages + topics + bosses + problems
     }

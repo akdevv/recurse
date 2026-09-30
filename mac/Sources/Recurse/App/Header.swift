@@ -8,10 +8,10 @@ extension View {
             .toolbar(removing: .title)
             .scrollEdgeEffectStyle(.soft, for: .top)
             .toolbar {
-                ToolbarItemGroup(placement: .navigation) { BackForward() } // its own glass capsule, like Finder's
+                ToolbarItemGroup(placement: .navigation) { BackForward() }
                 // own pill, set apart from back/forward (a fixed ToolbarSpacer collapses in the navigation area)
                 ToolbarItem(placement: .navigation) { Breadcrumbs() }.sharedBackgroundVisibility(.hidden)
-                ToolbarSpacer(.flexible) // pushes page actions and the search field to the right end
+                ToolbarSpacer(.flexible)
             }
             .navigationBarBackButtonHidden() // ours (BackForward) follows the whole history, not just this stack
             .modifier(HeaderSearch(enabled: !workspace))
@@ -95,30 +95,22 @@ private struct Breadcrumbs: View {
 
     private func trail(_ r: Route) -> (String, [Crumb]) {
         switch r {
-        case .today: return ("house", [Crumb(label: "Today")])
-        case .course: return ("map", [Crumb(label: "Course")])
-        case .review: return ("arrow.counterclockwise", [Crumb(label: "Review")])
-        case .problems: return ("checklist", [Crumb(label: "Problems")])
-        case .patterns: return ("square.on.circle", [Crumb(label: "Patterns")])
-        case .stats: return ("chart.bar", [Crumb(label: "Stats")])
-        case .rewards: return ("gift", [Crumb(label: "Rewards")])
+        case .today, .course, .review, .problems, .patterns, .stats, .rewards: return (r.icon, [Crumb(label: r.title)])
         case .topic(let id):
             let m = Content.modules().first { $0.topics.contains(id) }
-            return ("map", [Crumb(label: "Course", route: .course), Crumb(label: m?.title ?? "", route: .course),
+            return (r.icon, [Crumb(label: "Course", route: .course), Crumb(label: m?.title ?? "", route: .course),
                             Crumb(label: Content.topic(id)?.title ?? id)])
         case .boss(let mid):
-            return ("map", [Crumb(label: "Course", route: .course), Crumb(label: Content.module(mid).title, route: .course),
+            return (r.icon, [Crumb(label: "Course", route: .course), Crumb(label: Content.module(mid)?.title ?? mid, route: .course),
                             Crumb(label: "Boss fight")])
         case .problem(let pid):
             let title = Content.problem(pid)?.title ?? pid
-            guard let home = Content.problemHome(pid) else { return ("checklist", [Crumb(label: "Problems", route: .problems), Crumb(label: title)]) }
-            return ("map", [Crumb(label: home.topic.title, route: .topic(home.topic.id)), Crumb(label: title)])
+            guard let home = Content.problemHome(pid) else { return (Route.problems.icon, [Crumb(label: Route.problems.title, route: .problems), Crumb(label: title)]) }
+            return (Route.course.icon, [Crumb(label: home.topic.title, route: .topic(home.topic.id)), Crumb(label: title)])
         }
     }
 }
 
-/// Progressive blur under the header, like Apple's: real blur (system material) that's full strength through the
-/// header row and fades out just below it, with a light canvas tint for legibility on this dark theme.
 struct HeaderFade: View {
     static let header: CGFloat = 52 // macOS 26 toolbar height
     static let trail: CGFloat = 14 // fade-out below it
@@ -142,7 +134,6 @@ struct HeaderFade: View {
     }
 }
 
-/// Back / forward as plain toolbar buttons, so the system draws them: a shared glass capsule, hover and press states.
 private struct BackForward: View {
     @Environment(Nav.self) private var nav
 

@@ -193,8 +193,6 @@ struct CodeBlock: View {
     }
 }
 
-// MARK: Python highlighting (shared by code blocks and the editor)
-
 enum Python {
     enum Kind { case keyword, builtin, string, comment, number, definition }
 

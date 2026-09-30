@@ -6,8 +6,8 @@ struct TopicView: View {
 
     var body: some View {
         if let t = Content.topic(topicId), let m = Content.modules().first(where: { $0.topics.contains(topicId) }) {
-            TopicPage(t: t, m: m, status: store.topicStatus(t, store.problemStatuses()),
-                      problems: store.topicProblems(t, store.problemStatuses()))
+            let statuses = store.problemStatuses()
+            TopicPage(t: t, m: m, status: store.topicStatus(t, statuses), problems: store.topicProblems(t, statuses))
         } else {
             ContentUnavailableView("Topic not found", systemImage: "questionmark.folder")
         }
@@ -338,7 +338,6 @@ final class SectionTracker {
 
     func report(_ id: String, top: CGFloat) {
         tops[id] = top
-        // the last section whose top has scrolled above the reading line
         // the last section whose top has scrolled above the reading line; the final one can't scroll that far,
         // so it counts once it's in the top half
         let current = (tops["explain"] ?? .infinity) < 420 ? "explain"
@@ -359,7 +358,6 @@ private struct TrackSection: ViewModifier {
     }
 }
 
-/// The page outline: a thin rail with the section being read marked in teal.
 private struct OnThisPage: View {
     let headings: [String]
     let hasQuiz, hasProblems: Bool
@@ -441,7 +439,6 @@ private struct WrappedCard: View {
     }
 }
 
-/// The topic's four steps in one card; each cell jumps to its section.
 private struct StepsCard: View {
     let steps: [Step]
     let jump: (String) -> Void
@@ -475,7 +472,6 @@ private struct StepsCard: View {
     }
 }
 
-/// "Why this matters": the topic's hook.
 private struct HookCallout: View {
     let text: String
 

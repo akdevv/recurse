@@ -8,10 +8,7 @@ struct PageShot {
     let page: CGRect
 }
 
-/// Two-finger swipe between pages, the way Safari and NSPageController's stack-history style do it: going back,
-/// the page follows your fingers off to the right, uncovering the previous one; going forward, the next page slides
-/// in from the right. It runs on snapshots, so the real page only changes, hidden, once the swipe lands.
-/// Uses the system's swipe tracking (springs, thresholds, and the "Swipe between pages" Trackpad setting).
+/// Safari-style two-finger swipe between pages. It runs on snapshots, so the real page only changes once the swipe lands.
 struct SwipeBack: View {
     @Environment(Nav.self) private var nav
     @State private var swipe: Swipe?
@@ -32,7 +29,7 @@ struct SwipeBack: View {
                 ZStack(alignment: .topLeading) {
                     Color.canvas
                     if let base { Image(nsImage: base.image).resizable().frame(width: geo.size.width, height: geo.size.height) }
-                    Color.black.opacity(0.25 * (1 - shift)) // the page underneath sits in shade until uncovered
+                    Color.black.opacity(0.25 * (1 - shift))
                     if let top {
                         crop(top, in: geo.size)
                             .shadow(color: .black.opacity(0.5 * (1 - shift)), radius: 20, x: -6)
@@ -54,7 +51,6 @@ struct SwipeBack: View {
         .onReceive(NotificationCenter.default.publisher(for: .devSwipe)) { n in begin(back: true, amount: n.object as? CGFloat ?? 0.5) }
     }
 
-    /// Just the page, cut out of its window snapshot and left where it was.
     private func crop(_ shot: PageShot, in size: CGSize) -> some View {
         Image(nsImage: shot.image).resizable().frame(width: size.width, height: size.height)
             .offset(x: -shot.page.minX, y: -shot.page.minY)
@@ -189,7 +185,6 @@ final class PageCamera {
     }
 }
 
-/// Sits behind the page area and tells the camera where it is and which window it's in.
 struct PageFrame: View {
     var body: some View {
         GeometryReader { geo in

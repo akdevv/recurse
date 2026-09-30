@@ -11,17 +11,17 @@ struct Sidebar: View {
                 TodayPanel(me: me)
 
                 group("Learn") {
-                    row(.today, "Today", "house")
-                    row(.course, "Course", "map")
-                    row(.review, "Review", "arrow.counterclockwise", count: me.reviewsDue)
+                    row(.today)
+                    row(.course)
+                    row(.review, count: me.reviewsDue)
                 }
                 group("Practice") {
-                    row(.problems, "Problems", "checklist")
-                    row(.patterns, "Patterns", "square.on.circle")
+                    row(.problems)
+                    row(.patterns)
                 }
                 group("Progress") {
-                    row(.stats, "Stats", "chart.bar")
-                    row(.rewards, "Rewards", "gift", count: store.rewardsWaiting)
+                    row(.stats)
+                    row(.rewards, count: store.rewardsWaiting)
                 }
             }
             .padding(.horizontal, 10).padding(.top, 4).padding(.bottom, 12)
@@ -38,10 +38,10 @@ struct Sidebar: View {
         }
     }
 
-    private func row(_ r: Route, _ title: String, _ icon: String, count: Int = 0) -> some View {
+    private func row(_ r: Route, count: Int = 0) -> some View {
         // topics and boss fights live under Course
         let inCourse = switch nav.selection { case .topic, .boss: true; default: false }
-        return SidebarRow(title: title, icon: icon, active: nav.selection == r || (r == .course && inCourse), count: count) { nav.go(r) }
+        return SidebarRow(title: r.title, icon: r.icon, active: nav.selection == r || (r == .course && inCourse), count: count) { nav.go(r) }
     }
 }
 
@@ -83,15 +83,6 @@ private struct SidebarRow: View {
     }
 }
 
-extension Me {
-    /// Today with the not-yet-flushed active seconds; today joins the streak the moment the live ring fills.
-    func today(pending: Int) -> (secs: Int, done: Bool, streak: Int) {
-        let secs = streak.todaySeconds + pending, done = secs >= Streak.dailyGoal
-        return (secs, done, streak.dayStreak + (!streak.todayDone && done ? 1 : 0))
-    }
-}
-
-/// Today's ring, the week's goal days and the streak: the sidebar's top card.
 private struct TodayPanel: View {
     @Environment(Activity.self) private var activity
     let me: Me
@@ -164,10 +155,10 @@ private struct ProfileRow: View {
     var body: some View {
         Button { openSettings() } label: {
             HStack(spacing: 10) {
-                Avatar(size: 34)
+                Avatar(size: 34, image: me.avatar)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(me.username).font(.callout.weight(.semibold)).lineLimit(1)
-                    Text("Lv \(me.level.level) · \(me.level.title)").font(.caption).foregroundStyle(.muted).lineLimit(1)
+                    Text(me.name).font(.callout.weight(.semibold)).lineLimit(1)
+                    Text("@\(me.username) · Lv \(me.level.level)").font(.caption).foregroundStyle(.muted).lineLimit(1)
                 }
                 Spacer(minLength: 4)
                 Image(systemName: "gearshape.fill").font(.system(size: 13)).foregroundStyle(hover ? .primary : Color.muted)
@@ -181,46 +172,5 @@ private struct ProfileRow: View {
         .onHover { hover = $0 }
         .help("Settings (⌘,)")
         .padding(.horizontal, 10).padding(.bottom, 10).padding(.top, 6)
-    }
-}
-
-/// The web app's avatar, drawn natively on its 36×36 grid.
-struct Avatar: View {
-    var size: CGFloat = 32
-
-    var body: some View {
-        Canvas { ctx, sz in
-            ctx.scaleBy(x: sz.width / 36, y: sz.height / 36)
-            let ink = Color(hex: 0x0b0f11), blue = Color(hex: 0x7aa2f7)
-            func about(_ deg: Double) -> CGAffineTransform {
-                CGAffineTransform(translationX: -18, y: -18).concatenating(.init(rotationAngle: deg * .pi / 180)).concatenating(.init(translationX: 18, y: 18))
-            }
-            ctx.fill(Path(CGRect(x: 0, y: 0, width: 36, height: 36)), with: .color(Color(hex: 0x0f2a27)))
-            ctx.fill(Path(ellipseIn: CGRect(x: 21, y: -3, width: 18, height: 18)), with: .color(blue.opacity(0.18)))
-            // face: scale, tilt 18° about the centre, shift down-right
-            let face = CGAffineTransform(scaleX: 0.9, y: 0.9).concatenating(about(18)).concatenating(.init(translationX: 5, y: 8))
-            ctx.fill(Path(roundedRect: CGRect(x: 0, y: 0, width: 36, height: 36), cornerRadius: 9).applying(face), with: .color(.warning))
-            // features: tilt 9°, shift down 1
-            let f = about(9).concatenating(.init(translationX: 0, y: 1))
-            for x in [12.3, 23.7] {
-                ctx.fill(Path(ellipseIn: CGRect(x: x - 1.3, y: 18.7, width: 2.6, height: 2.6)).applying(f), with: .color(blue.opacity(0.45)))
-            }
-            for x in [13.5, 20.5] {
-                ctx.fill(Path(roundedRect: CGRect(x: x, y: 15, width: 2, height: 3), cornerRadius: 1).applying(f), with: .color(ink))
-            }
-            var glasses = Path()
-            glasses.addEllipse(in: CGRect(x: 11.6, y: 13.6, width: 5.8, height: 5.8))
-            glasses.addEllipse(in: CGRect(x: 18.6, y: 13.6, width: 5.8, height: 5.8))
-            glasses.move(to: CGPoint(x: 17.4, y: 16.5))
-            glasses.addLine(to: CGPoint(x: 18.6, y: 16.5))
-            ctx.stroke(glasses.applying(f), with: .color(ink), lineWidth: 1)
-            var smile = Path()
-            smile.move(to: CGPoint(x: 14.5, y: 21.5))
-            smile.addCurve(to: CGPoint(x: 21.5, y: 21.5), control1: CGPoint(x: 16.1, y: 23.5), control2: CGPoint(x: 19.9, y: 23.5))
-            ctx.stroke(smile.applying(f), with: .color(ink), style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
-        }
-        .frame(width: size, height: size)
-        .clipShape(.circle)
-        .overlay(Circle().strokeBorder(.hairline))
     }
 }

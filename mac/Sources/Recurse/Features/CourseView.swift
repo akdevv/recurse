@@ -32,8 +32,6 @@ struct CourseView: View {
     }
 }
 
-// MARK: summary
-
 private struct Summary: View {
     let modules: [ModuleView]
     let current: ModuleView?
@@ -42,8 +40,7 @@ private struct Summary: View {
     var body: some View {
         let topics = modules.flatMap(\.topics)
         let done = topics.filter(\.status.complete).count
-        var seen = Set<String>()
-        let problems = topics.flatMap(\.problems).filter { seen.insert($0.id).inserted }
+        let problems = topics.flatMap(\.problems).uniqued(by: \.id)
         let solved = problems.filter { Store.isSolved($0.status) }.count
         let nextTopic = current?.topics.first { !$0.status.complete }
 
@@ -67,7 +64,7 @@ private struct Summary: View {
                 }
             }
         }
-        .fixedSize(horizontal: false, vertical: true) // all three as tall as the tallest
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -115,8 +112,6 @@ private struct GaugeRing: View {
         .scaleEffect(0.85)
     }
 }
-
-// MARK: module card
 
 private struct ModuleCard: View {
     let m: ModuleView

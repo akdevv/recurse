@@ -1,8 +1,6 @@
-// Pure logic, free of DB and UI; covered by EngineTests.
 import Foundation
 
-// MARK: dates: local calendar dates as "YYYY-MM-DD" strings, weeks start on Monday
-
+/// Local "YYYY-MM-DD" strings; weeks start on Monday.
 enum Dates {
     static let cal = Calendar(identifier: .gregorian)
 
@@ -36,7 +34,14 @@ enum Dates {
     }
 }
 
-// MARK: streak
+extension Array {
+    subscript(safe i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
+
+    func uniqued(by key: (Element) -> some Hashable) -> [Element] {
+        var seen = Set<AnyHashable>()
+        return filter { seen.insert(key($0)).inserted }
+    }
+}
 
 struct StreakState: Equatable {
     struct Day: Equatable { let date: String; let seconds: Int; let qualifies: Bool }
@@ -100,8 +105,6 @@ enum Streak {
     }
 }
 
-// MARK: xp
-
 enum Outcome: String, CaseIterable {
     case solved, hinted, assisted
     var rank: Int { [.solved: 3, .hinted: 2, .assisted: 1][self]! }
@@ -149,8 +152,6 @@ enum XP {
     ]
 }
 
-// MARK: srs
-
 enum SRS {
     static let intervals = [1, 3, 7, 21, 60] // days
 
@@ -164,8 +165,6 @@ enum SRS {
         return (n, Dates.add(today, intervals[n]))
     }
 }
-
-// MARK: hints
 
 struct Unlocks: Equatable {
     var hintsAvailable: Int
@@ -187,8 +186,6 @@ enum Hints {
             solutionAvailable: active >= solutionAt, solutionAt: solutionAt)
     }
 }
-
-// MARK: reminders (Reminders.swift supplies the clock and settings)
 
 enum ReminderTiming {
     static let minGap: TimeInterval = 20 * 60

@@ -1,41 +1,62 @@
-// Real-world reward path (unlocked by finishing parts of the course) and tiered trophies.
 import SwiftUI
 
+/// What you get for a milestone: one of the presets, or a custom item (which always uses the "custom" illustration).
+struct RewardItem: Codable, Equatable, Hashable {
+    var title: String
+    var note = ""
+    var icon = "custom"
+
+    static let presets = [
+        RewardItem(title: "Coffee", note: "A quick first win", icon: "coffee"),
+        RewardItem(title: "A cappuccino", note: "Sit down and enjoy it", icon: "coffee-cappuccino"),
+        RewardItem(title: "An iced coffee", note: "Something cold and sweet", icon: "coffee-iced"),
+        RewardItem(title: "An espresso", note: "Small and strong", icon: "coffee-espresso"),
+        RewardItem(title: "Coffee to go", note: "Take a walk with it", icon: "coffee-togo"),
+        RewardItem(title: "A nice meal", note: "Somewhere you've wanted to try", icon: "meal"),
+        RewardItem(title: "Something to wear", note: "One you actually like", icon: "shirt"),
+        RewardItem(title: "Movie night", note: "Big screen, snacks included", icon: "movie"),
+        RewardItem(title: "New shoes", note: "For the second half of the climb", icon: "shoes"),
+        RewardItem(title: "A book", note: "Any book, not a DSA one", icon: "book"),
+        RewardItem(title: "Headphones", note: "Or a game, your call", icon: "headphones"),
+        RewardItem(title: "The big one", note: "Something you really want. Make it yours.", icon: "gift"),
+    ]
+
+    static func preset(_ icon: String) -> RewardItem { presets.first { $0.icon == icon }! }
+}
+
+/// A point on the path: fixed by the course; what it rewards is the user's choice (`item`).
 struct RewardDef {
-    let id, label, title, note, icon: String
+    let id, label: String
     let size: Size
     var topics: [String] = []
     var modules: [String] = []
     var boss: String?
+    let item: RewardItem
     enum Size { case small, medium, big }
 
     static let path: [RewardDef] = [
-        RewardDef(id: "coffee-1", label: "Your first two topics", title: "Coffee", note: "A quick first win", icon: "coffee",
-                  size: .small, topics: ["python-for-dsa", "complexity-analysis"]),
-        RewardDef(id: "coffee-2", label: "Foundations", title: "Coffee", note: "", icon: "coffee-cappuccino", size: .small, modules: ["foundations"]),
-        RewardDef(id: "coffee-3", label: "Arrays & Strings", title: "Coffee", note: "", icon: "coffee-iced", size: .small, modules: ["arrays-strings"]),
-        RewardDef(id: "coffee-4", label: "Hashing", title: "Coffee", note: "", icon: "coffee-espresso", size: .small, modules: ["hashing"]),
-        RewardDef(id: "meal", label: "Two Pointers & Windows", title: "A nice meal", note: "Somewhere you've wanted to try", icon: "meal",
-                  size: .small, modules: ["two-pointers-sliding-window"]),
-        RewardDef(id: "coffee-5", label: "Sorting & Searching", title: "Coffee", note: "Binary search conquered", icon: "coffee-togo",
-                  size: .small, modules: ["sorting-searching"]),
-        RewardDef(id: "tshirt", label: "Linked Lists & Stacks", title: "A T-shirt", note: "One you actually like", icon: "shirt",
-                  size: .medium, modules: ["linked-lists", "stacks-queues"]),
-        RewardDef(id: "movie", label: "Recursion", title: "Movie night", note: "Big screen, snacks included", icon: "movie",
-                  size: .medium, modules: ["recursion-backtracking"]),
-        RewardDef(id: "shoes", label: "Trees", title: "New shoes", note: "Halfway there", icon: "shoes", size: .medium, modules: ["trees"]),
-        RewardDef(id: "book", label: "Heaps", title: "A book", note: "Any book, not a DSA one", icon: "book", size: .medium, modules: ["heaps"]),
-        RewardDef(id: "gear", label: "Graphs", title: "Headphones", note: "Or a game, your call", icon: "headphones", size: .medium, modules: ["graphs"]),
-        RewardDef(id: "grand", label: "Everything + the DP boss", title: "The big one: ₹10,000", note: "Anything you want within the budget",
-                  icon: "gift", size: .big,
+        RewardDef(id: "coffee-1", label: "Your first two topics", size: .small, topics: ["python-for-dsa", "complexity-analysis"], item: .preset("coffee")),
+        RewardDef(id: "coffee-2", label: "Foundations", size: .small, modules: ["foundations"], item: .preset("coffee-cappuccino")),
+        RewardDef(id: "coffee-3", label: "Arrays & Strings", size: .small, modules: ["arrays-strings"], item: .preset("coffee-iced")),
+        RewardDef(id: "coffee-4", label: "Hashing", size: .small, modules: ["hashing"], item: .preset("coffee-espresso")),
+        RewardDef(id: "meal", label: "Two Pointers & Windows", size: .small, modules: ["two-pointers-sliding-window"], item: .preset("meal")),
+        RewardDef(id: "coffee-5", label: "Sorting & Searching", size: .small, modules: ["sorting-searching"], item: .preset("coffee-togo")),
+        RewardDef(id: "tshirt", label: "Linked Lists & Stacks", size: .medium, modules: ["linked-lists", "stacks-queues"], item: .preset("shirt")),
+        RewardDef(id: "movie", label: "Recursion", size: .medium, modules: ["recursion-backtracking"], item: .preset("movie")),
+        RewardDef(id: "shoes", label: "Trees", size: .medium, modules: ["trees"], item: .preset("shoes")),
+        RewardDef(id: "book", label: "Heaps", size: .medium, modules: ["heaps"], item: .preset("book")),
+        RewardDef(id: "gear", label: "Graphs", size: .medium, modules: ["graphs"], item: .preset("headphones")),
+        RewardDef(id: "grand", label: "Everything + the DP boss", size: .big,
                   modules: ["greedy-intervals", "dynamic-programming", "tries", "bit-manipulation", "advanced-structures"],
-                  boss: "dynamic-programming"),
+                  boss: "dynamic-programming", item: .preset("gift")),
     ]
 }
 
 struct RewardState: Identifiable {
     enum Status { case locked, unlocked, availed }
     let def: RewardDef
+    let item: RewardItem
+    var custom: Bool { item != def.item }
     let requires: [String]
     let done, total: Int
     let status: Status
@@ -66,17 +87,18 @@ extension Store {
         let views = moduleViews()
         let topicDone = Set(views.flatMap(\.topics).filter(\.status.complete).map(\.id))
         let topicsOf = { (mid: String) in views.first { $0.id == mid }?.topics.map(\.id) ?? [] }
+        let chosen = rewardItems()
         let claims = Dictionary(uniqueKeysWithValues: db.all("SELECT id, claimed_at FROM reward_claims").map { ($0.str("id")!, $0.str("claimed_at")!) })
         return RewardDef.path.map { r in
             // the finale needs the whole course, not just its listed modules
             let mods = r.size == .big ? views.map(\.id) : r.modules
             let needed = r.topics + mods.flatMap(topicsOf)
             let done = needed.filter(topicDone.contains).count
-            let bossWon = r.boss.map { db.one("SELECT 1 AS x FROM boss_runs WHERE module_id = ? AND passed = 1", $0) != nil } ?? true
+            let bossWon = r.boss.map(bossWon) ?? true
             let requires = r.topics.map { Content.topic($0)?.title ?? $0 }
-                + (r.size == .big ? ["every module"] : r.modules.map { Content.module($0).title })
-                + (r.boss.map { ["\(Content.module($0).title) boss fight"] } ?? [])
-            return RewardState(def: r, requires: requires, done: done, total: needed.count,
+                + (r.size == .big ? ["every module"] : r.modules.map { Content.module($0)?.title ?? $0 })
+                + (r.boss.map { ["\(Content.module($0)?.title ?? $0) boss fight"] } ?? [])
+            return RewardState(def: r, item: chosen[r.id] ?? r.item, requires: requires, done: done, total: needed.count,
                                status: claims[r.id] != nil ? .availed : done == needed.count && bossWon ? .unlocked : .locked,
                                availedAt: claims[r.id])
         }
@@ -89,10 +111,23 @@ extension Store {
         }
         if availed {
             _db.run("INSERT OR IGNORE INTO reward_claims (id, claimed_at) VALUES (?, ?)", id, Dates.iso())
-            toast = "Enjoy it: \(r.def.title)"
+            toast = "Enjoy it: \(r.item.title)"
         } else {
             _db.run("DELETE FROM reward_claims WHERE id = ?", id)
         }
+        changed()
+    }
+
+    /// The user's picks by milestone id; missing ones use the default.
+    func rewardItems() -> [String: RewardItem] {
+        db.one("SELECT value FROM settings WHERE key = 'rewards'")?.json("value") ?? [:]
+    }
+
+    /// `nil` goes back to the default. Claims are kept: they belong to the milestone, not the item.
+    func setReward(_ id: String, _ item: RewardItem?) {
+        var all = rewardItems()
+        all[id] = item.map { RewardItem(title: $0.title.trimmingCharacters(in: .whitespaces), note: $0.note.trimmingCharacters(in: .whitespaces), icon: $0.icon) }
+        putSetting("rewards", all)
         changed()
     }
 

@@ -1,7 +1,3 @@
-// Dev check of the real UI, no Screen Recording permission needed (an app may capture its own windows):
-//   RECURSE_SNAPSHOT=<dir> RECURSE_ROUTES="today,today@scroll,review@reveal,topic:x,problem:y,rewards:trophies"
-// For each route: <n>-<route>.png (the composited window, glass included) and <n>-<route>-toolbar.txt
-// (header items and their frames). "@reveal" presses ⌘↵ first, "@scroll" (or "@y<offset>") scrolls the page down. Quits when done.
 import AppKit
 import ScreenCaptureKit
 import SwiftUI
@@ -10,10 +6,19 @@ import SwiftUI
 enum DevSnapshots {
     static var problemTab: String?
 
+    /// Throwaway snapshot DBs skip the welcome screen, unless the "welcome" route is what's being captured.
+    static func enroll(_ store: Store) {
+        let env = ProcessInfo.processInfo.environment
+        guard env["RECURSE_SNAPSHOT"] != nil, env["RECURSE_ROUTES"]?.hasPrefix("welcome") != true, !store.enrolled else { return }
+        var s = store.settings()
+        s.name = "akdevv"
+        s.username = "akdevv"
+        store.saveSettings(s)
+    }
+
     static func run(nav: Nav, store: Store, activity: Activity) async {
         let env = ProcessInfo.processInfo.environment
         guard let dir = env["RECURSE_SNAPSHOT"] else { return }
-        // RECURSE_SIZE=1400x900: a bigger window, wide enough to show the sidebar
         if let size = env["RECURSE_SIZE"]?.split(separator: "x").compactMap({ Double($0) }), size.count == 2,
            let w = NSApp.windows.first(where: { $0.isVisible && $0.toolbar != nil }) {
             w.setContentSize(NSSize(width: size[0], height: size[1]))
@@ -23,12 +28,13 @@ enum DevSnapshots {
             }
         }
         for (i, spec) in (env["RECURSE_ROUTES"] ?? "today").split(separator: ",").enumerated() {
-            // "@y2400" scrolls to that offset; "@scroll" is @y360
             let offset = spec.firstMatch(of: /@y(\d+)/).flatMap { Double($0.output.1) } ?? (spec.contains("@scroll") ? 360 : nil)
             let scroll = offset != nil, reveal = spec.contains("@reveal")
             let parts = spec.replacing(/@y\d+/, with: "").replacingOccurrences(of: "@scroll", with: "").replacingOccurrences(of: "@reveal", with: "").replacingOccurrences(of: "@open", with: "")
                 .split(separator: ":", maxSplits: 1).map(String.init)
             switch parts[0] {
+            case "welcome": break
+            case "tour": store.tourPending = true
             case "review": nav.go(.review)
             case "course": nav.go(.course)
             case "problems": nav.go(.problems)
@@ -41,18 +47,17 @@ enum DevSnapshots {
             case "topic": nav.go(.topic(parts[1]))
             case "back": nav.back()
             case "forward": nav.forward()
-            case "swipe": // swipe:0.4 freezes a back swipe that far along
+            case "swipe":
                 NotificationCenter.default.post(name: .devSwipe, object: CGFloat(Double(parts[1]) ?? 0.5))
-            case "problem": // problem:<id>:<tab> opens it on that tab (statement, hints, tutor, solutions, submissions)
+            case "problem":
                 let bits = parts[1].split(separator: ":").map(String.init)
                 problemTab = bits.count > 1 ? bits[1] : nil
                 nav.go(.problem(bits[0]))
-            case "settings": // the ⌘, window; settings:<tab> picks its tab
+            case "settings":
                 UserDefaults.standard.set(parts.count > 1 ? parts[1] : "general", forKey: "settingsTab")
                 if let appMenu = NSApp.mainMenu?.items.first?.submenu,
                    let i = appMenu.items.firstIndex(where: { $0.keyEquivalent == "," }) { appMenu.performActionForItem(at: i) }
-            case "menubar": // <n>-menubar-item.png: the item in a mock menu bar. Its menu can't be captured: opening it
-                // tracks modally and nothing else runs until it closes
+            case "menubar":
                 let bar = HStack(spacing: 14) {
                     HStack(spacing: 4) { MenuBarLabel() }
                     Image(systemName: "wifi")
@@ -77,7 +82,7 @@ enum DevSnapshots {
             try? await Task.sleep(for: .seconds(2))
             let settings = parts[0] == "settings"
             guard let window = NSApp.windows.first(where: {
-                $0.isVisible && (settings ? $0.identifier?.rawValue.contains("Settings") == true : $0.toolbar != nil && $0.identifier?.rawValue.contains("Settings") != true)
+                $0.isVisible && (settings ? $0.identifier?.rawValue.contains("Settings") == true : $0.canBecomeMain && $0.identifier?.rawValue.contains("Settings") != true)
             }) else { continue }
             if reveal, let e = NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: .command, timestamp: 0,
                                                 windowNumber: window.windowNumber, context: nil, characters: "\r",

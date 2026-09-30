@@ -111,7 +111,7 @@ final class Reminders: NSObject, UNUserNotificationCenterDelegate {
         center?.add(UNNotificationRequest(identifier: UUID().uuidString, content: c, trigger: nil))
     }
 
-    // MARK: routes in notifications ("today", "review", "topic:<id>", "problem:<id>")
+    // Routes in notifications: "today", "review", "topic:<id>", "problem:<id>"
 
     static func encode(_ r: Route) -> String {
         switch r {
@@ -134,14 +134,13 @@ final class Reminders: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    /// Clicking a nudge opens the app where it points.
     nonisolated func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
         let route = response.notification.request.content.userInfo["route"] as? String ?? "today"
         await MainActor.run {
             NSApp.activate()
             NSApp.windows.first { $0.identifier?.rawValue == "main" || $0.title == "Recurse" }?.makeKeyAndOrderFront(nil)
             let r = Self.decode(route)
-            if case .problem = r { nav.go(.today) }
+            if r.isProblem { nav.go(.today) }
             nav.go(r)
         }
     }
@@ -150,8 +149,6 @@ final class Reminders: NSObject, UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification) async -> UNNotificationPresentationOptions {
         [.banner, .sound]
     }
-
-    // MARK: open at login
 
     static var openAtLogin: Bool {
         get { SMAppService.mainApp.status == .enabled }

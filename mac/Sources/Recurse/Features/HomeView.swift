@@ -8,19 +8,19 @@ struct HomeView: View {
     var body: some View {
         let me = store.me()
         let next = store.nextAction(store.moduleViews())
-        let secs = me.streak.todaySeconds + activity.pending
+        let secs = me.today(pending: activity.pending).secs
         let goal = Streak.dailyGoal
 
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 HStack(spacing: 16) {
-                    Avatar(size: 48)
+                    Avatar(size: 48, image: me.avatar)
                         .padding(3)
                         .overlay(Circle().strokeBorder(.white.opacity(0.14), lineWidth: 1))
                     VStack(alignment: .leading, spacing: 3) {
                         Text(Date.now.formatted(.dateTime.weekday(.wide).day().month(.wide)))
                             .font(.caption.weight(.medium)).foregroundStyle(.muted)
-                        Text("\(greeting), \(me.username)").font(.title.weight(.semibold))
+                        Text("\(greeting), \(me.name.split(separator: " ").first ?? "")").font(.title.weight(.semibold))
                     }
                 }
                 .padding(.top, 8)

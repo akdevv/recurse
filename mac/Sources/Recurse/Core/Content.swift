@@ -9,7 +9,7 @@ enum Role: String, Decodable {
     case guided, core, optional
 }
 
-struct Course: Decodable { let id, title: String; let modules: [String] }
+struct Course: Decodable { let modules: [String] }
 
 struct Module: Decodable, Identifiable, Hashable {
     let id: String
@@ -30,7 +30,7 @@ struct ProblemRef: Decodable, Hashable {
 }
 
 struct Topic: Decodable, Identifiable, Hashable {
-    let id, title, status, learn: String
+    let id, title, status: String
     let hook: String?
     let patterns: [String]
     let problems: [ProblemRef]
@@ -91,7 +91,7 @@ struct VizTrace: Decodable {
 
 struct Solution: Identifiable {
     let id, title, time, space: String
-    let reference, slow: Bool
+    let reference: Bool
     let code, notes: String
 }
 
@@ -111,20 +111,31 @@ struct Problem {
 
 @MainActor
 enum Content {
+    private static func modified(_ url: URL) -> Date? {
+        (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+    }
+
+    // Cached by mtime, so content edits still show up live.
+    private static var jsonCache: [URL: (mtime: Date?, value: Any?)] = [:]
+
     private static func json<T: Decodable>(_ url: URL) -> T? {
-        guard let data = try? Data(contentsOf: url) else { return nil }
-        do { return try JSONDecoder().decode(T.self, from: data) } catch {
-            print("bad JSON \(url.path): \(error)")
-            return nil
+        let mtime = modified(url)
+        if let hit = jsonCache[url], hit.mtime == mtime { return hit.value as? T }
+        var value: T?
+        if let data = try? Data(contentsOf: url) {
+            do { value = try JSONDecoder().decode(T.self, from: data) } catch { print("bad JSON \(url.path): \(error)") }
         }
+        jsonCache[url] = (mtime, value)
+        return value
     }
 
     private static func text(_ url: URL) -> String { (try? String(contentsOf: url, encoding: .utf8)) ?? "" }
 
-    // ponytail: JSON files are re-read on every call so content edits show up live; problems are cached by mtime
-    static func course() -> Course { json(Paths.course.appending(path: "course.json"))! }
-    static func module(_ id: String) -> Module { json(Paths.course.appending(path: "modules/\(id)/module.json"))! }
-    static func modules() -> [Module] { course().modules.map(module) }
+    static func course() -> Course { json(Paths.course.appending(path: "course.json")) ?? Course(modules: []) }
+    /// Nil for ids the course no longer has (the DB keeps old ones).
+    static func module(_ id: String) -> Module? { json(Paths.course.appending(path: "modules/\(id)/module.json")) }
+    static func modules() -> [Module] { course().modules.compactMap(module) }
+    static func patterns() -> [PatternDef] { json(Paths.course.appending(path: "patterns.json")) ?? [] }
 
     static func topicDir(_ id: String) -> URL? {
         for m in course().modules {
@@ -149,8 +160,6 @@ enum Content {
         }
         return (text(d.appending(path: "lesson.md")), viz)
     }
-
-    // MARK: problems
 
     private static let problemsDir = Paths.course.appending(path: "problems")
 
@@ -192,7 +201,7 @@ enum Content {
 
     static func problem(_ id: String) -> Problem? {
         let url = problemDir(id).appending(path: "problem.md")
-        let mtime = (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+        let mtime = modified(url) ?? .distantPast
         if let hit = parsed[id], hit.mtime == mtime { return hit.problem }
         let p = parseProblem(id, text(url))
         parsed[id] = (mtime, p)
@@ -225,7 +234,7 @@ enum Content {
                 let notes = t.range(of: "```python\n" + code, options: .backwards).map { String(t[..<$0.lowerBound]) } ?? ""
                 solutions.append(Solution(
                     id: parts[0], title: parts[1], time: parts[2], space: parts[3],
-                    reference: parts.contains("reference"), slow: parts.contains("slow"),
+                    reference: parts.contains("reference"),
                     code: code, notes: notes.trimmingCharacters(in: .whitespacesAndNewlines)))
             }
         }

@@ -35,7 +35,6 @@ struct GlassTabs: View {
     }
 }
 
-/// Segmented tabs with a Liquid Glass pill that lifts on press, follows a drag and settles on the nearest tab.
 struct Segments: View {
     @Binding var selection: String
     let options: [(id: String, title: String)]
@@ -168,7 +167,6 @@ struct TextArea: View {
     }
 }
 
-/// A plain button that hands its label the hover state (for web-style row highlights).
 struct HoverButton<Label: View>: View {
     var enabled = true
     let action: () -> Void

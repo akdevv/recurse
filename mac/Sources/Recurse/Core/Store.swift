@@ -1,21 +1,34 @@
-// App state and all reads and writes over the SQLite store.
 import Foundation
 import Observation
 
 struct Settings: Equatable {
     struct Window: Codable, Equatable { var start = "10:00", end = "23:00" }
-    var username = "akdevv"
+    var name = ""
+    var username = ""
+    var avatar: Data? // 256×256 PNG; nil = the default avatar
+
+    /// Lowercase letters, digits, "-", "_" and ".", at most 24.
+    static func clean(_ username: String) -> String {
+        String(username.lowercased().filter { $0.isASCII && ($0.isLetter || $0.isNumber || "-_.".contains($0)) }.prefix(24))
+    }
     var plannedDays = [0, 1, 2, 3, 4] // 0 = Monday
     var window = Window()
     var reminders = true
 }
 
 struct Me {
-    var username: String
+    var name, username: String
+    var avatar: Data?
     var xp: Int
     var level: Level
     var streak: StreakState
     var reviewsDue: Int
+
+    /// Today including not-yet-flushed seconds; today joins the streak the moment the goal is met.
+    func today(pending: Int) -> (secs: Int, done: Bool, streak: Int) {
+        let secs = streak.todaySeconds + pending, done = secs >= Streak.dailyGoal
+        return (secs, done, streak.dayStreak + (!streak.todayDone && done ? 1 : 0))
+    }
 }
 
 struct TopicStatus {
@@ -63,6 +76,36 @@ enum Route: Hashable {
     case topic(String)
     case boss(String)
     case problem(String)
+
+    static let pages: [Route] = [.today, .course, .review, .problems, .patterns, .stats, .rewards]
+
+    var title: String {
+        switch self {
+        case .today: "Today"
+        case .course: "Course"
+        case .review: "Review"
+        case .problems: "Problems"
+        case .patterns: "Patterns"
+        case .stats: "Stats"
+        case .rewards: "Rewards"
+        case .topic, .boss, .problem: ""
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .today: "house"
+        case .course, .topic, .boss: "map"
+        case .review: "arrow.counterclockwise"
+        case .problems: "checklist"
+        case .patterns: "square.on.circle"
+        case .stats: "chart.bar"
+        case .rewards: "gift"
+        case .problem: "chevron.left.forwardslash.chevron.right"
+        }
+    }
+
+    var isProblem: Bool { if case .problem = self { true } else { false } }
 }
 
 struct NextAction {
@@ -118,7 +161,6 @@ final class Store {
     var db: DB { _ = tick; return _db }
     var toast: String?
     var error: String?
-    /// Chests just earned; the root view shows the opening sheet for the first one.
     var chestQueue: [Int] = []
 
     init(db: DB) { _db = db }
@@ -143,32 +185,44 @@ final class Store {
         return amount
     }
 
-    // MARK: progress
-
-    var username: String { settings().username }
+    /// Set up once a name is saved (the welcome screen).
+    var enrolled: Bool { !settings().name.isEmpty }
 
     func settings() -> Settings {
         var s = Settings()
         func value<T: Decodable>(_ key: String, _: T.Type) -> T? {
-            db.one("SELECT value FROM settings WHERE key = ?", key)?.str("value").flatMap { try? JSONDecoder().decode(T.self, from: Data($0.utf8)) }
+            db.one("SELECT value FROM settings WHERE key = ?", key)?.json("value")
         }
+        if let v = value("name", String.self) { s.name = v }
         if let v = value("username", String.self) { s.username = v }
+        if let v = value("avatar", Data.self) { s.avatar = v }
         if let v = value("plannedDays", [Int].self) { s.plannedDays = v }
         if let v = value("window", Settings.Window.self) { s.window = v }
         if let v = value("reminders", Bool.self) { s.reminders = v }
         return s
     }
 
+    func putSetting(_ key: String, _ value: some Encodable) {
+        _db.run("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", key, value.jsonText)
+    }
+
     func saveSettings(_ s: Settings) {
-        func put(_ k: String, _ v: some Encodable) {
-            _db.run("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                    k, String(decoding: try! JSONEncoder().encode(v), as: UTF8.self))
-        }
-        put("username", s.username)
-        put("plannedDays", s.plannedDays.sorted())
-        put("window", s.window)
-        put("reminders", s.reminders)
+        putSetting("name", s.name)
+        putSetting("username", s.username)
+        putSetting("avatar", s.avatar)
+        putSetting("plannedDays", s.plannedDays.sorted())
+        putSetting("window", s.window)
+        putSetting("reminders", s.reminders)
         changed()
+    }
+
+    /// The how-it-works tour: shown once after the welcome screen, again from Help.
+    var tourPending: Bool {
+        get { db.one("SELECT value FROM settings WHERE key = 'tourPending'")?.json("value") ?? false }
+        set {
+            putSetting("tourPending", newValue)
+            changed()
+        }
     }
 
     func activityMap() -> [String: Int] {
@@ -187,7 +241,8 @@ final class Store {
 
     func me() -> Me {
         let xp = db.one("SELECT COALESCE(SUM(amount), 0) AS xp FROM xp_events")?.int("xp") ?? 0
-        return Me(username: username, xp: xp, level: XP.level(xp),
+        let s = settings()
+        return Me(name: s.name, username: s.username, avatar: s.avatar, xp: xp, level: XP.level(xp),
                   streak: Streak.compute(activityMap(), today: Dates.local(), bonusFreezes: bonusFreezes()),
                   reviewsDue: reviewsDue)
     }
@@ -223,7 +278,6 @@ final class Store {
                            solved: solved, required: required.count, complete: complete)
     }
 
-    /// What mastering a topic took, for its Wrapped card.
     func topicWrapped(_ t: Topic) -> TopicWrapped {
         let ids = Set(t.problems.map(\.id))
         let attempts = db.all("SELECT problem_id, outcome, active_seconds, finished_at FROM attempts").filter { ids.contains($0.str("problem_id")!) }
@@ -282,7 +336,19 @@ final class Store {
         return NextAction(kind: .browse, title: "Browse the course", context: "", route: .course)
     }
 
-    // MARK: activity
+    func exportData(to url: URL) throws { try _db.export(to: url) }
+
+    /// Where `importData` saves the data it replaces.
+    var backupsDir: URL { _db.path.deletingLastPathComponent().appending(path: "Backups") }
+
+    /// The current data is saved to `backupsDir` first, so an import can always be undone.
+    func importData(from url: URL) throws {
+        try FileManager.default.createDirectory(at: backupsDir, withIntermediateDirectories: true)
+        let stamp = Dates.iso().replacingOccurrences(of: ":", with: "-")
+        try _db.export(to: backupsDir.appending(path: "before-import-\(stamp).recurse"))
+        try _db.restore(from: url)
+        changed()
+    }
 
     func addActivity(seconds: Int, problemId: String?) {
         let s = max(0, min(120, seconds))
@@ -294,8 +360,6 @@ final class Store {
         }
         changed()
     }
-
-    // MARK: topics
 
     private func upsertTopic(_ tid: String, _ col: String, _ val: any SQLBindable) {
         _db.run("INSERT INTO topic_progress (topic_id, \(col)) VALUES (?, ?) ON CONFLICT(topic_id) DO UPDATE SET \(col) = excluded.\(col)", tid, val)
@@ -341,11 +405,8 @@ final class Store {
         _db.run("INSERT OR IGNORE INTO reviews (item_type, item_id, interval_idx, due) VALUES (?, ?, ?, ?)", type, id, r.idx, r.due)
     }
 
-    // MARK: grades
-
     func latestGrade(_ kind: String, _ ref: String) -> Grade? {
-        db.one("SELECT json FROM grades WHERE kind = ? AND ref = ? ORDER BY id DESC LIMIT 1", kind, ref)?.str("json")
-            .flatMap { try? JSONDecoder().decode(Grade.self, from: Data($0.utf8)) }
+        db.one("SELECT json FROM grades WHERE kind = ? AND ref = ? ORDER BY id DESC LIMIT 1", kind, ref)?.json("json")
     }
 
     private func rubric(_ kind: String, _ id: String) -> (question: String, keyPoints: [String])? {
@@ -364,14 +425,15 @@ final class Store {
             throw Proc.AIError(errorDescription: "AI grading is unavailable right now. Use the checklist.")
         }
         let best = _db.one("SELECT MAX(score) AS s FROM grades WHERE kind = ? AND ref = ?", kind, id)?.int("s") ?? 0
-        _db.run("INSERT INTO grades (kind, ref, ts, score, json) VALUES (?, ?, ?, ?, ?)", kind, id, Dates.iso(), g.score,
-                String(decoding: try JSONEncoder().encode(g), as: UTF8.self))
+        saveGrade(kind, id, g)
         flashXP(addXp(max(0, g.score - best) * XP.gradePerPoint, "grade", "\(kind):\(id)"))
         changed()
         return g
     }
 
-    // MARK: problems
+    func saveGrade(_ kind: String, _ ref: String, _ g: Grade) {
+        _db.run("INSERT INTO grades (kind, ref, ts, score, json) VALUES (?, ?, ?, ?, ?)", kind, ref, Dates.iso(), g.score, g.jsonText)
+    }
 
     func latestAttempt(_ pid: String) -> Attempt? {
         db.one("SELECT * FROM attempts WHERE problem_id = ? ORDER BY id DESC LIMIT 1", pid).map(Attempt.init)
@@ -381,7 +443,6 @@ final class Store {
         db.one("SELECT 1 AS x FROM attempts WHERE problem_id = ? AND outcome IS NOT NULL", pid) != nil
     }
 
-    /// A boss fight is a mock interview: no hints, solutions or tutor until explained.
     func inBoss(_ attemptId: Int) -> Bool { activeBossRun(attemptId: attemptId) != nil }
 
     /// Continue the latest attempt; `fresh` starts a new one after a finished attempt.
@@ -478,8 +539,6 @@ final class Store {
         return (r, outcome)
     }
 
-    // MARK: tutor
-
     func tutorMessages(_ attemptId: Int) -> [(role: String, text: String)] {
         db.all("SELECT role, text FROM tutor_messages WHERE attempt_id = ? ORDER BY id", attemptId).map { ($0.str("role")!, $0.str("text")!) }
     }
@@ -503,8 +562,6 @@ final class Store {
         _db.run("INSERT INTO tutor_messages (attempt_id, ts, role, text) VALUES (?, ?, ?, ?)", a.id, Dates.iso(), "tutor", reply)
         changed()
     }
-
-    // MARK: reviews
 
     func dueReviews() -> [ReviewItem] {
         db.all("SELECT * FROM reviews WHERE due <= ? ORDER BY due", Dates.local()).map { r in

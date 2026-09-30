@@ -81,7 +81,7 @@ struct PatternsView: View {
             StatCard(label: "Mastered", tint: .success, value: mastered, total: all.count)
             UpNext(p: next)
         }
-        .fixedSize(horizontal: false, vertical: true) // all three as tall as the tallest
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -108,7 +108,6 @@ private struct PatternColumns<A: View, B: View, C: View>: View {
     }
 }
 
-/// A pattern; click to see its problems and where it's taught.
 private struct PatternRow: View {
     @Environment(Nav.self) private var nav
     let p: PatternView

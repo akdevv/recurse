@@ -1,6 +1,5 @@
 import Foundation
 
-/// Today's progress for the widget. The app writes it to the shared App Group container, the widget reads it.
 /// Compiled into both (see build-app.sh), so it stays Foundation-only.
 struct WidgetSnapshot: Codable, Equatable {
     var day: String // local YYYY-MM-DD it describes

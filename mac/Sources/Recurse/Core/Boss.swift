@@ -1,4 +1,3 @@
-// Boss fights: a timed mock interview that closes each module.
 import Foundation
 
 struct BossRun: Identifiable {
@@ -44,6 +43,10 @@ extension Store {
         db.all("SELECT * FROM boss_runs WHERE module_id = ? ORDER BY id DESC LIMIT 10", moduleId).map(BossRun.init)
     }
 
+    func bossWon(_ moduleId: String) -> Bool {
+        db.one("SELECT 1 AS x FROM boss_runs WHERE module_id = ? AND passed = 1", moduleId) != nil
+    }
+
     func activeBossRun(attemptId: Int) -> BossRun? {
         db.one("SELECT * FROM boss_runs WHERE attempt_id = ? AND finished_at IS NULL", attemptId).map(BossRun.init)
     }
@@ -51,22 +54,21 @@ extension Store {
     /// The module's playable core/guided problems: the unsolved ones, or all once every one is solved.
     func bossCandidates(_ moduleId: String) -> [String] {
         let statuses = problemStatuses()
-        var seen = Set<String>()
-        let ids = Content.module(moduleId).topics.flatMap { Content.topic($0)?.problems ?? [] }
+        let ids = (Content.module(moduleId)?.topics ?? []).flatMap { Content.topic($0)?.problems ?? [] }
             .filter { $0.role != .optional && Content.hasProblem($0.id) }.map(\.id)
-            .filter { seen.insert($0).inserted }
+            .uniqued { $0 }
         let fresh = ids.filter { !Store.isSolved(statuses[$0]) }
         return fresh.isEmpty ? ids : fresh
     }
 
     /// Starts a run on a random candidate (abandoning any open one) and returns its problem id.
     func startBoss(_ moduleId: String) -> String? {
-        guard let pid = bossCandidates(moduleId).randomElement() else { return nil }
+        guard let m = Content.module(moduleId), let pid = bossCandidates(moduleId).randomElement() else { return nil }
         let now = Dates.iso()
         _db.run("UPDATE boss_runs SET finished_at = ?, passed = 0 WHERE module_id = ? AND finished_at IS NULL", now, moduleId)
         let aid = _db.run("INSERT INTO attempts (problem_id, started_at) VALUES (?, ?)", pid, now)
         _db.run("INSERT INTO boss_runs (module_id, problem_id, attempt_id, started_at, limit_s) VALUES (?, ?, ?, ?, ?)",
-                moduleId, pid, aid, now, Content.module(moduleId).boss.timeLimitMin * 60)
+                moduleId, pid, aid, now, m.boss.timeLimitMin * 60)
         changed()
         return pid
     }
@@ -94,10 +96,9 @@ extension Store {
         }
         let inTime = solvedIn <= r.limitS
         let passed = inTime && grade.score >= Store.bossPassScore
-        let firstWin = passed && _db.one("SELECT 1 AS x FROM boss_runs WHERE module_id = ? AND passed = 1", r.moduleId) == nil
+        let firstWin = passed && !bossWon(r.moduleId)
         _db.run("UPDATE boss_runs SET finished_at = ?, score = ?, passed = ? WHERE id = ?", Dates.iso(), grade.score, passed, id)
-        _db.run("INSERT INTO grades (kind, ref, ts, score, json) VALUES ('boss', ?, ?, ?, ?)", r.moduleId, Dates.iso(), grade.score,
-                String(decoding: try JSONEncoder().encode(grade), as: UTF8.self))
+        saveGrade("boss", r.moduleId, grade)
         let xp = firstWin ? addXp(Store.bossXP, "boss", r.moduleId) : 0
         flashXP(xp)
         // one chest per module per day, so re-running a boss can't farm them

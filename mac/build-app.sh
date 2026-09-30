@@ -7,6 +7,11 @@ APP=build/Recurse.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$(swift build -c release --show-bin-path)/Recurse" "$APP/Contents/MacOS/"
+VERSION=$(cat VERSION)
+BUILD=$(git rev-list --count HEAD)
+
+# the course and the judge, for Macs without this checkout (committed files only)
+git -C .. ls-files courses/dsa scripts/pyjudge.py | rsync -a --files-from=- .. "$APP/Contents/Resources/"
 
 # icon: the Liquid Glass render of the Recurse icon
 ICON=build/AppIcon.iconset
@@ -30,8 +35,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleExecutable</key><string>Recurse</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>0.1</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$BUILD</string>
   <key>LSMinimumSystemVersion</key><string>26.0</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSAccentColorName</key><string>AccentColor</string>
@@ -55,8 +60,8 @@ if [ -n "$IDENTITY" ]; then
   <key>CFBundleIdentifier</key><string>dev.akdevv.recurse.widget</string>
   <key>CFBundleExecutable</key><string>RecurseWidget</string>
   <key>CFBundlePackageType</key><string>XPC!</string>
-  <key>CFBundleShortVersionString</key><string>0.1</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleShortVersionString</key><string>$VERSION</string>
+  <key>CFBundleVersion</key><string>$BUILD</string>
   <key>LSMinimumSystemVersion</key><string>26.0</string>
   <key>NSExtension</key><dict><key>NSExtensionPointIdentifier</key><string>com.apple.widgetkit-extension</string></dict>
 </dict></plist>

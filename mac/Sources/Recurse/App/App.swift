@@ -19,6 +19,7 @@ struct RecurseApp: App {
         _nav = State(initialValue: nav)
         let reminders = Reminders(store: store, activity: activity, nav: nav)
         _reminders = State(initialValue: reminders)
+        DevSnapshots.enroll(store)
         reminders.schedule()
         store.publishWidget()
     }
@@ -36,6 +37,8 @@ struct RecurseApp: App {
                 .containerBackground(.canvas, for: .window)
         }
         .commands {
+            CommandGroup(after: .appInfo) { CheckForUpdates() }
+            CommandGroup(replacing: .help) { Button("How Recurse Works") { store.tourPending = true } }
             CommandMenu("Go") {
                 Button("Search…") { nav.searching = true }.keyboardShortcut("k")
                 Divider()
@@ -64,6 +67,16 @@ struct RecurseApp: App {
     }
 }
 
+private struct CheckForUpdates: View {
+    @Environment(\.openSettings) private var openSettings
+    var body: some View {
+        Button("Check for Updates…") {
+            UserDefaults.standard.set("updates", forKey: "settingsTab")
+            openSettings()
+        }
+    }
+}
+
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         // a bare SPM executable starts as a background process; make it a real app with a Dock icon
@@ -86,8 +99,6 @@ final class Nav {
 
     var current: Route? { path.last ?? selection }
 
-    /// Browser-style history: every move is recorded, so Back (⌘[, the header button, a two-finger swipe right)
-    /// retraces your steps across pages, not just out of a problem.
     struct Place: Hashable { let selection: Route?, path: [Route] }
     private var backStack: [Place] = []
     private var forwardStack: [Place] = []
@@ -95,7 +106,6 @@ final class Nav {
     var canGoForward: Bool { !forwardStack.isEmpty }
     private var place: Place { Place(selection: selection, path: path) }
 
-    /// What each page in the history looked like when you left it, for the swipe (see `SwipeBack`).
     @ObservationIgnored private var shots: [Place: PageShot] = [:]
     var backShot: PageShot? { backStack.last.flatMap { shots[$0] } }
     var forwardShot: PageShot? { forwardStack.last.flatMap { shots[$0] } }
@@ -103,7 +113,7 @@ final class Nav {
     /// Top-level places select a sidebar row; problems push on top of wherever you are.
     func go(_ r: Route) {
         let before = place, shot = PageCamera.shared.latest
-        if case .problem = r { path.append(r) } else {
+        if r.isProblem { path.append(r) } else {
             selection = r
             path = []
         }
@@ -148,33 +158,40 @@ struct RootView: View {
     @State private var columns = NavigationSplitViewVisibility.automatic
 
     var body: some View {
+        Group {
+            if !store.enrolled { WelcomeView() }
+            else if store.tourPending { TourView().transition(.opacity) }
+            else { main.transition(.opacity) }
+        }
+        .animation(.easeInOut(duration: 0.5), value: store.tourPending)
+        .task { await DevSnapshots.run(nav: nav, store: store, activity: activity) }
+    }
+
+    private var main: some View {
         @Bindable var nav = nav
-        NavigationSplitView(columnVisibility: $columns) {
+        return NavigationSplitView(columnVisibility: $columns) {
             Sidebar()
                 .navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 340)
         } detail: {
             NavigationStack(path: $nav.path) {
-                page(nav.selection ?? .today).pageChrome(workspace: isProblem(nav.selection))
-                    .navigationDestination(for: Route.self) { page($0).pageChrome(workspace: isProblem($0)) }
+                page(nav.selection ?? .today).pageChrome(workspace: nav.selection?.isProblem == true)
+                    .navigationDestination(for: Route.self) { page($0).pageChrome(workspace: $0.isProblem) }
             }
             .background { PageFrame().ignoresSafeArea(edges: .top) } // not .leading: the sidebar floats over that inset and stays put in a swipe
             .background(alignment: .top) {
-                if let tint = glow(nav.current ?? .today) {
-                    Backdrop(tint: tint).frame(height: 380).ignoresSafeArea().backgroundExtensionEffect()
-                        .animation(.easeInOut(duration: 0.4), value: tint)
+                if let family = glow(nav.current ?? .today) {
+                    Backdrop(family: family).frame(height: 620).ignoresSafeArea().backgroundExtensionEffect()
                 }
             }
         }
         .onChange(of: nav.current, initial: true) { old, r in
             activity.route(r)
             PageCamera.shared.pageChanged()
-            // problems get the whole window; the sidebar comes back when you leave
-            let isProblem = { (r: Route?) in if case .problem = r { true } else { false } }
-            if isProblem(r) != isProblem(old) { withAnimation { columns = isProblem(r) ? .detailOnly : .automatic } }
+            let problem = r?.isProblem == true
+            if problem != (old?.isProblem == true) { withAnimation { columns = problem ? .detailOnly : .automatic } }
         }
         .overlay(alignment: .top) { Toast() }
         .overlay { SwipeBack() }
-        .task { await DevSnapshots.run(nav: nav, store: store, activity: activity) }
         .sheet(item: Binding(get: { store.chestQueue.first.map(SheetID.init) }, set: { if $0 == nil, !store.chestQueue.isEmpty { store.chestQueue.removeFirst() } })) {
             ChestSheet(id: $0.id)
         }
@@ -183,16 +200,14 @@ struct RootView: View {
         } message: { Text(store.error ?? "") }
     }
 
-    private func isProblem(_ r: Route?) -> Bool { if case .problem = r { true } else { false } }
-
-    private func glow(_ r: Route) -> Color? {
+    private func glow(_ r: Route) -> GradientFamily? {
         switch r {
-        case .today, .course: .brand
-        case .review: .success
-        case .stats: Color(hex: 0x7aa2f7)
-        case .rewards: .warning
-        case .boss(let mid): store.bossRuns(mid).contains { $0.passed == true } ? .success : .warning
-        case .topic(let id): Content.topic(id).map { store.topicStatus($0, store.problemStatuses()).complete } == true ? .success : .brand
+        case .today, .course: .ocean
+        case .review: .meadow
+        case .stats: .cobalt
+        case .rewards: .gold
+        case .boss(let mid): store.bossRuns(mid).contains { $0.passed == true } ? .meadow : .gold
+        case .topic(let id): Content.topic(id).map { store.topicStatus($0, store.problemStatuses()).complete } == true ? .meadow : .ocean
         case .problem, .problems, .patterns: nil
         }
     }

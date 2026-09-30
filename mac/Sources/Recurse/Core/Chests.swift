@@ -1,4 +1,4 @@
-// Mystery chests, earned by boss wins and clean first solves. Rewards are stored in the web app's JSON shape.
+// Rewards are stored in the web app's JSON shape.
 import SwiftUI
 
 enum ChestReward: Codable, Equatable {
@@ -80,7 +80,7 @@ struct Collectible: Identifiable {
 
 struct ChestRow: Identifiable {
     let id: Int
-    let ts, source, ref: String
+    let ts, source: String
     let openedAt: String?
     let reward: ChestReward?
 }
@@ -91,7 +91,7 @@ extension Store {
     @discardableResult
     func earnChest(_ source: String, _ ref: String) -> Int {
         let id = _db.run("INSERT INTO chests (ts, source, ref) VALUES (?, ?, ?)", Dates.iso(), source, ref)
-        chestQueue.append(id) // pops the opening sheet wherever you are
+        chestQueue.append(id)
         return id
     }
 
@@ -101,9 +101,9 @@ extension Store {
 
     func chests() -> [ChestRow] {
         db.all("SELECT * FROM chests ORDER BY id DESC").map {
-            ChestRow(id: $0.int("id")!, ts: $0.str("ts")!, source: $0.str("source")!, ref: $0.str("ref")!,
+            ChestRow(id: $0.int("id")!, ts: $0.str("ts")!, source: $0.str("source")!,
                      openedAt: $0.str("opened_at"),
-                     reward: $0.str("reward").flatMap { try? JSONDecoder().decode(ChestReward.self, from: Data($0.utf8)) })
+                     reward: $0.json("reward"))
         }
     }
 
@@ -131,8 +131,7 @@ extension Store {
         guard let c = chests().first(where: { $0.id == id }) else { return nil }
         if let r = c.reward { return r }
         let reward = roll(c.source)
-        _db.run("UPDATE chests SET opened_at = ?, reward = ? WHERE id = ?", Dates.iso(),
-                String(decoding: try! JSONEncoder().encode(reward), as: UTF8.self), id)
+        _db.run("UPDATE chests SET opened_at = ?, reward = ? WHERE id = ?", Dates.iso(), reward.jsonText, id)
         if case .xp(let n) = reward { addXp(n, "chest", String(id)) }
         changed()
         return reward

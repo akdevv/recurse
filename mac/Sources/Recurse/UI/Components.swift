@@ -59,7 +59,6 @@ extension View {
             .surface()
     }
 
-    /// The solid card look used across the app: surface fill, hairline border, 14pt continuous corners.
     /// `clip` for cards whose rows or hover fills run edge to edge.
     @ViewBuilder
     func surface(clip: Bool = false, border: Color = .hairline) -> some View {
@@ -71,18 +70,6 @@ extension View {
         }
     }
 
-}
-
-struct Backdrop: View {
-    let tint: Color
-    var body: some View {
-        MeshGradient(width: 3, height: 2, points: [[0, 0], [0.5, 0], [1, 0], [0, 1], [0.6, 1], [1, 1]], colors: [
-            tint.opacity(0.22), tint.opacity(0.1), Color(hex: 0x7aa2f7).opacity(0.1),
-            .clear, .clear, .clear,
-        ])
-        .mask(LinearGradient(colors: [.black, .black.opacity(0)], startPoint: .top, endPoint: .bottom))
-        .allowsHitTesting(false)
-    }
 }
 
 struct SectionHeader: View {
@@ -146,10 +133,6 @@ struct ProblemRow: View {
             .background(hover ? Color.hover : .clear, in: .rect(cornerRadius: 7, style: .continuous))
         }
     }
-}
-
-extension Array {
-    subscript(safe i: Int) -> Element? { indices.contains(i) ? self[i] : nil }
 }
 
 func fmtClock(_ s: Int) -> String {

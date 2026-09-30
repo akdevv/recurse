@@ -24,7 +24,15 @@ struct BossView: View {
     @State private var err = ""
 
     var body: some View {
-        let m = Content.module(moduleId)
+        if let m = Content.module(moduleId) {
+            page(m)
+        } else {
+            ContentUnavailableView("Module not found", systemImage: "questionmark.folder")
+        }
+    }
+
+    @ViewBuilder
+    private func page(_ m: Module) -> some View {
         let runs = store.bossRuns(moduleId)
         let active = runs.first { !$0.finished }
         let beaten = runs.contains { $0.passed == true }
@@ -199,12 +207,7 @@ private struct ResultCard: View {
             VStack(alignment: .leading, spacing: 10) {
                 Text("Interviewer's notes").font(.headline)
                 Text(r.grade.feedback).foregroundStyle(.primary.opacity(0.85)).fixedSize(horizontal: false, vertical: true)
-                if !r.grade.followUp.isEmpty {
-                    Text("\(Text("Follow-up  ").foregroundStyle(.muted).fontWeight(.medium))\(Text(r.grade.followUp))")
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.leading, 10)
-                        .overlay(alignment: .leading) { Capsule().fill(.hairline).frame(width: 2) }
-                }
+                FollowUp(text: r.grade.followUp)
             }
             .frame(maxWidth: .infinity, alignment: .leading).padding(20)
             Divider()

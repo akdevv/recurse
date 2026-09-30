@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// Python editor: NSTextView with highlighting, 4-space tabs and auto-indent.
 struct CodeEditor: NSViewRepresentable {
     @Binding var text: String
 
@@ -114,7 +113,6 @@ struct CodeEditor: NSViewRepresentable {
     }
 }
 
-/// Gutter with line numbers.
 final class LineNumbers: NSRulerView {
     private let font = NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
 
@@ -139,7 +137,6 @@ final class LineNumbers: NSRulerView {
         let cursor = ns.substring(to: min(tv.selectedRange().location, ns.length)).reduce(1) { $1 == "\n" ? $0 + 1 : $0 }
         let draw = { (n: Int, fragmentY: CGFloat, height: CGFloat) in
             let y = self.convert(NSPoint(x: 0, y: fragmentY + tv.textContainerOrigin.y), from: tv).y
-            // the cursor's line number stands out, like Xcode
             let color = n == cursor ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor.withAlphaComponent(0.4)
             let s = NSAttributedString(string: "\(n)", attributes: [.font: self.font, .foregroundColor: color])
             s.draw(at: NSPoint(x: self.ruleThickness - s.size().width - 10, y: y + (height - s.size().height) / 2 - 1.5))

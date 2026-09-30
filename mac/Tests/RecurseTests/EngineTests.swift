@@ -173,7 +173,7 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     #expect(store.bossCandidates(mid).contains(pid))
     let a = try #require(store.latestAttempt(pid))
     let run = try #require(store.activeBossRun(attemptId: a.id))
-    #expect(run.limitS == Content.module(mid).boss.timeLimitMin * 60)
+    #expect(run.limitS == Content.module(mid)!.boss.timeLimitMin * 60)
     // a mock interview: nothing unlocks, however long you work
     store.addActivity(seconds: 120, problemId: pid)
     #expect(store.unlocks(store.latestAttempt(pid), hintCount: 2) == .none)
@@ -287,7 +287,7 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     var s = store.settings()
     s.username = "ak"; s.plannedDays = [4, 0]; s.reminders = false
     store.saveSettings(s)
-    #expect(store.settings().plannedDays == [0, 4] && store.username == "ak" && !store.settings().reminders)
+    #expect(store.settings().plannedDays == [0, 4] && store.settings().username == "ak" && !store.settings().reminders)
     #expect(store._db.one("SELECT value FROM settings WHERE key = 'plannedDays'")?.str("value") == "[0,4]")
 }
 
@@ -365,4 +365,60 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     #expect(nav.current == .topic("python-for-dsa"))
     nav.back(); nav.back(); nav.back()
     #expect(nav.current == .today && !nav.canGoBack)
+}
+
+@MainActor @Test func enrollAndBackupRoundTrip() throws {
+    let dir = FileManager.default.temporaryDirectory.appending(path: "recurse-backup-\(UUID())")
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let a = Store(db: try DB(path: dir.appending(path: "a.db")))
+    #expect(!a.enrolled)
+    var s = a.settings()
+    s.name = "Ada Lovelace"; s.username = Settings.clean("Ada L!"); s.avatar = Data([1, 2, 3])
+    a.saveSettings(s)
+    #expect(a.enrolled && a.settings().username == "adal")
+    a.addXp(40, "test")
+    let file = dir.appending(path: "backup.recurse")
+    try a.exportData(to: file)
+
+    let b = Store(db: try DB(path: dir.appending(path: "b.db")))
+    b.addXp(5, "test")
+    try b.importData(from: file)
+    #expect(b.settings() == a.settings() && b.me().xp == 40)
+    // what it replaced was kept, and restores the old state
+    let saved = try #require(try FileManager.default.contentsOfDirectory(at: b.backupsDir, includingPropertiesForKeys: nil).first)
+    try b.importData(from: saved)
+    #expect(b.me().xp == 5 && !b.enrolled)
+
+    let junk = dir.appending(path: "junk.recurse")
+    try Data("not a database".utf8).write(to: junk)
+    #expect(throws: (any Error).self) { try b.importData(from: junk) }
+    #expect(b.me().xp == 5)
+}
+
+@Test func versionOrder() {
+    #expect(Updates.isNewer("0.10.0", than: "0.9.2"))
+    #expect(Updates.isNewer("1.0", than: "0.9.9"))
+    #expect(!Updates.isNewer("0.2.0", than: "0.2"))
+    #expect(!Updates.isNewer("0.1.9", than: "0.2.0"))
+}
+
+@MainActor @Test func customRewards() throws {
+    let store = try tempStore()
+    let item = { (id: String) in store.rewardPath().first { $0.id == id }! }
+    #expect(item("grand").item == RewardDef.path.last!.item && !item("grand").custom)
+    store.setReward("grand", RewardItem(title: "  A trip to the mountains ", note: "Book it the day it unlocks"))
+    #expect(item("grand").item == RewardItem(title: "A trip to the mountains", note: "Book it the day it unlocks", icon: "custom"))
+    store.setReward("coffee-1", .preset("book"))
+    #expect(item("coffee-1").item.icon == "book" && item("coffee-1").custom)
+    try complete(store, "python-for-dsa")
+    try complete(store, "complexity-analysis")
+    store.setAvailed("coffee-1", true)
+    store.setReward("coffee-1", nil) // back to the default; the claim stays with the milestone
+    #expect(item("coffee-1").item == RewardDef.path[0].item && item("coffee-1").status == .availed)
+    let file = FileManager.default.temporaryDirectory.appending(path: "rewards-\(UUID()).recurse")
+    try store.exportData(to: file)
+    let other = try tempStore()
+    try other.importData(from: file)
+    #expect(other.rewardPath().first { $0.id == "grand" }!.item.title == "A trip to the mountains")
+    #expect(RewardItem.presets.allSatisfy { Art.image($0.icon) != nil } && Art.image("custom") != nil)
 }

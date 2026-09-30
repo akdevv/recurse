@@ -1,7 +1,6 @@
 import AppKit
 import SwiftUI
 
-/// The status item next to Control Center: today's ring, minutes and day streak, like the battery's glyph and percentage.
 struct MenuBarLabel: View {
     @Environment(Store.self) private var store
     @Environment(Activity.self) private var activity
@@ -45,8 +44,6 @@ struct MenuBarLabel: View {
     }
 }
 
-/// What the status item opens: a plain system menu. Where today stands, the next step in the course, due reviews,
-/// and the usual app items.
 struct MenuBarMenu: View {
     @Environment(Store.self) private var store
     @Environment(Activity.self) private var activity

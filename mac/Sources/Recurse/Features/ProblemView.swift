@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ProblemView: View {
     @Environment(Store.self) private var store
-    @Environment(Activity.self) private var activity
     @Environment(Nav.self) private var nav
     let pid: String
 
@@ -122,7 +121,6 @@ struct ProblemView: View {
     }
 }
 
-/// Strip above the editor: the file, the language and a reset to the starter code.
 private struct EditorBar: View {
     let starter: String
     @Binding var code: String
@@ -161,8 +159,6 @@ private struct AttemptClock: View {
             .help("Active time on this attempt")
     }
 }
-
-// MARK: left pane
 
 private struct DescriptionPane: View {
     @Environment(Store.self) private var store
@@ -354,7 +350,7 @@ private struct SubmissionsTab: View {
         } else {
             VStack(spacing: 0) {
                 ForEach(subs) { s in
-                    let ok = s.verdict == "Accepted" || s.verdict == "Ran"
+                    let ok = JudgeResult.passes(s.verdict)
                     HStack(spacing: 10) {
                         Image(systemName: ok ? "checkmark.circle.fill" : "xmark.circle.fill").foregroundStyle(ok ? .success : .danger)
                         Text(s.verdict).fontWeight(.medium).foregroundStyle(ok ? .success : .danger)
@@ -403,7 +399,6 @@ private struct TutorTab: View {
                 }
                 if open {
                     if msgs.isEmpty && draft.isEmpty && !busy {
-                        // conversation starters: one row when they fit, stacked when the pane is narrow
                         ViewThatFits {
                             HStack(spacing: 6) { starters }
                             VStack(alignment: .leading, spacing: 6) { starters }
@@ -543,8 +538,6 @@ private struct TutorBubble: View {
     }
 }
 
-// MARK: console
-
 private struct ConsolePane: View {
     @Environment(Store.self) private var store
     let p: Problem
@@ -612,14 +605,11 @@ private struct Results: View {
     let params: [String]
     @State private var sel = 0
 
-    private static let pass: Set<String> = ["Accepted", "Ran"]
-
     var body: some View {
-        let ok = res.verdict == "Accepted"
         let r = res.results[safe: min(sel, res.results.count - 1)]
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(res.verdict).font(.title3.weight(.semibold)).foregroundStyle(ok || res.verdict == "Ran" ? .success : .danger)
+                Text(res.verdict).font(.title3.weight(.semibold)).foregroundStyle(JudgeResult.passes(res.verdict) ? .success : .danger)
                 Text("\(res.passed) / \(res.total) tests passed" + (kind == "submit" && res.slowestMs != nil ? " · slowest \(Int(res.slowestMs!)) ms" : ""))
                     .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
@@ -636,7 +626,7 @@ private struct Results: View {
                             let c = res.results[i]
                             Button { sel = i } label: {
                                 HStack(spacing: 5) {
-                                    Circle().fill(Self.pass.contains(c.verdict) ? Color.success : .danger).frame(width: 6, height: 6)
+                                    Circle().fill(JudgeResult.passes(c.verdict) ? Color.success : .danger).frame(width: 6, height: 6)
                                     Text(c.kind == "custom" ? "Custom" : "Case \(i + 1)")
                                 }
                                 .font(.caption.weight(.medium))
@@ -648,7 +638,7 @@ private struct Results: View {
                         }
                     }
                 }
-                if !Self.pass.contains(r.verdict) {
+                if !JudgeResult.passes(r.verdict) {
                     Text("\(r.verdict) · \(r.kind) test · \(Int(r.ms)) ms").font(.caption.weight(.medium)).foregroundStyle(.danger)
                 }
                 Field(label: "Input") {
@@ -658,7 +648,7 @@ private struct Results: View {
                         }
                     }
                 }
-                if let got = r.got { Field(label: "Output") { Text(got).foregroundStyle(Self.pass.contains(r.verdict) ? .primary : Color.danger) } }
+                if let got = r.got { Field(label: "Output") { Text(got).foregroundStyle(JudgeResult.passes(r.verdict) ? .primary : Color.danger) } }
                 if let exp = r.expected { Field(label: "Expected") { Text(exp).foregroundStyle(.success) } }
                 if !r.stdout.isEmpty { Field(label: "Stdout") { Text(r.stdout) } }
                 if let e = r.error { ErrorBox(text: e) }

@@ -94,7 +94,6 @@ struct VizView: View {
     }
 }
 
-/// The drawing for one step (separate from the controls so it can be rendered on its own).
 struct VizStage: View {
     let view: String
     let step: JSON
@@ -133,8 +132,6 @@ private struct DotGrid: View {
         }
     }
 }
-
-// MARK: pieces
 
 private let mono = Font.system(size: 13, design: .monospaced)
 

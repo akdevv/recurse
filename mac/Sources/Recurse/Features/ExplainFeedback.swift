@@ -84,17 +84,24 @@ private struct GradeSummary: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text(label).font(.headline)
                 Text(g.feedback).font(.callout).foregroundStyle(.primary.opacity(0.85)).fixedSize(horizontal: false, vertical: true)
-                if !g.followUp.isEmpty {
-                    Text("\(Text("Follow-up  ").foregroundStyle(.muted).fontWeight(.medium))\(Text(g.followUp))")
-                        .font(.callout).fixedSize(horizontal: false, vertical: true)
-                        .padding(.leading, 10)
-                        .overlay(alignment: .leading) { Capsule().fill(.hairline).frame(width: 2) }
-                }
+                FollowUp(text: g.followUp).font(.callout)
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.canvas.opacity(0.45), in: .rect(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(.hairline))
+    }
+}
+
+struct FollowUp: View {
+    let text: String
+    var body: some View {
+        if !text.isEmpty {
+            Text("\(Text("Follow-up  ").foregroundStyle(.muted).fontWeight(.medium))\(Text(text))")
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.leading, 10)
+                .overlay(alignment: .leading) { Capsule().fill(.hairline).frame(width: 2) }
+        }
     }
 }

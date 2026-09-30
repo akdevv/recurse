@@ -22,7 +22,7 @@ struct StatsView: View {
                         Text("Quiz average \(s.quizAvg.map { "\(Int(($0 * 100).rounded()))%" } ?? "—")")
                     }
                 }
-                .fixedSize(horizontal: false, vertical: true) // all four as tall as the tallest
+                .fixedSize(horizontal: false, vertical: true)
 
                 ActivityPanel(days: s.days, weeks: s.weeks)
 

@@ -2,7 +2,6 @@ import Foundation
 
 struct JudgeResult: Decodable {
     struct Case: Decodable {
-        let i: Int
         let kind, verdict: String
         let ms: Double
         let stdout: String
@@ -14,6 +13,8 @@ struct JudgeResult: Decodable {
     var error: String?
     var slowestMs: Double?
     var results: [Case]
+
+    static func passes(_ verdict: String) -> Bool { verdict == "Accepted" || verdict == "Ran" }
 }
 
 struct Grade: Codable, Equatable {
@@ -77,8 +78,6 @@ enum Proc {
 
     private final class Buffer: @unchecked Sendable { var data = Data(); var flag = false }
 
-    // MARK: judge
-
     /// Per-test limits are enforced in Python; the timeout here is the hard backstop.
     static func judge(problemDir: URL, code: String, mode: String, custom: [String] = []) async -> JudgeResult {
         let req = try! JSONSerialization.data(withJSONObject: [
@@ -92,8 +91,6 @@ enum Proc {
             error: o.timedOut ? "Killed: total time limit exceeded" : String((o.err.isEmpty ? "exit \(o.status)" : o.err).suffix(2000)),
             results: [])
     }
-
-    // MARK: AI
 
     static let gradeModel = ProcessInfo.processInfo.environment["AI_MODEL"] ?? "opus"
     static let tutorModel = ProcessInfo.processInfo.environment["AI_TUTOR_MODEL"] ?? "sonnet"

@@ -1,4 +1,3 @@
-// Reward and chest illustrations as 64×64 SVG, which NSImage renders natively.
 import AppKit
 import SwiftUI
 
@@ -38,6 +37,7 @@ enum Art {
         "shoes": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="up" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f59a7c"/><stop offset="1" stop-color="#cf5f45"/></linearGradient></defs><ellipse cx="32" cy="54" rx="26" ry="3" fill="#000" opacity=".28"/><path d="M5 44.5h53c1.8 0 1.8 6.5 0 6.5H8c-2.6 0-3.7-3.6-3-6.5z" fill="#f6efe3"/><path d="M7 48h51" stroke="#d6c7ae" stroke-width="1.4"/><path d="M6.5 44.5c0-9 4-14 10-15.5l10.5-5c3 6 10 8.5 16.5 10.5 8 2.5 13 5.5 13 10z" fill="url(#up)"/><path d="M6.5 44.5c0-5 1.5-9 4-11.5 2 4.5 2 8.5 1 11.5z" fill="#a9442f"/><path d="M44 34c6 2 10.5 4.3 12 7.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".4"/><path d="M18.5 40.5c9-4.5 21-3 32 .5" fill="none" stroke="#fff7e6" stroke-width="3.2" stroke-linecap="round"/><g stroke="#fff7e6" stroke-width="1.9" stroke-linecap="round"><path d="m24.5 27.6 3.2 3.2M28.6 25.8l3.2 3.2M32.8 27.8l3.2 3.2"/></g><circle cx="14.5" cy="37" r="1.4" fill="#fff7e6" opacity=".8"/></svg>"##,
         "book": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="cov" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b04e5d"/><stop offset="1" stop-color="#7c2d3b"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f9d774"/><stop offset="1" stop-color="#d69e22"/></linearGradient></defs><ellipse cx="33" cy="58" rx="18" ry="2.6" fill="#000" opacity=".28"/><path d="M19 49h31v6.5H19z" fill="#f6efe3"/><path d="M19 51.2h31M19 53.4h31" stroke="#d8c9b0" stroke-width=".8"/><rect x="14" y="7" width="36" height="44.5" rx="3.2" fill="url(#cov)"/><rect x="14" y="7" width="7.5" height="44.5" rx="2.8" fill="#652331"/><path d="M21.5 7v44.5" stroke="#4d1924" stroke-width="1"/><rect x="26.5" y="15" width="18" height="12" rx="2" fill="none" stroke="url(#gold)" stroke-width="1.4"/><rect x="29" y="18.8" width="13" height="2.2" rx="1.1" fill="url(#gold)"/><rect x="31" y="22.4" width="9" height="1.5" rx=".75" fill="url(#gold)" opacity=".7"/><path d="M24.5 10v38" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".18"/><path d="M41 49v12l2.6-2.2 2.6 2.2V49z" fill="url(#gold)"/></svg>"##,
         "headphones": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="band" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a6076"/><stop offset="1" stop-color="#26374a"/></linearGradient><linearGradient id="cup" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#43596e"/><stop offset="1" stop-color="#1f2d3a"/></linearGradient><linearGradient id="pad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fdccb"/><stop offset="1" stop-color="#2a9d8f"/></linearGradient></defs><ellipse cx="32" cy="58" rx="22" ry="2.6" fill="#000" opacity=".28"/><path d="M12.5 38v-7a19.5 19.5 0 0 1 39 0v7" fill="none" stroke="url(#band)" stroke-width="5.5" stroke-linecap="round"/><path d="M16 29.5A16 16 0 0 1 29.5 15" fill="none" stroke="#7d95ab" stroke-width="1.6" stroke-linecap="round" opacity=".8"/><rect x="5.5" y="32.5" width="13.5" height="22" rx="6" fill="url(#cup)"/><rect x="45" y="32.5" width="13.5" height="22" rx="6" fill="url(#cup)"/><rect x="16" y="34.5" width="5.5" height="18" rx="2.75" fill="url(#pad)"/><rect x="42.5" y="34.5" width="5.5" height="18" rx="2.75" fill="url(#pad)"/><path d="M8.5 37v6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".3"/><path d="M48 37v6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".3"/><circle cx="12.2" cy="46.5" r="1.8" fill="#6fdccb" opacity=".85"/><circle cx="51.8" cy="46.5" r="1.8" fill="#6fdccb" opacity=".85"/></svg>"##,
+        "custom": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="tk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b8a4ff"/><stop offset="1" stop-color="#6a52d6"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbdc7e"/><stop offset="1" stop-color="#d69e22"/></linearGradient></defs><ellipse cx="32" cy="58.5" rx="23" ry="2.6" fill="#000" opacity=".28"/><path d="M9 9l1.2 3 3 1.2-3 1.2L9 17.4l-1.2-3-3-1.2 3-1.2zM55.5 5.5l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1zM52 20l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="#f7cf63"/><g transform="rotate(-8 32 33)"><path d="M11 18h42a4 4 0 0 1 4 4v7a4 4 0 0 0 0 8v7a4 4 0 0 1-4 4H11a4 4 0 0 1-4-4v-7a4 4 0 0 0 0-8v-7a4 4 0 0 1 4-4z" fill="url(#tk)"/><path d="M11 18h42a4 4 0 0 1 4 4v1.5H7V22a4 4 0 0 1 4-4z" fill="#fff" opacity=".25"/><path d="M42 21v26" stroke="#fff" stroke-width="1.6" stroke-dasharray="2.4 2.4" opacity=".55"/><path d="M25.0 25.5L26.9 30.3L32.1 30.7L28.1 34.0L29.4 39.1L25.0 36.3L20.6 39.1L21.9 34.0L17.9 30.7L23.1 30.3z" fill="url(#gold)" stroke="#c28a1c" stroke-width="1" stroke-linejoin="round"/><path d="M47 28h5M47 33h5M47 38h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".5"/></g></svg>"##,
         "gift": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="box" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5fd3c2"/><stop offset="1" stop-color="#23877b"/></linearGradient><linearGradient id="lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fe3d4"/><stop offset="1" stop-color="#43b7a6"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbdc7e"/><stop offset="1" stop-color="#d69e22"/></linearGradient></defs><ellipse cx="32" cy="58.5" rx="23" ry="2.6" fill="#000" opacity=".28"/><path d="M9 9l1.2 3 3 1.2-3 1.2L9 17.4l-1.2-3-3-1.2 3-1.2zM55.5 5.5l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1zM52 20l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z" fill="#f7cf63"/><rect x="10" y="29" width="44" height="28" rx="3.5" fill="url(#box)"/><rect x="7" y="21" width="50" height="10" rx="3.2" fill="url(#lid)"/><rect x="7" y="21" width="50" height="3" rx="1.5" fill="#fff" opacity=".25"/><path d="M10 31h44" stroke="#1d6f65" stroke-width="1.4" opacity=".6"/><rect x="28.8" y="21" width="6.4" height="36" fill="url(#gold)"/><path d="M32 21c-8-12-20.5-8-11 0zM32 21c8-12 20.5-8 11 0z" fill="url(#gold)" stroke="#c28a1c" stroke-width="1.1" stroke-linejoin="round"/><path d="M32 21l-6 7M32 21l6 7" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="21" r="3.4" fill="#e0a92c"/><circle cx="31" cy="20" r="1" fill="#fff" opacity=".5"/></svg>"##,
         "chest": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8743f"/><stop offset="1" stop-color="#7a4520"/></linearGradient><linearGradient id="lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d08c52"/><stop offset="1" stop-color="#b8743f"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbdc7e"/><stop offset="1" stop-color="#c9901d"/></linearGradient></defs><ellipse cx="32" cy="57.5" rx="25" ry="3" fill="#000" opacity=".3"/><rect x="8" y="30" width="48" height="25" rx="3" fill="url(#body)"/><path d="M8 30h48v4H8z" fill="#000" opacity=".2"/><path d="M10 17.5C10 12 14 9 20 9h24c6 0 10 3 10 8.5V30H10z" fill="url(#lid)"/><path d="M14 13.5c2-2 4.5-2.5 8-2.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".35" fill="none"/><g fill="url(#gold)"><rect x="8" y="28" width="48" height="4.5" rx="1.5"/><rect x="14" y="9.5" width="5" height="45.5" rx="1.2"/><rect x="45" y="9.5" width="5" height="45.5" rx="1.2"/><rect x="8" y="51" width="48" height="4" rx="1.5"/></g><rect x="26" y="26" width="12" height="13" rx="2.5" fill="url(#gold)" stroke="#a8761a" stroke-width=".8"/><circle cx="32" cy="31.2" r="2.6" fill="#3fbfae"/><circle cx="31.2" cy="30.4" r=".8" fill="#fff" opacity=".7"/><path d="M32 33.6v2.6" stroke="#6b4a12" stroke-width="1.6" stroke-linecap="round"/><g fill="#fff3c4" opacity=".9"><path d="M55 5l.9 2.2 2.2.9-2.2.9L55 11.2l-.9-2.2-2.2-.9 2.2-.9z"/><path d="M6.5 20l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/></g></svg>"##,
         "chest-boss": ##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64"><defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f4aa8"/><stop offset="1" stop-color="#3f2566"/></linearGradient><linearGradient id="lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a63c4"/><stop offset="1" stop-color="#6f4aa8"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbdc7e"/><stop offset="1" stop-color="#c9901d"/></linearGradient></defs><ellipse cx="32" cy="57.5" rx="25" ry="3" fill="#000" opacity=".3"/><rect x="8" y="30" width="48" height="25" rx="3" fill="url(#body)"/><path d="M8 30h48v4H8z" fill="#000" opacity=".2"/><path d="M10 17.5C10 12 14 9 20 9h24c6 0 10 3 10 8.5V30H10z" fill="url(#lid)"/><path d="M14 13.5c2-2 4.5-2.5 8-2.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".35" fill="none"/><g fill="url(#gold)"><rect x="8" y="28" width="48" height="4.5" rx="1.5"/><rect x="14" y="9.5" width="5" height="45.5" rx="1.2"/><rect x="45" y="9.5" width="5" height="45.5" rx="1.2"/><rect x="8" y="51" width="48" height="4" rx="1.5"/></g><rect x="26" y="26" width="12" height="13" rx="2.5" fill="url(#gold)" stroke="#a8761a" stroke-width=".8"/><circle cx="32" cy="31.2" r="2.6" fill="#e0707a"/><circle cx="31.2" cy="30.4" r=".8" fill="#fff" opacity=".7"/><path d="M32 33.6v2.6" stroke="#6b4a12" stroke-width="1.6" stroke-linecap="round"/><g fill="#fff3c4" opacity=".9"><path d="M55 5l.9 2.2 2.2.9-2.2.9L55 11.2l-.9-2.2-2.2-.9 2.2-.9z"/><path d="M6.5 20l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/></g></svg>"##,
@@ -61,7 +61,6 @@ enum Art {
     ]
 }
 
-/// Trophy medal: ribbon tails, a metal rim and face, and the badge's symbol engraved in it.
 struct Medal: View {
     enum Metal {
         case bronze, silver, gold, jade, locked
@@ -109,7 +108,6 @@ struct Medal: View {
     }
 }
 
-/// The two ribbon tails under a medal, on a 96×96 grid.
 private struct Ribbon: Shape {
     func path(in r: CGRect) -> Path {
         let s = r.width / 96
@@ -120,5 +118,87 @@ private struct Ribbon: Shape {
             p.closeSubpath()
         }
         return p
+    }
+}
+
+/// The user's photo, or the web app's default avatar drawn natively on its 36×36 grid.
+struct Avatar: View {
+    var size: CGFloat = 32
+    var image: Data?
+
+    var body: some View {
+        Group {
+            if let image, let photo = NSImage(data: image) {
+                Image(nsImage: photo).resizable().scaledToFill()
+            } else {
+                standard
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(.circle)
+        .overlay(Circle().strokeBorder(.hairline))
+    }
+
+    private var standard: some View {
+        Canvas { ctx, sz in
+            ctx.scaleBy(x: sz.width / 36, y: sz.height / 36)
+            let ink = Color(hex: 0x0b0f11), blue = Color(hex: 0x7aa2f7)
+            func about(_ deg: Double) -> CGAffineTransform {
+                CGAffineTransform(translationX: -18, y: -18).concatenating(.init(rotationAngle: deg * .pi / 180)).concatenating(.init(translationX: 18, y: 18))
+            }
+            ctx.fill(Path(CGRect(x: 0, y: 0, width: 36, height: 36)), with: .color(Color(hex: 0x0f2a27)))
+            ctx.fill(Path(ellipseIn: CGRect(x: 21, y: -3, width: 18, height: 18)), with: .color(blue.opacity(0.18)))
+            // face: scale, tilt 18° about the centre, shift down-right
+            let face = CGAffineTransform(scaleX: 0.9, y: 0.9).concatenating(about(18)).concatenating(.init(translationX: 5, y: 8))
+            ctx.fill(Path(roundedRect: CGRect(x: 0, y: 0, width: 36, height: 36), cornerRadius: 9).applying(face), with: .color(.warning))
+            // features: tilt 9°, shift down 1
+            let f = about(9).concatenating(.init(translationX: 0, y: 1))
+            for x in [12.3, 23.7] {
+                ctx.fill(Path(ellipseIn: CGRect(x: x - 1.3, y: 18.7, width: 2.6, height: 2.6)).applying(f), with: .color(blue.opacity(0.45)))
+            }
+            for x in [13.5, 20.5] {
+                ctx.fill(Path(roundedRect: CGRect(x: x, y: 15, width: 2, height: 3), cornerRadius: 1).applying(f), with: .color(ink))
+            }
+            var glasses = Path()
+            glasses.addEllipse(in: CGRect(x: 11.6, y: 13.6, width: 5.8, height: 5.8))
+            glasses.addEllipse(in: CGRect(x: 18.6, y: 13.6, width: 5.8, height: 5.8))
+            glasses.move(to: CGPoint(x: 17.4, y: 16.5))
+            glasses.addLine(to: CGPoint(x: 18.6, y: 16.5))
+            ctx.stroke(glasses.applying(f), with: .color(ink), lineWidth: 1)
+            var smile = Path()
+            smile.move(to: CGPoint(x: 14.5, y: 21.5))
+            smile.addCurve(to: CGPoint(x: 21.5, y: 21.5), control1: CGPoint(x: 16.1, y: 23.5), control2: CGPoint(x: 19.9, y: 23.5))
+            ctx.stroke(smile.applying(f), with: .color(ink), style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+        }
+    }
+}
+
+/// Choose a photo (cropped to a 256×256 square PNG) or go back to the default avatar.
+struct PhotoButtons: View {
+    @Binding var avatar: Data?
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button("Choose Photo…") { if let png = Self.pick() { avatar = png } }
+            if avatar != nil { Button("Use Default") { avatar = nil } }
+        }
+    }
+
+    static func pick() -> Data? {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.image]
+        return panel.runModal() == .OK ? panel.url.flatMap { squarePNG($0) } : nil
+    }
+
+    static func squarePNG(_ url: URL, side out: Int = 256) -> Data? {
+        guard let cg = NSImage(contentsOf: url)?.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+        let side = min(cg.width, cg.height)
+        guard let square = cg.cropping(to: CGRect(x: (cg.width - side) / 2, y: (cg.height - side) / 2, width: side, height: side)),
+              let ctx = CGContext(data: nil, width: out, height: out, bitsPerComponent: 8, bytesPerRow: 0,
+                                  space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        else { return nil }
+        ctx.interpolationQuality = .high
+        ctx.draw(square, in: CGRect(x: 0, y: 0, width: out, height: out))
+        return ctx.makeImage().flatMap { NSBitmapImageRep(cgImage: $0).representation(using: .png, properties: [:]) }
     }
 }

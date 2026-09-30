@@ -38,7 +38,7 @@ struct ProblemsView: View {
                             .pickerStyle(.inline)
                         } label: {
                             HStack(spacing: 10) {
-                                Text(module == "all" ? "All modules" : Content.module(module).title).lineLimit(1).frame(maxWidth: 200)
+                                Text(Content.module(module)?.title ?? "All modules").lineLimit(1).frame(maxWidth: 200)
                                 Image(systemName: "chevron.down").font(.caption.weight(.semibold)).foregroundStyle(.muted)
                             }
                             .padding(.horizontal, 16).frame(height: 36)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RewardsView: View {
     @Environment(Store.self) private var store
+    @Environment(\.openSettings) private var openSettings
     @AppStorage("rewardsTab") private var tab = "path"
 
     var body: some View {
@@ -26,6 +27,18 @@ struct RewardsView: View {
                         ("trophies", "Trophies \(badges.reduce(0) { $0 + $1.tier })/\(badges.reduce(0) { $0 + $1.tiers.count })"),
                         ("chests", store.chestsWaiting > 0 ? "Chests · \(store.chestsWaiting) new" : "Chests"),
                     ])
+                    Button {
+                        UserDefaults.standard.set("rewards", forKey: "settingsTab")
+                        openSettings()
+                    } label: {
+                        Label("Edit Rewards", systemImage: "pencil")
+                            .font(.callout).foregroundStyle(.primary)
+                            .padding(.horizontal, 14).frame(height: 36)
+                            .glassEffect(.regular.interactive(), in: .capsule)
+                            .contentShape(.capsule)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Choose what each milestone rewards")
                 }
                 switch tab {
                 case "trophies": TrophiesTab(badges: badges)
@@ -50,7 +63,6 @@ struct RewardsView: View {
 }
 
 private struct PathTab: View {
-    @Environment(Store.self) private var store
     let path: [RewardState]
 
     var body: some View {
@@ -113,8 +125,8 @@ private struct RewardCard: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            RewardArt(icon: x.def.icon, status: x.status).padding(.bottom, 6)
-            Text(x.def.title).font(.callout.weight(.semibold)).foregroundStyle(x.status == .locked ? .secondary : .primary).lineLimit(1)
+            RewardArt(icon: x.item.icon, status: x.status).padding(.bottom, 6)
+            Text(x.item.title).font(.callout.weight(.semibold)).foregroundStyle(x.status == .locked ? .secondary : .primary).lineLimit(1)
             Text(x.def.label).font(.caption).foregroundStyle(.muted).lineLimit(1)
             Spacer(minLength: 12)
             switch x.status {
@@ -134,8 +146,9 @@ private struct RewardCard: View {
         .padding(14)
         .frame(maxWidth: .infinity, minHeight: 180)
         .surface(border: x.status == .unlocked ? Color.warning.opacity(0.5) : .hairline)
-        .help(x.def.note)
+        .help(x.item.note)
         .onHover { hover = $0 }
+
     }
 }
 
@@ -149,10 +162,10 @@ private struct NextReward: View {
         let unlocked = path.filter { $0.status != .locked }.count
         VStack(spacing: 0) {
             HStack(spacing: 18) {
-                RewardArt(icon: next?.def.icon ?? "gift", status: .unlocked, size: 68)
+                RewardArt(icon: next?.item.icon ?? "gift", status: .unlocked, size: 68)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(next == nil ? "Every reward unlocked" : "Up next").font(.caption).foregroundStyle(.secondary)
-                    Text(next?.def.title ?? "You finished the course").font(.title2.weight(.semibold))
+                    Text(next?.item.title ?? "You finished the course").font(.title2.weight(.semibold))
                     if let next {
                         let left = next.total - next.done
                         Text("\(Text("Finish \(next.requires.joined(separator: " + ")) · "))\(Text("\(left) topic\(left == 1 ? "" : "s") to go").foregroundStyle(.primary))")
@@ -171,7 +184,7 @@ private struct NextReward: View {
                 HStack {
                     Circle().fill(.warning).frame(width: 7, height: 7).shadow(color: .warning, radius: 4)
                     let more = waiting.count > 1 ? " (+\(waiting.count - 1) more)" : ""
-                    Text("\(Text(w.def.title).fontWeight(.medium))\(Text(" is unlocked\(more). Enjoy it, then mark it as availed.").foregroundStyle(.secondary))")
+                    Text("\(Text(w.item.title).fontWeight(.medium))\(Text(" is unlocked\(more). Enjoy it, then mark it as availed.").foregroundStyle(.secondary))")
                         .font(.callout)
                     Spacer()
                     Button("Mark as availed") { store.setAvailed(w.id, true) }
@@ -198,10 +211,10 @@ private struct Finale: View {
                 Text("All of it, plus one mock interview").font(.caption).foregroundStyle(.secondary)
             }
             HStack(spacing: 20) {
-                RewardArt(icon: x.def.icon, status: x.status, size: 84)
+                RewardArt(icon: x.item.icon, status: x.status, size: 84)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(x.def.title).font(.title2.weight(.semibold))
-                    Text(x.def.note).foregroundStyle(.secondary)
+                    Text(x.item.title).font(.title2.weight(.semibold))
+                    Text(x.item.note).foregroundStyle(.secondary)
                 }
                 Spacer()
                 switch x.status {

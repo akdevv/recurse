@@ -45,12 +45,11 @@ extension Store {
         }
         let grades = db.all("SELECT kind, ref, ts, score FROM grades ORDER BY id DESC LIMIT 30").reversed().map { g in
             let kind = g.str("kind")!, ref = g.str("ref")!
-            let title = kind == "problem" ? Content.problem(ref)?.title : kind == "boss" ? Content.module(ref).title : Content.topic(ref)?.title
+            let title = kind == "problem" ? Content.problem(ref)?.title : kind == "boss" ? Content.module(ref)?.title : Content.topic(ref)?.title
             return (kind, title ?? ref, g.str("ts")!, g.int("score")!)
         }
         let modules = moduleViews().map { m in
-            var seen = Set<String>()
-            let probs = m.topics.flatMap(\.problems).filter { seen.insert($0.id).inserted }
+            let probs = m.topics.flatMap(\.problems).uniqued(by: \.id)
             return (m.module, m.topics.count, m.topics.filter(\.status.complete).count, probs.count, probs.filter { Store.isSolved($0.status) }.count)
         }
         let days = Array(activity.values)
@@ -65,7 +64,7 @@ extension Store {
     }
 
     func patterns() -> [PatternView] {
-        let catalog: [PatternDef] = (try? JSONDecoder().decode([PatternDef].self, from: Data(contentsOf: Paths.course.appending(path: "patterns.json")))) ?? []
+        let catalog = Content.patterns()
         let views = moduleViews()
         let topics = views.flatMap { m in m.topics.map { (topic: $0, module: m.module) } }
         return catalog.map { p in

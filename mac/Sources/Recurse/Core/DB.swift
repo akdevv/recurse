@@ -1,16 +1,16 @@
 import Foundation
 import SQLite3
 
-/// Repo root: courses/ (content) and scripts/pyjudge.py (the judge) live here.
 enum Paths {
-    // ponytail: #filePath points at this checkout, fine for a single-user build; RECURSE_ROOT overrides it
+    /// The checkout this was built from, so content edits show up live; a downloaded app uses the copy in its Resources.
     static let root: URL = {
         if let env = ProcessInfo.processInfo.environment["RECURSE_ROOT"] { return URL(fileURLWithPath: env) }
         var dir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
-        while dir.path != "/", !FileManager.default.fileExists(atPath: dir.appending(path: "courses").path) {
+        while dir.path != "/" {
+            if FileManager.default.fileExists(atPath: dir.appending(path: "courses/dsa/course.json").path) { return dir }
             dir.deleteLastPathComponent()
         }
-        return dir
+        return Bundle.main.resourceURL ?? dir
     }()
     static let course = root.appending(path: "courses/dsa")
     static let pyjudge = root.appending(path: "scripts/pyjudge.py")
@@ -48,6 +48,11 @@ extension Dictionary where Key == String, Value == SQL {
         if case .text(let v) = self[k] { return v }
         return nil
     }
+    func json<T: Decodable>(_ k: String) -> T? { str(k).flatMap { try? JSONDecoder().decode(T.self, from: Data($0.utf8)) } }
+}
+
+extension Encodable {
+    var jsonText: String { String(decoding: try! JSONEncoder().encode(self), as: UTF8.self) }
 }
 
 protocol SQLBindable { var sql: SQL { get } }
@@ -60,8 +65,10 @@ extension Optional: SQLBindable where Wrapped: SQLBindable { var sql: SQL { self
 @MainActor
 final class DB {
     private var handle: OpaquePointer?
+    let path: URL
 
     init(path: URL = Paths.db) throws {
+        self.path = path
         guard sqlite3_open(path.path, &handle) == SQLITE_OK else { throw DBError(message: "can't open \(path.path)") }
         try exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;")
         try exec(DB.schema)
@@ -79,6 +86,29 @@ final class DB {
             sqlite3_free(err)
             throw DBError(message: msg)
         }
+    }
+
+    /// A consistent single-file copy, safe while the app is writing.
+    func export(to url: URL) throws {
+        try? FileManager.default.removeItem(at: url)
+        try exec("VACUUM INTO '\(url.path.replacingOccurrences(of: "'", with: "''"))'")
+    }
+
+    /// Replaces everything in this database with the backup at `url`, in place.
+    func restore(from url: URL) throws {
+        var src: OpaquePointer?
+        defer { sqlite3_close(src) }
+        var stmt: OpaquePointer?
+        guard sqlite3_open_v2(url.path, &src, SQLITE_OPEN_READONLY, nil) == SQLITE_OK,
+              sqlite3_prepare_v2(src, "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'attempts'", -1, &stmt, nil) == SQLITE_OK
+        else { throw DBError(message: "That file isn't a Recurse backup.") }
+        let isBackup = sqlite3_step(stmt) == SQLITE_ROW
+        sqlite3_finalize(stmt)
+        guard isBackup else { throw DBError(message: "That file isn't a Recurse backup.") }
+        guard let b = sqlite3_backup_init(handle, "main", src, "main") else { throw DBError(message: String(cString: sqlite3_errmsg(handle))) }
+        sqlite3_backup_step(b, -1)
+        guard sqlite3_backup_finish(b) == SQLITE_OK else { throw DBError(message: String(cString: sqlite3_errmsg(handle))) }
+        try exec(DB.schema) // older backups get tables added since
     }
 
     @discardableResult
@@ -126,10 +156,8 @@ final class DB {
 }
 
 extension DB {
-    /// Progress is keyed by content slugs (topic / problem ids), so content can be reordered or extended freely.
+    /// Progress is keyed by content slugs (topic / problem / module ids), so content can be reordered or extended freely.
     static let schema = """
-        -- Progress keyed by content slugs (topic / problem ids), so content can be reordered or extended freely.
-
         CREATE TABLE IF NOT EXISTS activity (
           date    TEXT PRIMARY KEY,          -- local YYYY-MM-DD
           seconds INTEGER NOT NULL DEFAULT 0 -- active (focused + in use) seconds
@@ -202,7 +230,7 @@ extension DB {
         CREATE INDEX IF NOT EXISTS grades_ref ON grades(kind, ref);
 
         CREATE TABLE IF NOT EXISTS reward_claims (  -- real-world rewards marked as availed
-          id         TEXT PRIMARY KEY,         -- reward id from REWARD_PATH in rewards.ts
+          id         TEXT PRIMARY KEY,         -- RewardDef.id
           claimed_at TEXT NOT NULL
         );
 

@@ -1,7 +1,6 @@
 import SwiftUI
 import WidgetKit
 
-// The Recurse widget: today's minutes against the goal and the day streak (small), plus the week (medium).
 // Built into Recurse.app/Contents/PlugIns by build-app.sh; reads what the app writes (WidgetSnapshot).
 
 struct Entry: TimelineEntry {
@@ -27,7 +26,6 @@ struct Provider: TimelineProvider {
         completion(Timeline(entries: [Entry(date: now, snap: snap), Entry(date: midnight, snap: next)], policy: .after(midnight)))
     }
 
-    /// The app's latest numbers, rolled forward if they're from an earlier day.
     private func current(_ now: Date) -> WidgetSnapshot {
         let today = Self.day(now)
         guard let s = WidgetSnapshot.load() else { return WidgetSnapshot(day: today, seconds: 0, goal: 30 * 60, streak: 0, week: Array(repeating: 0, count: 7)) }
