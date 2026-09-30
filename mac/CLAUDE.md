@@ -5,9 +5,10 @@ Native SwiftUI port of the web app (SwiftPM, macOS 15+, no dependencies). Run co
 ## Run
 
 - `swift build && swift run`: debug build (opens in Xcode too: `open Package.swift`)
-- `./build-app.sh [--open]`: release `build/Recurse.app` (icon from `AppIcon.png`, ad-hoc signed)
+- `./build-app.sh [--open]`: release `build/Recurse.app` (icon from `AppIcon.png`, teal accent from `Assets.xcassets` via `actool`; with an Apple Development identity it's signed with it and gets the widget in `PlugIns/`, otherwise ad-hoc and no widget)
 - `swift test`: engine checks (mirror `web/server/engine/selfcheck.ts`), problem.md parser over every problem, judge + solve/boss/chest/reward/settings/stats flows, reminder timing (same PRNG as the web) on a temp DB (boss AI grading isn't covered), every viz step renders
-- Throwaway DB: `DB_PATH=/tmp/x.db swift run`. Screenshots without Screen Recording permission: `open -n -W --env DB_PATH=… --env RECURSE_SNAPSHOT=<dir> --env RECURSE_ROUTES="today,review,course,rewards:<path|trophies|chests>,problems,stats,patterns,boss:<module>,topic:<id>,problem:<id>" build/Recurse.app` writes one PNG per route, then quits
+- Throwaway DB: `DB_PATH=/tmp/x.db swift run`
+- Real screenshots (no Screen Recording permission needed; `DevSnapshots.swift` captures the app's own window with ScreenCaptureKit): `open -n -W --env DB_PATH=… --env RECURSE_SNAPSHOT=<dir> --env RECURSE_ROUTES="today,today@scroll,rewards:trophies,problems,stats,patterns,boss:<module>,topic:<id>,problem:<id>,settings:reminders" build/Recurse.app` writes `<n>-<route>.png` plus `<n>-<route>-toolbar.txt` (header items and frames) per route, then quits. `@scroll` (or `@y<offset>`) scrolls the page first, `@reveal` presses ⌘↵ first (e.g. Review's Show answer), `problem:<id>:tutor` opens a problem on that tab, `menubar` renders the status item in a mock menu bar (`<n>-menubar-item.png`; its menu can't be captured, it tracks modally), `swipe:0.4` freezes a back swipe that far along, `chest` shows the chest dialog and `chest@open` opens it (the run then has to be killed; the sheet blocks quitting). `--env RECURSE_SIZE=1300x860` enlarges the window and opens the sidebar. Keep screenshots for the user in `mac/screenshots/<page>/{before,after}/` (gitignored). SwiftUI trap: a `Spacer` inside a toolbar item makes it count as flexible space and it silently disappears
 - `VIZ_OUT=<dir> swift test --filter everyVizRenders`: PNG of every viz trace's middle step
 
 ## Data
@@ -19,14 +20,19 @@ Native SwiftUI port of the web app (SwiftPM, macOS 15+, no dependencies). Run co
 
 ## Layout (`Sources/Recurse`)
 
-- `Engine.swift`: pure logic, 1:1 port of `web/server/engine` (dates, streak, xp, srs, hints). Change both or neither
-- `Content.swift`: course/topic/quiz/viz loaders + the problem.md parser (keep in sync with `pyjudge.load_problem` and `web/server/content.ts`). Problems cached by mtime
-- `Store.swift`: the "server" (`web/server/{index,progress}.ts`). `@Observable`; every read goes through `db`, which touches `tick`, and every write bumps it, so views re-render after changes
-- `Proc.swift`: child processes, `scripts/pyjudge.py` and `claude -p` (same prompts/models as `web/server/ai.ts`). PATH gets `~/.local/bin` and Homebrew added since GUI apps start with a bare PATH
-- `Activity.swift`: active time: only on topic/problem/review/boss, app frontmost, system input within 90 s (or a playing viz). Flushes every 60 s
-- `Boss.swift` (runs, wall-clock countdown, AI-graded finish, +100 XP first win, one boss chest per module per day) and `Chests.swift` (earn/roll/open, collectibles; reward JSON matches the web). `Rewards.swift` (real-world reward path + claims, tiered trophies; one Rewards screen with Path / Trophies / Chests tabs). All three are `Store` extensions plus their views
-- `Browse.swift` (Problems table, ⌘K palette), `Insights.swift` (Stats with Swift Charts, Patterns), `SettingsView.swift` (⌘, window: same `settings` keys as the web), `Reminders.swift` (native notifications, timing from `ReminderTiming` in Engine = `engine/reminders.ts`; needs the .app bundle, so `swift run` sends none). The app keeps running with its window closed so reminders fire; Settings can register it as a login item
-- Views: `App.swift` (split view, sidebar = course tree, `Nav`), `HomeView`, `CourseView`, `TopicView` (lesson, quiz, explain), `ProblemView` (tabs | editor + console), `ReviewView`, `Markdown.swift` (block renderer + Python highlighter), `VizView.swift`, `CodeEditor.swift` (NSTextView)
+- `App/`: `App.swift` (scenes, `RootView` split view, `Nav`), `Header.swift` (breadcrumbs, header blur, the system search field; problem pages drop search; back/forward are plain toolbar buttons in their own glass group), `Sidebar.swift`, `MenuBar.swift` (`MenuBarExtra` status item: today's ring, minutes and day streak; a plain system menu: today, streak, the next step, due reviews, open/settings/quit; hidden via Settings › General), `SwipeBack.swift` (Safari-style two-finger swipe for back/forward over `Nav`'s history, run on page snapshots; `PageCamera` retakes the current page with ScreenCaptureKit shortly after it settles, since `cacheDisplay`/`layer.render` draw SwiftUI blank), `Theme.swift` (palette), `DevSnapshots.swift`
+- `Core/`: models, persistence and logic; no views
+  - `Engine.swift`: pure logic, 1:1 port of `web/server/engine` (dates, streak, xp, srs, hints, reminder timing). Change both or neither
+  - `Content.swift`: course/topic/quiz/viz loaders + the problem.md parser (keep in sync with `pyjudge.load_problem`). Problems cached by mtime
+  - `Store.swift`: `@Observable` app state; every read goes through `db`, which touches `tick`, and every write bumps it, so views re-render after changes. `Rewards`, `Chests`, `Boss`, `Insights`, `Catalog` (problem list, search items) are `Store` extensions
+  - `DB.swift` (SQLite + embedded schema, `Paths`), `Proc.swift` (`scripts/pyjudge.py` and `claude -p`; PATH gets `~/.local/bin` and Homebrew since GUI apps start with a bare PATH), `Activity.swift` (active time: learning screens only, app frontmost, input within 90 s or a playing viz; flushes every 60 s), `Reminders.swift` (local notifications; needs the .app bundle, so `swift run` sends none)
+- `Widget/RecurseWidget.swift`: WidgetKit extension (small: today's ring, minutes, day streak; medium adds the week), built by `build-app.sh` with `swiftc` (not SwiftPM) together with `Core/WidgetSnapshot.swift` and `App/Theme.swift`. The app writes `WidgetSnapshot` to the App Group `L63A6B5UJ9.dev.akdevv.recurse` (team-prefixed, so no provisioning profile; the team is the certificate's OU) after every write (`App/WidgetSync.swift`); the widget rolls the day over at midnight itself. The container is off-limits to other processes; DevSnapshots dumps what the widget reads to `widget.json`
+- `Features/`: one file per screen (`HomeView`, `CourseView`, `TopicView`, `ProblemView`, `ReviewView`, `ProblemsView`, `PatternsView`, `StatsView`, `RewardsView`, `ChestsView`, `BossView`, `SettingsView`) plus `ExplainFeedback` (key points + AI grading, shared by topic, problem and review)
+- `UI/`: shared building blocks. `Components.swift` (badges, rings, `.surface()`/`.card()`, `ProblemRow`, formatting helpers), `Controls.swift` (`Segments`, `GlassTabs`, `FilterField`, `TextArea`, `HoverButton`…), `Art.swift` (SVG illustrations, `Medal`), `Markdown.swift`, `CodeEditor.swift` (NSTextView), `VizView.swift`
+
+## UI rules
+
+Prefer Apple's built-ins over custom UI: system toolbar glass, `.searchable`, scroll edge effects, glass button styles. Custom views only where no built-in exists.
 
 ## Differences from the web
 

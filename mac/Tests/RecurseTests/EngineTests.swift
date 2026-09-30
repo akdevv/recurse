@@ -1,4 +1,3 @@
-// Mirrors web/server/engine/selfcheck.ts, so both apps agree on streaks, XP, reviews and unlocks.
 import Foundation
 import Testing
 import SwiftUI
@@ -306,4 +305,64 @@ private func days(_ start: String, _ n: Int, _ s: Int = Streak.dailyGoal) -> [St
     let w = store.topicWrapped(t)
     #expect(w.solved == t.problems.filter { $0.role != .optional }.count && w.hintFree == 1 && w.quizBest == 1 && w.masteredAt != nil)
     for r in [Route.today, .review, .course, .topic("x"), .problem("two-sum")] { #expect(Reminders.decode(Reminders.encode(r)) == r) }
+}
+
+/// Every trophy medal in each of its metals renders. `MEDALS_OUT=<dir>` also writes a preview sheet.
+@MainActor @Test func medalsRender() throws {
+    let trophies: [(String, String, Bool)] = [
+        ("First Accepted", "checkmark.seal.fill", true), ("Problem Solver", "chevron.left.forwardslash.chevron.right", false),
+        ("No Hints Needed", "lightbulb.fill", false), ("Stretch Goals", "mountain.2.fill", false), ("Speedrun", "bolt.fill", false),
+        ("Clear Explainer", "text.bubble.fill", false), ("Perfect Score", "star.fill", true), ("Quiz Ace", "target", false),
+        ("Spaced Out", "rectangle.stack.fill", false), ("Full Week", "calendar", false), ("Deep Work", "hourglass", false),
+        ("Comeback", "arrow.uturn.up", true), ("Topic Master", "book.fill", false), ("Boss Slayer", "figure.fencing", false),
+        ("Module Master", "laurel.leading", false),
+    ]
+    let sheet = LazyVGrid(columns: Array(repeating: GridItem(.fixed(400), spacing: 16), count: 3), spacing: 16) {
+        ForEach(trophies, id: \.0) { name, icon, single in
+            VStack(alignment: .leading, spacing: 10) {
+                Text(name).font(.headline).foregroundStyle(.white)
+                HStack(spacing: 12) {
+                    ForEach(Array((single ? [Medal.Metal.locked, .jade] : [.locked, .bronze, .silver, .gold]).enumerated()), id: \.offset) { _, m in
+                        Medal(icon: icon, metal: m, size: 80)
+                    }
+                }
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.surface, in: .rect(cornerRadius: 14))
+        }
+    }
+    .padding(24)
+    .background(Color.canvas)
+    .environment(\.colorScheme, .dark)
+    let r = ImageRenderer(content: sheet)
+    r.scale = 2
+    let img = try #require(r.nsImage)
+    if let out = ProcessInfo.processInfo.environment["MEDALS_OUT"], let tiff = img.tiffRepresentation,
+       let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) {
+        try png.write(to: URL(fileURLWithPath: out).appending(path: "trophies-preview.png"))
+    }
+}
+
+/// Back/forward retrace every move, like a browser; a new move drops the forward history.
+@MainActor @Test func navHistory() {
+    let nav = Nav()
+    #expect(!nav.canGoBack)
+    nav.go(.course)
+    nav.go(.topic("python-for-dsa"))
+    nav.go(.problem("fizz-buzz"))
+    #expect(nav.current == .problem("fizz-buzz"))
+    nav.back()
+    #expect(nav.current == .topic("python-for-dsa") && nav.path.isEmpty)
+    nav.back()
+    #expect(nav.current == .course)
+    nav.forward()
+    #expect(nav.current == .topic("python-for-dsa") && nav.canGoForward)
+    nav.go(.stats)
+    #expect(!nav.canGoForward)
+    nav.go(.stats) // same place: no new entry
+    nav.back()
+    #expect(nav.current == .topic("python-for-dsa"))
+    nav.back(); nav.back(); nav.back()
+    #expect(nav.current == .today && !nav.canGoBack)
 }
