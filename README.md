@@ -15,9 +15,7 @@
   <a href="https://github.com/akdevv/recurse/releases">Releases</a>
 </p>
 
-<!-- Screenshot: Today. Add docs/screenshots/today.png and uncomment.
-<p align="center"><img src="docs/screenshots/today.png" width="820" alt="Today" /></p>
--->
+<p align="center"><img src="docs/screenshots/today.jpg" alt="Today: daily goal, streaks and activity" /></p>
 
 ## What's inside
 
@@ -29,16 +27,18 @@
 - **Rewards you pick.** XP, trophies and mystery chests, plus real treats you choose that unlock as you finish modules.
 - **Feels at home on the Mac.** Liquid Glass, ⌘K search, a menu bar item, a widget and gentle reminders.
 
-<!-- Screenshots: add images to docs/screenshots/ and uncomment.
-<p align="center">
-  <img src="docs/screenshots/topic.png" width="400" alt="A topic lesson" />
-  <img src="docs/screenshots/problem.png" width="400" alt="Solving a problem" />
-</p>
-<p align="center">
-  <img src="docs/screenshots/stats.png" width="400" alt="Stats" />
-  <img src="docs/screenshots/rewards.png" width="400" alt="Rewards" />
-</p>
--->
+<table>
+  <tr>
+    <td><img src="docs/screenshots/course.jpg" alt="The course" /></td>
+    <td><img src="docs/screenshots/lesson.jpg" alt="A lesson with visualizations" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/problem.jpg" alt="Solving a problem" /></td>
+    <td><img src="docs/screenshots/stats.jpg" alt="Stats" /></td>
+  </tr>
+</table>
+
+<p align="center"><img src="docs/screenshots/rewards.jpg" width="640" alt="Rewards" /></p>
 
 ## Install
 
