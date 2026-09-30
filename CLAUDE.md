@@ -1,11 +1,8 @@
-# Recurse: personal DSA learning tool (single user: akdevv)
+# Recurse: DSA learning app for macOS
 
-One repo, two apps over the same curriculum:
-
-- `web/`: React + Hono web app (PWA). See `web/CLAUDE.md`; run npm commands from `web/`
-- `mac/`: native SwiftUI Mac app (core loop ported; see `mac/CLAUDE.md`)
-- `courses/dsa/`: curriculum, the source of truth for both apps. Content format is documented in `web/CLAUDE.md`
-- `scripts/`: python content tooling + `pyjudge.py` (judge core, spawned by both apps)
-- `data/`: gitignored runtime data (web app's `learn.db`, logs, VAPID keys). Never test on it
+- `mac/`: the native SwiftUI app. See `mac/CLAUDE.md`; run its commands from `mac/`
+- `courses/dsa/`: curriculum, the source of truth. Format in `courses/CLAUDE.md`
+- `scripts/`: python content tooling + `pyjudge.py` (judge core, spawned by the app)
+- The original web app is archived on the `web-archive` branch
 
 Never run prettier on `courses/`.

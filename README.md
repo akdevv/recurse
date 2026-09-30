@@ -1,82 +1,80 @@
 <p align="center">
-  <img src="public/icon-192.png" width="96" alt="Recurse icon" />
+  <img src="mac/AppIcon.png" width="112" alt="Recurse icon" />
 </p>
 
 <h1 align="center">Recurse</h1>
 
-<p align="center">A personal, local-first app for learning data structures and algorithms in Python, one focused half hour a day.</p>
+<p align="center">
+  Learn data structures and algorithms in Python, one focused half hour a day.<br />
+  A native Mac app. Local-first, no account.
+</p>
 
----
+<p align="center">
+  <a href="https://github.com/akdevv/recurse/releases/latest/download/Recurse.zip"><b>Download for macOS</b></a>
+  ·
+  <a href="https://github.com/akdevv/recurse/releases">Releases</a>
+</p>
+
+<!-- Screenshot: Today. Add docs/screenshots/today.png and uncomment.
+<p align="center"><img src="docs/screenshots/today.png" width="820" alt="Today" /></p>
+-->
 
 ## What's inside
 
-- **A full course:** 16 modules, 51 topics and 235 LeetCode problems, from Python basics through graphs and dynamic programming. Each topic has a short lesson, step-through visualizations and a quiz.
-- **A local judge:** solve problems in the browser. Your Python runs against generated tests, with timing limits that catch slow solutions.
-- **Learning that sticks:** a ladder of hints, spaced-repetition reviews, explain-back answers graded by Claude, and a Socratic tutor that asks questions instead of giving answers.
-- **Honest progress:** time counts only while you're actively learning on a lesson or problem. A 30-minute daily goal feeds a day streak and a weekly streak, the weekly one with earned freezes.
-- **Rewards for effort only:** XP and levels, boss fights at the end of each module, mystery chests, topic "Wrapped" cards, and real-world rewards unlocked by finishing modules.
-- **Installable PWA:** app shortcuts, push reminders that pick their timing around your day, and a clear offline page when the local server is down.
+- **A full course.** 16 modules, 51 topics and 235 problems, from Python basics to graphs and dynamic programming. Every topic has a short lesson, step-through visualizations and a quiz.
+- **A built-in judge.** Write Python in the app. Run checks the examples, Submit runs every generated test, with time limits that catch slow solutions.
+- **Help that makes you think first.** Hints unlock with time spent trying, then a Socratic tutor, then full solutions.
+- **Learning that sticks.** Spaced reviews bring problems back before you forget them. Every module ends with a boss fight: one timed problem, then explain your solution.
+- **Honest progress.** Only active time counts. A daily goal feeds your day and week streaks.
+- **Rewards you pick.** XP, trophies and mystery chests, plus real treats you choose that unlock as you finish modules.
+- **Feels at home on the Mac.** Liquid Glass, ⌘K search, a menu bar item, a widget and gentle reminders.
 
-## Stack
+<!-- Screenshots: add images to docs/screenshots/ and uncomment.
+<p align="center">
+  <img src="docs/screenshots/topic.png" width="400" alt="A topic lesson" />
+  <img src="docs/screenshots/problem.png" width="400" alt="Solving a problem" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/stats.png" width="400" alt="Stats" />
+  <img src="docs/screenshots/rewards.png" width="400" alt="Rewards" />
+</p>
+-->
 
-React 19, React Router and Tailwind v4 on the front end. Hono on Node 24 (running TypeScript directly) with SQLite (`node:sqlite`) on the back end. A Python judge, plus the `claude` CLI for AI grading and the tutor.
+## Install
 
-## Getting started
+1. [Download **Recurse.zip**](https://github.com/akdevv/recurse/releases/latest/download/Recurse.zip), unzip it and drag **Recurse.app** into Applications.
+2. Open it. macOS says it can't verify the developer, because the app isn't notarized. Open **System Settings › Privacy & Security**, scroll down and click **Open Anyway**. You only do this once.
+3. Running code needs `python3`. If macOS offers to install the Command Line Tools, accept.
 
-Requirements: Node 24+, Python 3 (the judge runs your code with it), and optionally the [`claude` CLI](https://claude.com/claude-code) for AI grading and the tutor.
+Requires macOS 26 or later. AI feedback on your explanations and the tutor use the [`claude` CLI](https://claude.com/claude-code), logged in. Everything else works without it.
+
+### Updates and your data
+
+Use **Recurse › Check for Updates…**, or download the new release and replace the app. Your progress is stored in `~/Library/Application Support/Recurse`, outside the app, so updating never touches it.
+
+To move to another Mac, use **Settings › Data › Export** and import that file on the new one.
+
+## Build from source
 
 ```sh
-npm install
-npm run dev        # API on :3001 + Vite on :5173
+cd mac
+swift run            # debug build
+./build-app.sh       # build/Recurse.app
+swift test
 ```
 
-Open http://localhost:5173.
-
-### Daily use
-
-For the installed PWA and reminders that arrive with the browser closed, run the built app all the time with the launchd agent. The plist has this machine's paths (project folder, Homebrew `node@24`, `~/.local/bin` for `claude`), so edit them first if yours differ.
-
-```sh
-npm run build
-cp launchd/dev.akdevv.rcx.plist ~/Library/LaunchAgents/
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/dev.akdevv.rcx.plist
-```
-
-It serves http://localhost:3000 and logs to `data/server.log`. Install the PWA from there and turn on reminders in Settings.
-
-```sh
-npm run build && launchctl kickstart -k gui/$(id -u)/dev.akdevv.rcx   # after changing app code
-launchctl bootout gui/$(id -u)/dev.akdevv.rcx                          # stop it
-```
-
-Only this production server sends reminders, so running `npm run dev` alongside it never doubles them (`REMINDERS=1` forces them on in dev).
-
-## Scripts
-
-| Command           | What it does                                            |
-| ----------------- | ------------------------------------------------------- |
-| `npm run dev`     | Dev servers with hot reload                             |
-| `npm run build`   | Production build into `dist/`                           |
-| `npm start`       | Serve the built app (`PORT=3000` to match the agent)    |
-| `npm run check`   | Type-check, lint, engine self-check, content validation |
-| `npm run content` | Rebuild visualization traces and tests, then validate   |
-| `npm run format`  | Prettier, except `courses/` (it would break problem.md) |
+See [`mac/CLAUDE.md`](mac/CLAUDE.md) for the architecture and [`courses/CLAUDE.md`](courses/CLAUDE.md) for the course content format.
 
 ## Project layout
 
 ```
-src/          React app (pages, components, activity tracker)
-server/       Hono API, SQLite, engine (streaks, XP, spaced review), judge, AI, reminders
-shared/       Types shared by client and server
+mac/          The SwiftUI app, widget and tests
 courses/dsa/  The course: modules → topics (lesson, quiz, viz) → problems
-scripts/      Content tooling: import problems and solutions, generate tests, build viz, validate
-public/       Service worker, manifest, icons, offline page
-launchd/      macOS agent that keeps the app running
+scripts/      Content tooling and pyjudge.py, the Python judge the app runs
 ```
 
-Problems live in `courses/dsa/problems/<id>-<slug>/`, as a `problem.md` (statement, starter, hints, solutions, test generator) and a generated `tests.json`. See [`CLAUDE.md`](CLAUDE.md) for the full content format and conventions.
+The original web version is archived on the [`web-archive`](https://github.com/akdevv/recurse/tree/web-archive) branch.
 
-## Notes
+## License
 
-- Everything runs locally, and progress is stored in `data/learn.db`, which git ignores.
-- Problem statements are copied from LeetCode for personal study, and some solutions and explanations come from [doocs/leetcode](https://github.com/doocs/leetcode) (CC BY-SA 4.0). Keep this repo private.
+The code is [MIT](LICENSE). Problem statements come from LeetCode, and some solutions and explanations come from [doocs/leetcode](https://github.com/doocs/leetcode) under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Those remain under their own terms.
