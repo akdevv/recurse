@@ -1,10 +1,12 @@
 <p align="center">
-  <img src="public/icon-192.png" width="96" alt="Recurse icon" />
+  <img src="web/public/icon-192.png" width="96" alt="Recurse icon" />
 </p>
 
 <h1 align="center">Recurse</h1>
 
 <p align="center">A personal, local-first app for learning data structures and algorithms in Python, one focused half hour a day.</p>
+
+> **Archived.** This branch keeps the original web app (PWA). Recurse is now a native Mac app on [`main`](https://github.com/akdevv/recurse). Run everything below from `web/`.
 
 ---
 
